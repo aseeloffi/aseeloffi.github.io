@@ -1,1 +1,180 @@
-hello world
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صبيحة ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        
+        .name {
+            position: relative;
+            color: #ff4081;
+            font-size: 72px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 64, 129, 0.7);
+            z-index: 10;
+            opacity: 0;
+            animation: fadeIn 2s forwards 3s;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="heartCanvas"></canvas>
+    <div class="name">صـبـيـحـة</div>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Heart drawing variables
+        let points = [];
+        let currentPoint = 0;
+        const totalPoints = 100;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const heartSize = Math.min(canvas.width, canvas.height) * 0.4;
+        
+        // Create heart points
+        for (let i = 0; i <= totalPoints; i++) {
+            const t = i / totalPoints * Math.PI * 2;
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+            
+            points.push({
+                x: centerX + x * heartSize / 16,
+                y: centerY + y * heartSize / 16
+            });
+        }
+        
+        // Animation variables
+        let animationStart = null;
+        const animationDuration = 3000; // 3 seconds
+        
+        // Draw heart line by line
+        function drawHeart(timestamp) {
+            if (!animationStart) animationStart = timestamp;
+            const progress = Math.min((timestamp - animationStart) / animationDuration, 1);
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#ff4081';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff4081';
+            ctx.beginPath();
+            
+            // Draw completed segments
+            const segmentsToDraw = Math.floor(progress * points.length);
+            
+            for (let i = 0; i < segmentsToDraw; i++) {
+                if (i === 0) {
+                    ctx.moveTo(points[i].x, points[i].y);
+                } else {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+            }
+            
+            ctx.stroke();
+            
+            // Draw glowing dot at current position
+            if (segmentsToDraw < points.length) {
+                const currentPos = points[segmentsToDraw];
+                ctx.beginPath();
+                ctx.arc(currentPos.x, currentPos.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#ff4081';
+                ctx.shadowBlur = 20;
+                ctx.fill();
+            }
+            
+            if (progress < 1) {
+                requestAnimationFrame(drawHeart);
+            } else {
+                // After drawing complete, make heart beat
+                setTimeout(() => {
+                    animateHeartBeat();
+                }, 500);
+            }
+        }
+        
+        // Heart beat animation
+        function animateHeartBeat() {
+            let scale = 1;
+            let growing = true;
+            
+            function beat() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                
+                if (growing) {
+                    scale += 0.01;
+                    if (scale >= 1.1) growing = false;
+                } else {
+                    scale -= 0.01;
+                    if (scale <= 1) growing = true;
+                }
+                
+                ctx.translate(centerX, centerY);
+                ctx.scale(scale, scale);
+                ctx.translate(-centerX, -centerY);
+                
+                ctx.strokeStyle = '#ff4081';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#ff4081';
+                ctx.beginPath();
+                
+                for (let i = 0; i < points.length; i++) {
+                    if (i === 0) {
+                        ctx.moveTo(points[i].x, points[i].y);
+                    } else {
+                        ctx.lineTo(points[i].x, points[i].y);
+                    }
+                }
+                
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+                
+                requestAnimationFrame(beat);
+            }
+            
+            beat();
+        }
+        
+        // Start the animation
+        requestAnimationFrame(drawHeart);
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            centerX = canvas.width / 2;
+            centerY = canvas.height / 2;
+        });
+    </script>
+</body>
+</html>
