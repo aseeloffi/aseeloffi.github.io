@@ -1,1 +1,426 @@
-hello world
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hmm</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <script type='text/javascript'
+        src='https://platform-api.sharethis.com/js/sharethis.js#property=67c58f3df80bb90012167e31&product=sop'
+        async='async'></script>
+
+    <style>
+        .swal2-popup {
+            background-color: #1e1e1e !important;
+            color: #e0e0e0 !important;
+            border-radius: 10px !important;
+            font-size: 14px !important;
+            width: 300px !important;
+        }
+
+        .swal2-title {
+            font-size: 18px !important;
+            color: #ffffff !important;
+        }
+
+        .swal2-content {
+            font-size: 14px !important;
+            color: #e0e0e0 !important;
+        }
+
+        .swal2-confirm {
+            background-color: #333 !important;
+            color: #ffffff !important;
+            font-size: 14px !important;
+            border: none !important;
+            border-radius: 5px !important;
+            padding: 8px 20px !important;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #444 !important;
+        }
+
+        body {
+            display:block;
+            /* display: flex; */
+            /* flex-direction: column; */
+            /* min-height: 100vh; */
+            margin-top: 60px;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+
+            /* flex: 1; */
+            text-align: center;
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            font-size: 14px;
+            border-top: 1px solid #333;
+            width: 100%;
+        }
+
+        .profile {
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            border: 3px solid #333;
+            object-fit: cover;
+        }
+
+        .name {
+            margin-top: 15px;
+            font-size: 26px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .quotes-section {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            padding: 20px;
+            background-color: #2d2d2d;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .quote {
+            font-size: 18px;
+            font-style: normal;
+            color: #e0e0e0;
+        }
+
+        .author {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .new-quote-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .new-quote-btn:hover {
+            background-color: #444;
+        }
+
+        .message-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .message-input {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background-color: #2d2d2d;
+            color: #ffffff;
+            font-size: 16px;
+            resize: none;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #555;
+            outline: none;
+        }
+
+        .send-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background-color: #333;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .send-button:hover {
+            background-color: #444;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            font-size: 14px;
+            border-top: 1px solid #333;
+            max-width: 400px;
+            width: 50%;
+            margin: 20px auto;
+            border-radius: 10px;
+        }
+
+        footer a {
+            color: #64B5F6;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #42A5F5;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                width: 90%;
+                margin: 40px auto 0px;
+                box-sizing: border-box;
+            }
+
+            .avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .name {
+                font-size: 20px;
+            }
+
+            .quote {
+                font-size: 15px;
+                font-style: normal;
+                color: #e0e0e0;
+            }
+
+            .author {
+                margin-top: 10px;
+                font-size: 14px;
+                color: #888;
+            }
+
+            .message-input {
+                height: 100px;
+                width: 95%;
+                font-size: 14px;
+            }
+
+            .send-button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            footer {
+                width: 90%;
+                margin: 60px auto 10px;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="profile">
+            <img src="avatar.jpg" alt="PIC" class="avatar">
+            <h1 class="name">Aseel</h1>
+        </div>
+        <div class="quotes-section">
+            <div class="quote" id="quote-text">Hmmm</div>
+            <!-- <div class="author" id="quote-author">Hmmm</div> -->
+           
+
+        </div>
+ <!-- ShareThis BEGIN -->
+            <div class="sharethis-inline-follow-buttons"></div><!-- ShareThis END -->
+
+
+    </div>
+
+    <div class="container">
+
+
+        <form onsubmit="sendEmail(event)" class="message-box">
+            <textarea name="message" placeholder="Don't Be Shy.." class="message-input"></textarea>
+            <button type="submit" class="send-button">Send</button>
+        </form>
+
+    </div>
+    <footer>Developed by <a href="https://instagram.com/h55q" target="_blank" rel="noopener noreferrer">Aseel</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <script>
+        (function () {
+            emailjs.init("zoJuwTAEEa8rYCfEU");
+        })();
+
+        function getPhoneModel(userAgent) {
+            const models = {
+                iPhone: "Apple iPhone",
+                iPad: "Apple iPad",
+                Samsung: "Samsung Device",
+                Huawei: "Huawei Device",
+                Xiaomi: "Xiaomi Device",
+                OnePlus: "OnePlus Device",
+                Pixel: "Google Pixel",
+                Oppo: "Oppo Device",
+                Vivo: "Vivo Device",
+                Sony: "Sony Xperia",
+                LG: "LG Device",
+                Nokia: "Nokia Device"
+            };
+            for (const [key, value] of Object.entries(models)) {
+                if (new RegExp(key, "i").test(userAgent)) return value;
+            }
+            return "Unknown Device";
+        }
+
+        // دالة لجمع معلومات الجهاز
+        async function getDeviceInfo() {
+            const userAgent = navigator.userAgent;
+            const platform = navigator.platform;
+            const language = navigator.language;
+            const screenWidth = window.screen.width;
+            const screenHeight = window.screen.height;
+            const onlineStatus = navigator.onLine ? "Online" : "Offline";
+            const deviceType = /Mobi|Android|iPhone|iPad/i.test(userAgent) ? "Mobile" : "Desktop";
+            const phoneModel = getPhoneModel(userAgent);
+
+            let batteryStatus = "Unknown";
+            if (navigator.getBattery) {
+                try {
+                    const battery = await navigator.getBattery();
+                    batteryStatus = battery.level * 100 + "%";
+                } catch (error) {
+                    console.warn("Battery status not available");
+                }
+            }
+
+            try {
+                const response = await fetch("https://ipapi.co/json/");
+                const data = await response.json();
+                return {
+                    userAgent,
+                    platform,
+                    language,
+                    screenResolution: `${screenWidth}x${screenHeight}`,
+                    onlineStatus,
+                    deviceType,
+                    phoneModel,
+                    batteryStatus,
+                    ip: data.ip,
+                    city: data.city,
+                    region: data.region,
+                    country: data.country_name,
+                    isp: data.org
+                };
+            } catch (error) {
+                console.warn("Failed to get IP/location data");
+                return {
+                    userAgent,
+                    platform,
+                    language,
+                    screenResolution: `${screenWidth}x${screenHeight}`,
+                    onlineStatus,
+                    deviceType,
+                    phoneModel,
+                    batteryStatus,
+                    ip: "Unknown",
+                    city: "Unknown",
+                    region: "Unknown",
+                    country: "Unknown",
+                    isp: "Unknown"
+                };
+            }
+        }
+
+        async function sendEmail(event) {
+            event.preventDefault();
+
+            const message = document.querySelector(".message-input").value;
+            if (message.trim().length < 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Typing something!',
+                    confirmButtonText: 'Yes sir'
+                });
+                return;
+            }
+
+            const sendButton = document.querySelector(".send-button");
+            sendButton.disabled = true;
+            sendButton.textContent = "Sending...";
+
+            Swal.fire({
+                title: 'Sending...',
+                text: 'Hmmm',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const deviceInfo = await getDeviceInfo();
+
+                await emailjs.send("service_yy7troc", "template_vpmzcrc", {
+                    message: message,
+                    deviceInfo: JSON.stringify(deviceInfo, null, 2),
+                });
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Message Sent!',
+                    text: 'Hmmm',
+                    confirmButtonText: 'Yes sir'
+                });
+
+                document.querySelector(".message-input").value = "";
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Send',
+                    text: 'Try again.',
+                    confirmButtonText: 'Yes sir'
+                });
+            }
+
+            sendButton.textContent = "Send";
+            sendButton.disabled = false;
+        }
+    </script>
+</body>
+
+</html>
