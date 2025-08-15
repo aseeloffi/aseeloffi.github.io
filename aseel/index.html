@@ -203,6 +203,7 @@
             position: relative;
             overflow: hidden;
             border: 1px solid var(--border-color);
+            text-decoration: none;
         }
 
         .social-link::before {
@@ -658,11 +659,7 @@
             </div>
         </div>
 
-        <!-- Share Section -->
-        <div class="content-section share-section">
-            <div class="share-title">Share my profile</div>
-            <div class="sharethis-inline-follow-buttons"></div>
-        </div>
+
 
         <!-- Contact Form -->
         <div class="content-section">
@@ -670,7 +667,7 @@
             <form onsubmit="sendEmail(event)" class="message-form">
                 <div class="form-group">
                     <label for="message" class="form-label">Your Message</label>
-                    <textarea id="message" name="message" placeholder="Don't be shy... I'd love to hear from you!" 
+                    <textarea id="message" name="message" placeholder="Don't be shy . ." 
                         class="message-input" required></textarea>
                 </div>
                 <button type="submit" class="send-button">
@@ -685,7 +682,7 @@
         <div class="footer-content">
 
             <p> Developed by <a href="https://instagram.com/h55q" target="_blank" rel="noopener noreferrer">Aseel</a>
-            © <span id="current-year"></span></p>
+           </p>
             
         </div>
     </footer>
@@ -701,8 +698,6 @@
             emailjs.init("zoJuwTAEEa8rYCfEU");
         })();
 
-        // Set current year in footer
-        document.getElementById('current-year').textContent = new Date().getFullYear();
 
         // Initialize particles.js
         document.addEventListener('DOMContentLoaded', function() {
