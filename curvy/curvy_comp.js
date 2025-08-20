@@ -1,0 +1,74 @@
+var requestAnimFrame = function () { return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (f, e) { window.setTimeout(f, 1E3 / 30) } }();
+function Curvy(f, e, b, g, k) {
+    var t = this, d = {}, m, q = 0, l = {}; e.lineColor = e.lineColor; e.background = e.background; e.tileBackground = e.tileBackground; e.edge = e.edge; e.bevel = e.bevel; var u = 0, w = 0, D = 0, v, n = !1, p = {
+        rotationAxisSet: !1, onDown: function (e) {
+            var a; a: {
+                a = e.layerX; e = e.layerY; a -= d.xshift; e -= d.yshift; var c = 2 * a / (3 * d.radius), h = c | 0, b = c - 1 / 3 | 0, c = e + d.height / (3 * d.radius) * a, c = c - d.height / 6, c = c / d.height, g = c | 0, c = c - 1 / 3 | 0; if (!(0 > c || 0 > b || b >= l.tiles.length || c >= l.tiles[b].length)) {
+                    if (c == g && b == h) { a = [b, c]; break a } for (; b <= h; b++)for (var r =
+                        c; r <= g; r++)if (Math.sqrt(Math.pow(a - Curvy.tileCenterX(b, r, d), 2) + Math.pow(e - Curvy.tileCenterY(b, r, d), 2)) < d.height / 2 && b < l.tiles.length && r < l.tiles[b].length && 0 <= b && 0 <= r) { a = [b, r]; break a }
+                } a = void 0
+            } a && (l.tiles[a[0]] && l.tiles[a[0]][a[1]]) && (m = a, v = [Curvy.tileCenterX(a[0], a[1], d) + d.xshift, Curvy.tileCenterY(a[0], a[1], d) + d.yshift], A($(f)[0], d))
+        }, onMove: function (e) {
+            if (v) {
+                var a = v[0] - e.layerX; e = v[1] - e.layerY; p.rotationAxisSet ? q = -1 * Math.atan2(a, e) + p.rotationAxis : Math.abs(a) < d.radius / 2.5 && Math.abs(e) < d.radius / 2.5 ?
+                    q = 0 : (p.rotationAxis = Math.atan2(a, e), p.rotationAxisSet = !0)
+            }
+        }, onUp: function (e) { p.rotationAxisSet = !1; v = void 0; Curvy.rotateTile(l.tiles[m[0]][m[1]], Math.round(6 * q / (2 * Math.PI)) % 6) }
+    }; this.complete = function (e) { this.completeCallback = e }; this.newpuzzle = this.newpuzzle = function (e, a, c) { B = !1; l = {}; l = Curvy.randomPuzzle(e, a, c); this.do_size() }; this.prepicon = this.prepicon = function () {
+        l.tiles[0][0].connection = [0, 1, 2, 1, 2, 2]; Curvy.calculateDimensions(0.45 * u, d); d.xshift = u - d.xStep * (3 * l.tiles.length + 1); d.xshift /= 2; d.xshift =
+            Math.floor(d.xshift); d.yshift = w - d.yStep * 2 * l.tiles[0].length - d.bevelDrop; d.yshift /= 2; d.yshift = Math.floor(d.yshift); m = [0, 0]; q = 15 * Math.PI / 180; $(f).unbind("mouseup", this.canvasclick).unbind("mousemove", this.canvasclick).unbind("mousedown", this.canvasclick); A($(f)[0], d)
+    }; var B = !1, C = !1; this.animMouseMove = function () { m && (p.onMove({ layerX: window.mouseX, layerY: window.mouseY }), A($(f)[0], d), C && requestAnimFrame(t.animMouseMove)) }; this.mousetrack = function (e) { window.mouseX = e.layerX; window.mouseY = e.layerY }; this.canvasclick =
+        function (b) {
+            if (B) return !1; b.layerX || (b.layerX = b.clientX, b.layerY = b.clientY); if ("mousemove" != b.type) if ("mousedown" == b.type) C = !0, D = (new Date).getTime(), p.onDown(b), requestAnimFrame(t.animMouseMove); else if ("mouseup" == b.type) {
+                C = !1; if (!m) return; if (200 > (new Date).getTime() - D) Curvy.rotateTile(l.tiles[m[0]][m[1]], 1), p.rotationAxisSet = !1; else p.onUp(b); var a = l.tiles[m[0]][m[1]]; q = 0; m = void 0; if (!n) {
+                    n = !0; b = [a.neighbor[Curvy.NORTHWEST], a.neighbor[Curvy.NORTH], a.neighbor[Curvy.NORTHEAST], a, a.neighbor[Curvy.SOUTHWEST],
+                    a.neighbor[Curvy.SOUTH], a.neighbor[Curvy.SOUTHEAST]]; var c = f.getContext("2d"); c.fillStyle = e.background; var h = Curvy.tileCenterX(a.i, a.j, d), a = Curvy.tileCenterY(a.i, a.j, d); c.save(); c.translate(d.xshift, d.yshift); c.save(); Curvy.clipRect(c, h - 1.5 * d.radius, a - 1.5 * d.radius, h + 1.5 * d.radius, a + 1.5 * d.radius); c.fillRect(h - 1.5 * d.radius, a - 1.5 * d.radius, 3 * d.radius, 3 * d.radius); for (h = 0; 7 > h; h++)b[h] && (c.save(), c.translate(d.radius + 3 * d.xStep * b[h].i + 0.5, d.yStep * (2 * b[h].j + 1 - b[h].i) + 0.5), x(b[h], c, 0, d), c.restore()); c.restore();
+                    for (h = 0; h < b.length; h++)if (b[h]) { var a = b[h], g = d, s = void 0, s = f.getContext("2d"); s.save(); s.translate(g.radius + 3 * g.xStep * a.i + 0.5, g.yStep * (2 * a.j + 1 - a.i) + 0.5); y(a, s, g); z(a, s, g); s.restore() } c.restore(); n = !1
+                } Curvy.complete(l) && (B = !0, t.completeCallback())
+            } return !1
+        }; this.do_size = this.do_size = function () {
+            var b = $(f), a = b.width(), b = b.height(); u = a; w = b; a = 2 * a / (3 * l.tiles.length + 3); b = b / (2 * l.tiles[0].length + 1 + Math.sin(Math.PI / 3)) / Math.sin(2 * Math.PI / 6); a = Math.min(a, b); Curvy.calculateDimensions(a, d); d.xshift = u - d.xStep * (3 *
+                l.tiles.length + 1); d.xshift /= 2; d.yshift = w - d.yStep * (2 * l.tiles[0].length + 1) - d.bevelDrop; d.yshift /= 2; a = l; if (!n) {
+                    n = !0; b = f.getContext("2d"); b.fillStyle = e.background; b.fillRect(0, 0, u + 1, w + 1); for (var c = 0; c < a.tiles.length; c++)for (var h = 0; h < a.tiles[c].length; h++)b.save(), b.translate(d.xshift, d.yshift), a.tiles[c][h] && (b.translate(d.radius + 3 * d.xStep * c + 0.5, d.yStep * (2 * h + 1 - c) + 0.5), x(a.tiles[c][h], b, 0, d)), b.restore(); for (c = 0; c < a.tiles.length; c++)for (h = 0; h < a.tiles[c].length; h++)b.save(), b.translate(d.xshift, d.yshift),
+                        a.tiles[c][h] && (b.translate(d.radius + 3 * d.xStep * c + 0.5, d.yStep * (2 * h + 1 - c) + 0.5), y(a.tiles[c][h], b, d), z(a.tiles[c][h], b, d)), b.restore(); n = !1
+                }
+        }; var A = function (e, a) {
+            if (!n) {
+                n = !0; var c = l.tiles[m[0]][m[1]], h = e.getContext("2d"), b = Curvy.tileCenterX(c.i, c.j, a), d = Curvy.tileCenterY(c.i, c.j, a); if (!isNaN(q)) {
+                    h.save(); h.translate(a.xshift, a.yshift); h.beginPath(); h.save(); Curvy.clipRect(h, b - 1.5 * a.radius, d - 1.5 * a.radius, b + 1.5 * a.radius, d + 1.5 * a.radius); h.fillRect(b - a.radius, d - a.radius - a.bevelDrop, 2 * a.radius, 2 * a.radius +
+                        a.bevelDrop); for (b = 0; 6 > b; b++)if (c.neighbor[b]) { h.save(); var d = c.neighbor[b].i, f = c.neighbor[b].j; h.translate(a.radius + 3 * a.xStep * d + 0.5, a.yStep * (2 * f + 1 - d) + 0.5); x(c.neighbor[b], h, 0, a); h.restore() } h.restore(); for (b = 0; 6 > b; b++)c.neighbor[b] && (h.save(), d = c.neighbor[b].i, f = c.neighbor[b].j, h.translate(a.radius + 3 * a.xStep * d + 0.5, a.yStep * (2 * f + 1 - d) + 0.5), y(c.neighbor[b], h, a), z(c.neighbor[b], h, a), h.restore()); d = c.i; f = c.j; h.save(); h.translate(a.radius + 3 * a.xStep * d + 0.5, a.yStep * (2 * f + 1 - d) + 0.5); h.translate(0, -1 * a.bevelDrop);
+                    x(c, h, q, a); h.rotate(q); y(c, h, a); z(c, h, a); h.restore(); h.restore(); n = !1
+                }
+            }
+        }, x = function (b, a, c, d) { c || (c = 0); a.save(); a.translate(0, d.bevelDrop); a.rotate(c); a.beginPath(); a.moveTo(d.vertex[0].x, d.vertex[0].y); a.lineTo(d.vertex[1].x, d.vertex[1].y); a.lineTo(d.vertex[2].x, d.vertex[2].y); a.lineTo(d.vertex[3].x, d.vertex[3].y); a.lineTo(d.vertex[4].x, d.vertex[4].y); a.lineTo(d.vertex[5].x, d.vertex[5].y); a.lineTo(d.vertex[0].x, d.vertex[0].y); a.fillStyle = e.bevel; a.fill(); a.strokeStyle = e.edge; a.stroke(); a.restore() },
+            y = function (d, a, c) {
+                a.beginPath(); a.moveTo(c.vertex[0].x, c.vertex[0].y); a.lineTo(c.vertex[1].x, c.vertex[1].y); a.lineTo(c.vertex[2].x, c.vertex[2].y); a.lineTo(c.vertex[3].x, c.vertex[3].y); a.lineTo(c.vertex[4].x, c.vertex[4].y); a.lineTo(c.vertex[5].x, c.vertex[5].y); a.lineTo(c.vertex[0].x, c.vertex[0].y); a.fillStyle = e.tileBackground; a.fill(); var b = !0, f = 0, g = [-1, -1, -1, -1, -1, -1]; a.lineWidth = c.lineWidth; for (var k = 0; 6 > k; k++)if (b = !0, 0 != d.connection[k]) {
+                    for (var l = 1; 4 > l; l++) {
+                        if (d.connection[(k + l) % 6] == d.connection[k]) {
+                            g[k] =
+                            (k + l) % 6; b = !1; break
+                        } if (d.connection[(6 + k - l) % 6] == d.connection[k]) { g[k] = (6 + k - l) % 6; b = !1; break }
+                    } b && (g[k] = k)
+                } a.save(); a.rotate(Curvy.radians(60 * d.orientation)); a.rotate(Curvy.radians(120)); for (k = 0; 6 > k; k++) {
+                    b = (k + d.orientation) % 6; if (0 != d.connection[b]) if (a.strokeStyle = e.lineColor[d.connection[b]], g[b] == b) {
+                        var l = c.midpoint[4].x * (4 - f) / 6, m = c.midpoint[4].y * (4 - 1.5 * f) / 6; a.beginPath(); a.moveTo(c.midpoint[4].x, c.midpoint[4].y); a.lineTo(l, m); l = Math.sqrt(Math.pow(l, 2) + Math.pow(m, 2)); a.moveTo(l, 0); a.arc(0, 0, l, 0, 1.5 *
+                            Math.PI, !1); a.stroke(); a.beginPath(); a.strokeStyle = e.lineColor[d.connection[b]]; a.arc(0, 0, l, Math.PI, 3 * Math.PI, !1); a.stroke(); a.beginPath(); f++
+                    } else {
+                        if (g[(b + 1) % 6] == b || g[b] == (b + 1) % 6) a.save(), a.rotate(Curvy.radians(-60)), Curvy.clipRect(a, c.vertex[0].x, c.vertex[0].y, c.vertex[3].x + 2, c.vertex[4].y), a.beginPath(), a.moveTo(c.midpoint[5].x, c.midpoint[5].y), a.quadraticCurveTo(0, 0, c.midpoint[0].x, c.midpoint[0].y), a.stroke(), a.restore(); if (g[(b + 2) % 6] == b || g[b] == (b + 2) % 6) a.save(), a.rotate(Curvy.radians(60)), Curvy.clipRect(a,
+                            c.midpoint[1].x - c.radius / 4, c.midpoint[1].y, c.vertex[3].x, c.midpoint[4].y), a.beginPath(), a.moveTo(c.midpoint[3].x, c.midpoint[3].y), a.quadraticCurveTo(0, 0, c.midpoint[5].x, c.midpoint[5].y), a.stroke(), a.restore(); if (g[(b + 3) % 6] == b || g[b] == (b + 3) % 6) a.save(), Curvy.clipRect(a, c.vertex[0].x, c.vertex[0].y - c.radius / 8, c.vertex[4].x, c.vertex[4].y), a.beginPath(), a.moveTo(c.midpoint[4].x, c.midpoint[4].y), a.quadraticCurveTo(0, 0, c.midpoint[1].x, c.midpoint[1].y), a.stroke(), a.restore(); if (g[(b + 4) % 6] == b || g[b] == (b + 4) % 6) a.save(),
+                                a.rotate(Curvy.radians(-60)), Curvy.clipRect(a, c.vertex[0].x, c.midpoint[1].y, c.midpoint[1].x + c.radius / 4, c.midpoint[4].y), a.beginPath(), a.moveTo(c.midpoint[5].x, c.midpoint[5].y), a.quadraticCurveTo(0, 0, c.midpoint[3].x, c.midpoint[3].y), a.stroke(), a.restore(); if (g[(b + 5) % 6] == b || g[b] == (b + 5) % 6) a.save(), a.rotate(Curvy.radians(60)), Curvy.clipRect(a, c.vertex[0].x, c.vertex[0].y - 1, c.vertex[3].x, c.midpoint[4].y), a.beginPath(), a.moveTo(c.midpoint[3].x, c.midpoint[3].y), a.quadraticCurveTo(0, 0, c.midpoint[2].x, c.midpoint[2].y),
+                                    a.stroke(), a.restore()
+                    } a.rotate(Curvy.radians(60))
+                } a.restore()
+            }, z = function (b, a, c) { a.beginPath(); a.moveTo(c.vertex[0].x, c.vertex[0].y); a.lineTo(c.vertex[1].x, c.vertex[1].y); a.lineTo(c.vertex[2].x, c.vertex[2].y); a.lineTo(c.vertex[3].x, c.vertex[3].y); a.lineTo(c.vertex[4].x, c.vertex[4].y); a.lineTo(c.vertex[5].x, c.vertex[5].y); a.lineTo(c.vertex[0].x, c.vertex[0].y); a.strokeStyle = e.edge; a.lineWidth = 2; a.stroke() }, l = Curvy.randomPuzzle(b, g, k); $(f).mouseup(this.canvasclick).mousedown(this.canvasclick); $(f).mousemove(this.mousetrack);
+    this.do_size()
+} Curvy.prototype.redo_size = function () { this.do_size() }; Curvy.redo_size = Curvy.prototype.redo_size; Curvy.NORTHWEST = 0; Curvy.NORTH = 1; Curvy.NORTHEAST = 2; Curvy.SOUTHEAST = 3; Curvy.SOUTH = 4; Curvy.SOUTHWEST = 5;
+Curvy.calculateDimensions = function (f, e) { e.radius = f; e.lineWidth = 0.15 * f; e.yStep = e.radius * Math.sin(2 * Math.PI / 6); e.xStep = e.radius / 2; e.width = 2 * e.radius; e.height = 2 * e.yStep; e.vertex = { "0": { x: -1 * e.radius, y: 0 }, 1: { x: -1 * e.xStep, y: -1 * e.yStep }, 2: { x: e.xStep, y: -1 * e.yStep }, 3: { x: e.radius, y: 0 }, 4: { x: e.xStep, y: e.yStep }, 5: { x: -1 * e.xStep, y: e.yStep } }; e.midpoint = {}; for (var b = 0; 6 > b; b++)e.midpoint[b] = { x: (e.vertex[b].x + e.vertex[(b + 1) % 6].x) / 2, y: (e.vertex[b].y + e.vertex[(b + 1) % 6].y) / 2 }; e.bevelDrop = Math.min(5, 0.1 * e.height) };
+Curvy.distributions = { "0": [0, 1], 1: [0, 0, 1, 1, 2, 2], 2: [0, 1, 1, 1, 2, 2, 2, 2] };
+Curvy.randomPuzzle = function (f, e, b) {
+    var g = []; b = Curvy.distributions[b]; for (var k = 0; k < f; k++) { g[k] = []; for (var t = Math.floor((k + 1) / 2) + e, d = Math.floor((k + 1) / 2); d < t; d++)g[k][d] = {}, g[k][d].connection = [0, 0, 0, 0, 0, 0], g[k][d].neighbor = [], g[k][d].orientation = 0, g[k][d].i = k, g[k][d].j = d } Curvy.connectTiles(g); for (k = 0; k < g.length; k++)for (f = 0; f < g[k].length; f++)if (g[k][f]) for (d = 3; 6 > d; d++)g[k][f].neighbor[d] && (e = Math.floor(Math.random() * b.length), g[k][f].connection[d] = b[e], g[k][f].neighbor[d].connection[(d + 3) % 6] = b[e]); for (k =
+        0; k < g.length; k++)for (d = 0; d < g[k].length; d++)g[k][d] && Curvy.rotateTile(g[k][d], Math.floor(6 * Math.random()) % 6); return { tiles: g }
+};
+Curvy.connectTiles = function (f) { for (var e = 0; e < f.length; e++)for (var b = 0; b < f[e].length; b++) { var g = f[e][b]; g && (0 != b && f[e][b - 1] && (g.neighbor[Curvy.NORTH] = f[e][b - 1], g.neighbor[Curvy.NORTH].neighbor[Curvy.SOUTH] = g), 0 != e && (f[e - 1].length > b && f[e - 1][b]) && (g.neighbor[Curvy.SOUTHWEST] = f[e - 1][b], g.neighbor[Curvy.SOUTHWEST].neighbor[Curvy.NORTHEAST] = g), 0 != e && (0 != b && f[e - 1].length > b - 1 && f[e - 1][b - 1]) && (g.neighbor[Curvy.NORTHWEST] = f[e - 1][b - 1], g.neighbor[Curvy.NORTHWEST].neighbor[Curvy.SOUTHEAST] = g)) } };
+Curvy.isSatisfied = function (f) { if (!f) return !0; for (var e = 0; 6 > e; e++)if (f.neighbor[e]) { if (f.connection[e] != f.neighbor[e].connection[(e + 3) % 6]) return !1 } else if (0 < f.connection[e]) return !1; return !0 }; Curvy.complete = function (f) { for (var e = 0; e < f.tiles.length; e++)for (var b = 0; b < f.tiles[e].length; b++)if (!Curvy.isSatisfied(f.tiles[e][b])) return !1; return !0 };
+Curvy.rotateTile = function (f, e) { for (var b = [], g = 0; 6 > g; g++)b[g] = f.connection[g]; e = 6 - e % 6; e %= 6; for (g = 0; 6 > g; g++)f.connection[g] = b[(g + e) % 6]; f.orientation -= e; f.orientation += 6; f.orientation %= 6 }; Curvy.radians = function (f) { return f / 180 * Math.PI }; Curvy.clipRect = function (f, e, b, g, k) { f.beginPath(); f.rect(e, b, g - e, k - b); f.clip() }; Curvy.tileCenterX = function (f, e, b) { return b.radius + f * (3 * b.radius / 2) }; Curvy.tileCenterY = function (f, e, b) { return b.height / 2 + e * b.height - b.height / 2 * f }; window.Curvy = Curvy;
