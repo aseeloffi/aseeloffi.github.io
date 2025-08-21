@@ -275,56 +275,74 @@
             border-radius: 3px;
         }
 
-        /* Quotes Section */
-        .quotes-section {
-            margin: 25px 0;
-            padding: 30px;
-            background-color: #2d2d2d;
-            border-radius: 12px;
-            text-align: center;
-            border-left: 5px solid var(--primary-color);
+        /* Ticker Container */
+        .ticker-container {
             position: relative;
+            width: 100%;
             overflow: hidden;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            border-radius: 12px;
+            padding: 20px 0;
+            margin: 25px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-
-        .quotes-section::before {
-            content: """;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 60px;
-            color: rgba(106, 90, 205, 0.1);
-            font-family: serif;
-            line-height: 1;
+        
+        .ticker-track {
+            display: flex;
+            width: max-content;
+            animation: ticker-scroll 15s linear infinite;
         }
-
-        .quotes-section::after {
-            content: """;
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            font-size: 60px;
-            color: rgba(106, 90, 205, 0.1);
-            font-family: serif;
-            line-height: 1;
-            transform: rotate(180deg);
-        }
-
-        .quote {
-            font-size: 20px;
-            font-style: italic;
-            color: var(--text-color);
-            line-height: 1.6;
-            margin-bottom: 15px;
+        
+        .ticker-item {
+            display: flex;
+            white-space: nowrap;
+            padding: 0 40px;
             position: relative;
-            z-index: 1;
         }
-
-        .author {
-            margin-top: 15px;
-            font-size: 16px;
-            color: var(--primary-light);
-            font-weight: 500;
+        
+        .ticker-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 70%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .ticker-text {
+            font-size: 18px;
+            color: var(--text-color);
+        }
+        
+        /* Create seamless infinite loop */
+        @keyframes ticker-scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-33.33%);
+            }
+        }
+        
+        /* Pause on hover */
+        .ticker-container:hover .ticker-track {
+            animation-play-state: paused;
+        }
+        
+        .info-box {
+            background-color: rgba(106, 90, 205, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .info-box p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* Message Form */
@@ -517,8 +535,12 @@
                 padding: 25px 20px;
             }
 
-            .quote {
-                font-size: 18px;
+            .ticker-text {
+                font-size: 16px;
+            }
+            
+            .ticker-item {
+                padding: 0 20px;
             }
         }
 
@@ -567,16 +589,16 @@
                 font-size: 20px;
             }
 
-            .quotes-section {
-                padding: 20px 15px;
+            .ticker-container {
+                padding: 15px 0;
             }
-
-            .quote {
-                font-size: 16px;
-            }
-
-            .author {
+            
+            .ticker-text {
                 font-size: 14px;
+            }
+            
+            .ticker-item {
+                padding: 0 15px;
             }
 
             .message-input {
@@ -653,16 +675,27 @@
             </div>
         </div>
 
-        <!-- Quotes Section -->
+        <!-- Ticker Section (Replaced Quotes Section) -->
         <div class="content-section">
             <h2 class="section-title">Hmm</h2>
-            <div class="quotes-section">
-                <div class="quote" id="quote-text"></div>
-                <div class="author" id="quote-author">Temporarily Archived</div>
+            <div class="ticker-container">
+                <div class="ticker-track">
+                    <div class="ticker-item">
+                        <p class="ticker-text">Temporarily Archived</p>
+                    </div>
+                    <div class="ticker-item">
+                        <p class="ticker-text">Temporarily Archived</p>
+                    </div>
+                    <div class="ticker-item">
+                        <p class="ticker-text">Temporarily Archived</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <p><i class="fas fa-info-circle"></i> This content has been temporarily archived and will be available again shortly.</p>
             </div>
         </div>
-
-
 
         <!-- Contact Form -->
         <div class="content-section">
