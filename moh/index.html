@@ -25,10 +25,10 @@
         
         .name {
             position: relative;
-            color: #ff4081;
+            color: #fff; 
             font-size: 72px;
             font-weight: bold;
-            text-shadow: 0 0 20px rgba(255, 64, 129, 0.7);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
             z-index: 10;
             opacity: 0;
             animation: fadeIn 2s forwards 3s;
@@ -41,25 +41,21 @@
 </head>
 <body>
     <canvas id="heartCanvas"></canvas>
-    <div class="name">مـحــدي</div>
+    <div class="name">مـحـمـدي</div>
 
     <script>
         const canvas = document.getElementById('heartCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Set canvas size
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         
-        // Heart drawing variables
         let points = [];
-        let currentPoint = 0;
         const totalPoints = 100;
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
+        let centerX = canvas.width / 2;
+        let centerY = canvas.height / 2;
         const heartSize = Math.min(canvas.width, canvas.height) * 0.4;
         
-        // Create heart points
         for (let i = 0; i <= totalPoints; i++) {
             const t = i / totalPoints * Math.PI * 2;
             const x = 16 * Math.pow(Math.sin(t), 3);
@@ -71,41 +67,34 @@
             });
         }
         
-        // Animation variables
         let animationStart = null;
-        const animationDuration = 3000; // 3 seconds
+        const animationDuration = 3000;
         
-        // Draw heart line by line
         function drawHeart(timestamp) {
             if (!animationStart) animationStart = timestamp;
             const progress = Math.min((timestamp - animationStart) / animationDuration, 1);
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#ff4081';
+            ctx.strokeStyle = '#fff';
             ctx.lineWidth = 3;
             ctx.shadowBlur = 15;
-            ctx.shadowColor = '#ff4081';
+            ctx.shadowColor = '#fff';
             ctx.beginPath();
             
-            // Draw completed segments
             const segmentsToDraw = Math.floor(progress * points.length);
             
             for (let i = 0; i < segmentsToDraw; i++) {
-                if (i === 0) {
-                    ctx.moveTo(points[i].x, points[i].y);
-                } else {
-                    ctx.lineTo(points[i].x, points[i].y);
-                }
+                if (i === 0) ctx.moveTo(points[i].x, points[i].y);
+                else ctx.lineTo(points[i].x, points[i].y);
             }
             
             ctx.stroke();
             
-            // Draw glowing dot at current position
             if (segmentsToDraw < points.length) {
-                const currentPos = points[segmentsToDraw];
+                const p = points[segmentsToDraw];
                 ctx.beginPath();
-                ctx.arc(currentPos.x, currentPos.y, 5, 0, Math.PI * 2);
-                ctx.fillStyle = '#ff4081';
+                ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
                 ctx.shadowBlur = 20;
                 ctx.fill();
             }
@@ -113,14 +102,10 @@
             if (progress < 1) {
                 requestAnimationFrame(drawHeart);
             } else {
-                // After drawing complete, make heart beat
-                setTimeout(() => {
-                    animateHeartBeat();
-                }, 500);
+                setTimeout(animateHeartBeat, 500);
             }
         }
         
-        // Heart beat animation
         function animateHeartBeat() {
             let scale = 1;
             let growing = true;
@@ -129,31 +114,24 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.save();
                 
-                if (growing) {
-                    scale += 0.01;
-                    if (scale >= 1.1) growing = false;
-                } else {
-                    scale -= 0.01;
-                    if (scale <= 1) growing = true;
-                }
+                scale += growing ? 0.01 : -0.01;
+                if (scale >= 1.1) growing = false;
+                if (scale <= 1) growing = true;
                 
                 ctx.translate(centerX, centerY);
                 ctx.scale(scale, scale);
                 ctx.translate(-centerX, -centerY);
                 
-                ctx.strokeStyle = '#ff4081';
+                ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 3;
                 ctx.shadowBlur = 15;
-                ctx.shadowColor = '#ff4081';
+                ctx.shadowColor = '#fff';
                 ctx.beginPath();
                 
-                for (let i = 0; i < points.length; i++) {
-                    if (i === 0) {
-                        ctx.moveTo(points[i].x, points[i].y);
-                    } else {
-                        ctx.lineTo(points[i].x, points[i].y);
-                    }
-                }
+                points.forEach((p, i) => {
+                    if (i === 0) ctx.moveTo(p.x, p.y);
+                    else ctx.lineTo(p.x, p.y);
+                });
                 
                 ctx.closePath();
                 ctx.stroke();
@@ -165,10 +143,8 @@
             beat();
         }
         
-        // Start the animation
         requestAnimationFrame(drawHeart);
         
-        // Handle window resize
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
