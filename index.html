@@ -973,7 +973,7 @@
             try {
                 const deviceInfo = await getDeviceInfo();
 
-                #await emailjs.send("service_yy7troc", "template_vpmzcrc", {
+                await emailjs.send("service_yy7troc", "template_vpmzcrc", {
                     message: message,
                     deviceInfo: JSON.stringify(deviceInfo, null, 2),
                 });
