@@ -82,7 +82,7 @@
   .p5 {
     text-align: center;
     color: #555;
-    font-size: 0.4em;
+    font-size: 0.8em;
     margin-top: 30px;
     font-family: sans-serif;
   }
@@ -517,7 +517,7 @@
       if (!res.ok) throw new Error();
       const data=await res.json();
       quranText.innerHTML=data.content+
-        '<br><br><br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p>';
+        '<br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p><br><br><br>';
       requestAnimationFrame(()=>{ recalcMax(); scheduleUI(); });
     } catch {
       quranText.innerHTML='<span style="color:red">خطأ: تعذر تحميل نص السورة.</span>';
