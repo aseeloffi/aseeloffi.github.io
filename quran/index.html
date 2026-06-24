@@ -1,232 +1,340 @@
 <!DOCTYPE html>
 
 <html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>سورة البقرة</title>
-<style>
-@font-face {
-  font-family: 'Conv_original-hafs';
-  src: url('https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2') format('woff2'),
-       url('https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>سورة البقرة</title>
+    <style>
+      @font-face {
+        font-family: 'Conv_original-hafs';
+        src: url('https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2') format('woff2'),
+          url('https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+      }
 
-/* ─── نمنع التمرير الأصلي تماماً ─── */
-html, body {
-overflow: hidden;
-height: 100%;
-width: 100%;
-background-color: #1a1a1a;
-color: #e8e8e8;
-direction: rtl;
-touch-action: none;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ─── الحاوية الثابتة التي تملأ الشاشة ─── */
-#viewport {
-position: fixed;
-top: 0; left: 0; right: 0; bottom: 0;
-overflow: hidden;
-}
+  html, body {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background-color: #1a1a1a;
+    color: #e8e8e8;
+    direction: rtl;
+    touch-action: none;
+  }
 
-/* ─── المحتوى يتحرك بـ transform فقط ─── */
-#scroller {
-will-change: transform;
-transform: translateY(0px);
-/* will-change يضع العنصر على layer منفصل في GPU */
-}
+  #viewport {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+  }
 
-.page-header {
-background-color: #111;
-padding: 18px 20px;
-text-align: center;
-border-bottom: 1px solid #333;
-}
-.page-header h1 {
-font-family: Conv_original-hafs, serif;
-font-size: 1.4em;
-font-weight: 400;
-color: #c8a96e;
-}
-.page-header p {
-color: #888; font-size: 0.75em; margin-top: 5px; font-family: sans-serif;
-}
-.basmalah {
-text-align: center;
-padding: 30px 20px 10px;
-font-family: Conv_original-hafs, serif;
-font-size: 2.2em;
-color: #e8e8e8;
-line-height: 1.8em;
-}
-.quran-container {
-max-width: 900px;
-margin: 0 auto;
-padding: 10px 25px 120px;
-}
-#quranText {
-font-size: 2em;
-text-align: justify;
-font-family: Conv_original-hafs, serif;
-color: #e8e8e8;
-font-weight: 400;
-line-height: 1.75em;
-}
+  #scroller {
+    will-change: transform;
+    transform: translateY(0px);
+    contain: layout style;
+  }
 
-label {
-  font-family: Conv_original-hafs, serif;
-  color: #4caf7d;
-  font-size: 0.75em;
-}
-b { 
-  font-weight: 400; 
-  color: #c8a96e;
-}
+  .page-header {
+    background-color: #111;
+    padding: 18px 20px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+  }
+  .page-header h1 {
+    font-family: Conv_original-hafs, serif;
+    font-size: 1.4em;
+    font-weight: 400;
+    color: #c8a96e;
+  }
+  .page-header p { color: #888; font-size: 0.75em; margin-top: 5px; font-family: sans-serif; }
 
-.p5 {
-text-align: center; color: #555; font-size: 0.4em;
-margin-top: 30px; font-family: sans-serif;
-}
-@media (max-width: 600px) {
-#quranText { font-size: 1.6em; }
-.quran-container { padding: 10px 15px 100px; }
-.basmalah { font-size: 1.6em; }
-}
+  .basmalah {
+    text-align: center;
+    padding: 30px 20px 10px;
+    font-family: Conv_original-hafs, serif;
+    font-size: 2.2em;
+    color: #e8e8e8;
+    line-height: 1.8em;
+  }
 
-/* ─── Progress bar ─── */
-.progress-container {
-position: fixed;
-top: 0; left: 0;
-width: 100%; height: 5px;
-background-color: #2a2a2a;
-z-index: 2000;
-pointer-events: none;
-}
-.progress-bar {
-height: 100%;
-width: 0%;
-background-color: #c8a96e;
-box-shadow: 0 0 8px #c8a96e;
-will-change: width;
-}
+  .quran-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 25px 160px;
+  }
 
-/* ─── لوحة التحكم ─── */
-.scroll-panel {
-position: fixed;
-bottom: 30px;
-left: 50%;
-transform: translateX(-50%);
-background-color: rgba(10,10,10,0.6);
-backdrop-filter: blur(30px);
--webkit-backdrop-filter: blur(30px);
-border: 1px solid rgba(255,255,255,0.08);
-border-radius: 24px;
-padding: 20px 25px;
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 16px;
-z-index: 1000;
-box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-font-family: system-ui, -apple-system, sans-serif;
-width: 90%;
-max-width: 380px;
-transition: opacity 0.3s ease;
-}
-.scroll-panel.hidden {
-opacity: 0;
-pointer-events: none;
-}
-.main-controls {
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 25px;
-width: 100%;
-}
-.step-btn {
-background: rgba(255,255,255,0.06);
-border: none;
-color: #e8e8e8;
-width: 40px; height: 40px;
-border-radius: 50%;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 1.2em;
-transition: background 0.2s;
-}
-.step-btn:hover { background: rgba(200,169,110,0.2); color: #c8a96e; }
-.scroll-btn {
-background-color: #c8a96e;
-color: #111;
-border: none;
-width: 60px; height: 60px;
-border-radius: 50%;
-cursor: pointer;
-font-size: 1.4em;
-display: flex;
-align-items: center;
-justify-content: center;
-box-shadow: 0 4px 15px rgba(200,169,110,0.25);
-transition: background-color 0.2s;
-}
-.scroll-btn:hover { background-color: #e4c48a; }
-.pause-icon {
-display: none;
-width: 16px; height: 18px;
-border-left: 5px solid #111;
-border-right: 5px solid #111;
-}
-.scroll-btn.active { background-color: rgba(255,255,255,0.9); }
-.scroll-btn.active .play-text { display: none; }
-.scroll-btn.active .pause-icon { display: inline-block; }
+  #quranText {
+    font-size: 2em;
+    text-align: justify;
+    font-family: Conv_original-hafs, serif;
+    color: #e8e8e8;
+    font-weight: 400;
+    line-height: 1.75em;
+  }
 
-.slider-container { width: 100%; display: flex; flex-direction: column; gap: 8px; }
-.speed-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-.speed-badge {
-background: rgba(200,169,110,0.15);
-color: #c8a96e;
-padding: 3px 8px;
-border-radius: 6px;
-font-size: 0.8em;
-font-weight: 600;
-}
-.time-remaining { color: #b0b0b0; font-size: 0.85em; }
-.speed-slider {
--webkit-appearance: none;
-width: 100%; height: 6px;
-border-radius: 4px;
-outline: none;
-background: rgba(255,255,255,0.1);
-}
-.speed-slider::-webkit-slider-thumb {
--webkit-appearance: none;
-width: 16px; height: 16px;
-border-radius: 50%;
-background: #ffffff;
-border: 2px solid #c8a96e;
-cursor: pointer;
-box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-}
+  b { font-weight: 400; color: #c8a96e; }
+  label { font-family: Conv_original-hafs, serif; color: #4caf7d; font-size: 0.75em; }
+
+  .p5 {
+    text-align: center;
+    color: #555;
+    font-size: 0.4em;
+    margin-top: 30px;
+    font-family: sans-serif;
+  }
+
+  @media (max-width: 600px) {
+    #quranText { font-size: 1.6em; }
+    .quran-container { padding: 10px 15px 150px; }
+    .basmalah { font-size: 1.6em; }
+  }
+
+  /* ─── شريط التقدم العلوي ─── */
+  .progress-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    z-index: 2000;
+    pointer-events: none;
+    contain: strict;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to left, #c8a96e, #e4c88a);
+    will-change: width;
+    transform: translateZ(0);
+  }
+
+  /* ══════════════════════════════════════════
+     لوحة التحكم — زجاج شفاف حقيقي
+  ══════════════════════════════════════════ */
+  .scroll-panel {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* شفافية عالية — يُرى ما خلفها */
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
+
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 22px;
+
+    padding: 13px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    z-index: 1000;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.35),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    font-family: system-ui, -apple-system, sans-serif;
+    width: 88%;
+    max-width: 320px;
+
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    contain: layout style;
+  }
+
+  .scroll-panel.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(10px);
+  }
+
+  /* ─── شريط التقدم / Seek ─── */
+  .progress-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .progress-label {
+    font-size: 0.65em;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.03em;
+  }
+
+  .progress-pct {
+    font-size: 0.65em;
+    font-weight: 700;
+    color: rgba(200, 169, 110, 0.85);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .seek-bar {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.07);
+  }
+  .seek-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid rgba(200, 169, 110, 0.9);
+    cursor: pointer;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    transition: transform 0.15s;
+  }
+  .seek-bar:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+  }
+
+  /* ─── فاصل ─── */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  /* ─── صف التحكم الرئيسي ─── */
+  .main-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .step-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.5);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05em;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+  }
+  .step-btn:hover {
+    background: rgba(200, 169, 110, 0.14);
+    color: rgba(200, 169, 110, 0.9);
+  }
+
+  .scroll-btn {
+    background: rgba(200, 169, 110, 0.9);
+    color: #111;
+    border: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 3px 14px rgba(200, 169, 110, 0.3),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: transform 0.15s, background 0.2s;
+    flex-shrink: 0;
+  }
+  .scroll-btn:active { transform: scale(0.92); }
+  .scroll-btn.active { background: rgba(255, 255, 255, 0.88); }
+
+  .pause-icon {
+    display: none;
+    width: 11px; height: 13px;
+    border-left: 3.5px solid #111;
+    border-right: 3.5px solid #111;
+  }
+  .scroll-btn.active .play-text  { display: none; }
+  .scroll-btn.active .pause-icon { display: inline-block; }
+
+  /* ─── صف السرعة ─── */
+  .speed-section {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .speed-label {
+    font-size: 0.62em;
+    color: rgba(255, 255, 255, 0.25);
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+  }
+
+  .speed-slider {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.07);
+  }
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: rgba(200, 169, 110, 0.9);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    transition: transform 0.15s;
+  }
+  .speed-slider:active::-webkit-slider-thumb { transform: scale(1.4); }
+
+  .speed-badge {
+    font-size: 0.62em;
+    font-weight: 700;
+    color: rgba(200, 169, 110, 0.8);
+    font-variant-numeric: tabular-nums;
+    min-width: 30px;
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  /* ─── الوقت المتبقي ─── */
+  .time-remaining {
+    font-size: 0.62em;
+    color: rgba(255, 255, 255, 0.22);
+    font-variant-numeric: tabular-nums;
+  }
 </style>
 
-</head>
-<body>
+
+  </head>
+  <body>
+
 
 <div class="progress-container">
   <div class="progress-bar" id="progressBar"></div>
 </div>
 
-<!-- الحاوية الثابتة -->
-
 <div id="viewport">
-  <!-- هذا العنصر يتحرك بـ GPU transform -->
   <div id="scroller">
     <div class="page-header">
       <h1>سورة البقرة مكتوبة كاملة بالتشكيل</h1>
@@ -240,6 +348,17 @@ box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 </div>
 
 <div class="scroll-panel" id="scrollPanel">
+
+  <div class="progress-section">
+    <div class="progress-labels">
+      <span class="progress-label">التقدم</span>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <input type="range" id="seekBar" class="seek-bar" min="0" max="1000" step="1" value="0">
+  </div>
+
+  <div class="divider"></div>
+
   <div class="main-controls">
     <button class="step-btn" id="minusBtn">−</button>
     <button class="scroll-btn" id="scrollBtn">
@@ -248,227 +367,236 @@ box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     </button>
     <button class="step-btn" id="plusBtn">+</button>
   </div>
-  <div class="slider-container">
-    <div class="speed-row">
-      <div class="time-remaining" id="timeRemaining">متبقي: --:--</div>
-      <div class="speed-badge" id="speedBadge">×1.0</div>
-    </div>
+
+  <div class="speed-section">
+    <span class="speed-label">السرعة</span>
     <input type="range" id="speedSlider" class="speed-slider" min="0.05" max="3.0" step="0.05" value="1.0">
+    <span class="speed-badge" id="speedBadge">×1.0</span>
   </div>
+
+  <div class="time-remaining" id="timeRemaining">متبقي: --:--</div>
 </div>
 
 <script>
-const scrollPanel   = document.getElementById('scrollPanel');
-const scrollBtn     = document.getElementById('scrollBtn');
-const plusBtn       = document.getElementById('plusBtn');
-const minusBtn      = document.getElementById('minusBtn');
-const speedSlider   = document.getElementById('speedSlider');
-const speedBadge    = document.getElementById('speedBadge');
-const timeRemainingEl = document.getElementById('timeRemaining');
-const progressBar   = document.getElementById('progressBar');
-const quranText     = document.getElementById('quranText');
-const scroller      = document.getElementById('scroller');
-const viewport      = document.getElementById('viewport');
+  const scrollPanel     = document.getElementById('scrollPanel');
+  const scrollBtn       = document.getElementById('scrollBtn');
+  const plusBtn         = document.getElementById('plusBtn');
+  const minusBtn        = document.getElementById('minusBtn');
+  const speedSlider     = document.getElementById('speedSlider');
+  const speedBadge      = document.getElementById('speedBadge');
+  const timeRemainingEl = document.getElementById('timeRemaining');
+  const progressBar     = document.getElementById('progressBar');
+  const progressPct     = document.getElementById('progressPct');
+  const seekBar         = document.getElementById('seekBar');
+  const quranText       = document.getElementById('quranText');
+  const scroller        = document.getElementById('scroller');
+  const viewport        = document.getElementById('viewport');
 
-const BASE_SPEED = 40; // px/s عند ×1.0
+  const BASE_SPEED = 40;
 
-let isScrolling  = false;
-let rafId        = null;
-let lastTime     = null;
-let posY         = 0;   // الموضع الحالي (موجب = تحريك للأعلى)
-let maxScroll    = 0;   // أقصى مسافة تمرير
-let uiFrame      = 0;
+  let isScrolling = false;
+  let rafId       = null;
+  let lastTime    = null;
+  let posY        = 0;
+  let maxScroll   = 0;
+  let uiFrame     = 0;
+  let isSeeking   = false;
 
-// ─── حساب maxScroll بعد تحميل المحتوى ───────────────────────────────────────
-function recalcMax() {
-  maxScroll = scroller.offsetHeight - viewport.offsetHeight;
-}
+  let uiRafId = null;
+  let uiDirty = false;
 
-// ─── حلقة التحريك الرئيسية ───────────────────────────────────────────────────
-function tick(timestamp) {
-  if (!isScrolling) return;
-
-  if (lastTime === null) lastTime = timestamp;
-  const delta = Math.min(timestamp - lastTime, 64);
-  lastTime = timestamp;
-
-  posY += (parseFloat(speedSlider.value) * BASE_SPEED * delta) / 1000;
-  if (posY > maxScroll) posY = maxScroll;
-
-  // ─ GPU composite-only: لا layout، لا paint ─
-  scroller.style.transform = `translateY(${-posY}px)`;
-
-  // UI كل 12 frame (~5 مرات/ثانية) لا يسبب jank
-  if (++uiFrame % 12 === 0) updateUI();
-
-  if (posY >= maxScroll) { stopScroll(); return; }
-  rafId = requestAnimationFrame(tick);
-}
-
-function updateUI() {
-  const pct = maxScroll > 0 ? (posY / maxScroll) * 100 : 0;
-  progressBar.style.width = pct + '%';
-
-  const remaining = maxScroll - posY;
-  if (remaining <= 2) { timeRemainingEl.textContent = 'تمت القراءة'; return; }
-  const speed = parseFloat(speedSlider.value);
-  const secs  = remaining / (speed * BASE_SPEED);
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  timeRemainingEl.textContent = `متبقي: ${m}:${s < 10 ? '0'+s : s} د`;
-}
-
-function startScroll() {
-  if (isScrolling) return;
-  isScrolling = true;
-  lastTime    = null;
-  uiFrame     = 0;
-  scrollBtn.classList.add('active');
-  rafId = requestAnimationFrame(tick);
-}
-
-function stopScroll() {
-  isScrolling = false;
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  scrollBtn.classList.remove('active');
-  updateUI();
-}
-
-// ─── سحب اللمس اليدوي مع inertia ────────────────────────────────────────────
-let touchStartY   = 0;
-let touchStartPos = 0;
-let touchLastY    = 0;
-let touchLastTime = 0;
-let touchVelocity = 0;   // px/ms
-let isTouching    = false;
-let movedEnough   = false;  // هل تجاوز 8px → سحب حقيقي
-let inertiaId     = null;
-
-function cancelInertia() {
-  if (inertiaId) { cancelAnimationFrame(inertiaId); inertiaId = null; }
-}
-
-viewport.addEventListener('touchstart', (e) => {
-  if (e.touches.length > 1) return;
-  cancelInertia();
-  isTouching    = true;
-  movedEnough   = false;
-  touchVelocity = 0;
-  touchStartY   = e.touches[0].clientY;
-  touchLastY    = touchStartY;
-  touchLastTime = performance.now();
-  touchStartPos = posY;
-  // لا نوقف التمرير التلقائي هنا — ننتظر لنرى هل هو سحب أم ضغطة
-}, { passive: true });
-
-viewport.addEventListener('touchmove', (e) => {
-  if (!isTouching || e.touches.length > 1) return;
-
-  const cy  = e.touches[0].clientY;
-  const now = performance.now();
-  const dy  = touchStartY - cy;
-
-  // إذا تحرك أكثر من 8px → سحب حقيقي، أوقف التمرير التلقائي
-  if (!movedEnough && Math.abs(dy) > 8) {
-    movedEnough = true;
-    stopScroll();
-    touchStartPos = posY; // نعيد الحساب من الموضع الحالي
+  function scheduleUI() {
+    if (uiDirty || uiRafId) return;
+    uiDirty = true;
+    uiRafId = requestAnimationFrame(flushUI);
   }
 
-  if (!movedEnough) return;
+  function flushUI() {
+    uiRafId = null;
+    uiDirty = false;
 
-  // حساب السرعة اللحظية
-  const dtms = now - touchLastTime;
-  if (dtms > 0) touchVelocity = (touchLastY - cy) / dtms;
-  touchLastY    = cy;
-  touchLastTime = now;
+    const pct    = maxScroll > 0 ? posY / maxScroll : 0;
+    const pctNum = Math.round(pct * 100);
 
-  posY = Math.max(0, Math.min(maxScroll, touchStartPos + (touchStartY - cy)));
-  scroller.style.transform = `translateY(${-posY}px)`;
-  updateUI();
-}, { passive: true });
+    progressBar.style.width = (pct * 100) + '%';
 
-viewport.addEventListener('touchend', (e) => {
-  if (!isTouching) return;
-  isTouching = false;
+    if (!isSeeking) seekBar.value = Math.round(pct * 1000);
+    seekBar.style.background =
+      `linear-gradient(to left, rgba(200,169,110,0.6) ${pctNum}%, rgba(255,255,255,0.07) ${pctNum}%)`;
+    progressPct.textContent = pctNum + '%';
 
-  if (!movedEnough) return; // ضغطة بدون سحب → لا شيء
+    const remaining = maxScroll - posY;
+    if (remaining <= 2) { timeRemainingEl.textContent = 'تمت القراءة'; return; }
+    const speed = parseFloat(speedSlider.value);
+    const secs  = remaining / (speed * BASE_SPEED);
+    const m     = Math.floor(secs / 60);
+    const s     = Math.floor(secs % 60);
+    timeRemainingEl.textContent = `متبقي: ${m}:${s < 10 ? '0'+s : s} د`;
+  }
 
-  // Momentum / inertia
-  let velocity = touchVelocity; // px/ms
-  const friction = 0.95;
+  function tick(timestamp) {
+    if (!isScrolling) return;
+    if (lastTime === null) lastTime = timestamp;
+    const delta = Math.min(timestamp - lastTime, 64);
+    lastTime = timestamp;
 
-  function inertia() {
-    velocity *= friction;
-    if (Math.abs(velocity) < 0.02) return; // توقف طبيعي
-    posY = Math.max(0, Math.min(maxScroll, posY + velocity * 16));
+    posY += (parseFloat(speedSlider.value) * BASE_SPEED * delta) / 1000;
+    if (posY > maxScroll) posY = maxScroll;
     scroller.style.transform = `translateY(${-posY}px)`;
-    updateUI();
-    inertiaId = requestAnimationFrame(inertia);
+
+    if (++uiFrame % 12 === 0) scheduleUI();
+    if (posY >= maxScroll) { stopScroll(); return; }
+    rafId = requestAnimationFrame(tick);
   }
-  inertiaId = requestAnimationFrame(inertia);
-}, { passive: true });
 
-// ─── عجلة الماوس ─────────────────────────────────────────────────────────────
-viewport.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  stopScroll();
-  posY = Math.max(0, Math.min(maxScroll, posY + e.deltaY));
-  scroller.style.transform = `translateY(${-posY}px)`;
-  updateUI();
-}, { passive: false });
-
-// ─── تحميل النص ──────────────────────────────────────────────────────────────
-async function loadSurahText() {
-  try {
-    const res  = await fetch('surah.json');
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    quranText.innerHTML = data.content +
-      '<br><br><br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p>';
-    // نتأخر frame واحد حتى يُحسب الـ layout
-    requestAnimationFrame(() => { recalcMax(); updateUI(); });
-  } catch {
-    quranText.innerHTML = '<span style="color:red">خطأ: تعذر تحميل نص السورة.</span>';
+  function startScroll() {
+    if (isScrolling) return;
+    isScrolling = true; lastTime = null; uiFrame = 0;
+    scrollBtn.classList.add('active');
+    rafId = requestAnimationFrame(tick);
   }
-}
 
-window.addEventListener('resize', () => { recalcMax(); updateUI(); });
+  function stopScroll() {
+    isScrolling = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    scrollBtn.classList.remove('active');
+    scheduleUI();
+  }
 
-// ─── Slider UI ───────────────────────────────────────────────────────────────
-function updateSliderUI() {
-  const val = parseFloat(speedSlider.value);
-  const pct = ((val - +speedSlider.min) / (+speedSlider.max - +speedSlider.min)) * 100;
-  speedSlider.style.background =
-    `linear-gradient(to left, #c8a96e ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
-  speedBadge.textContent = `×${val.toFixed(2)}`;
-  updateUI();
-}
+  function recalcMax() {
+    maxScroll = scroller.offsetHeight - viewport.offsetHeight;
+  }
 
-// ─── الأزرار ─────────────────────────────────────────────────────────────────
-scrollBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  isScrolling ? stopScroll() : startScroll();
-});
-plusBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  speedSlider.value = Math.min(parseFloat(speedSlider.value) + 0.1, +speedSlider.max).toFixed(2);
-  updateSliderUI();
-});
-minusBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  speedSlider.value = Math.max(parseFloat(speedSlider.value) - 0.1, +speedSlider.min).toFixed(2);
-  updateSliderUI();
-});
-speedSlider.addEventListener('click', (e) => e.stopPropagation());
-speedSlider.addEventListener('input', updateSliderUI);
+  /* ── Seek Bar ── */
+  seekBar.addEventListener('mousedown',  () => { isSeeking = true; });
+  seekBar.addEventListener('touchstart', () => { isSeeking = true; }, { passive: true });
+  seekBar.addEventListener('touchmove',  (e) => e.stopPropagation(), { passive: true });
+  seekBar.addEventListener('input', () => {
+    posY = Math.max(0, Math.min(maxScroll, (parseInt(seekBar.value) / 1000) * maxScroll));
+    scroller.style.transform = `translateY(${-posY}px)`;
+    scheduleUI();
+  });
+  seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); });
+  seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); }, { passive: true });
 
-document.body.addEventListener('click', (e) => {
-  if (!scrollPanel.contains(e.target)) scrollPanel.classList.toggle('hidden');
-});
+  /* ── اللمس + inertia ── */
+  let touchStartY=0, touchStartPos=0, touchLastY=0, touchLastTime=0;
+  let touchVelocity=0, isTouching=false, movedEnough=false;
+  let inertiaId=null, pendingDY=null;
 
-window.addEventListener('load', () => { loadSurahText(); updateSliderUI(); });
+  function cancelInertia() {
+    if (inertiaId) { cancelAnimationFrame(inertiaId); inertiaId = null; }
+  }
+
+  viewport.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) return;
+    cancelInertia();
+    isTouching=true; movedEnough=false; touchVelocity=0; pendingDY=null;
+    touchStartY=e.touches[0].clientY; touchLastY=touchStartY;
+    touchLastTime=performance.now(); touchStartPos=posY;
+  }, { passive: true });
+
+  viewport.addEventListener('touchmove', (e) => {
+    if (!isTouching || e.touches.length > 1) return;
+    const cy=e.touches[0].clientY, now=performance.now(), dy=touchStartY-cy;
+    if (!movedEnough && Math.abs(dy) > 8) {
+      movedEnough=true; stopScroll(); touchStartPos=posY;
+    }
+    if (!movedEnough) return;
+    const dtms=now-touchLastTime;
+    if (dtms>0) touchVelocity=(touchLastY-cy)/dtms;
+    touchLastY=cy; touchLastTime=now; pendingDY=touchStartY-cy;
+    if (!rafId) rafId=requestAnimationFrame(applyTouch);
+  }, { passive: true });
+
+  function applyTouch() {
+    rafId=null;
+    if (pendingDY===null) return;
+    posY=Math.max(0,Math.min(maxScroll,touchStartPos+pendingDY));
+    scroller.style.transform=`translateY(${-posY}px)`;
+    scheduleUI();
+  }
+
+  viewport.addEventListener('touchend', () => {
+    if (!isTouching) return;
+    isTouching=false;
+    if (!movedEnough) return;
+    let velocity=touchVelocity;
+    function inertia() {
+      velocity*=0.93;
+      if (Math.abs(velocity)<0.05) return;
+      posY=Math.max(0,Math.min(maxScroll,posY+velocity*16));
+      scroller.style.transform=`translateY(${-posY}px)`;
+      scheduleUI();
+      inertiaId=requestAnimationFrame(inertia);
+    }
+    inertiaId=requestAnimationFrame(inertia);
+  }, { passive: true });
+
+  /* ── Wheel ── */
+  let wheelPending=0, wheelRafId=null;
+  viewport.addEventListener('wheel', (e) => {
+    e.preventDefault(); stopScroll();
+    wheelPending+=e.deltaY;
+    if (!wheelRafId) wheelRafId=requestAnimationFrame(applyWheel);
+  }, { passive: false });
+  function applyWheel() {
+    wheelRafId=null;
+    posY=Math.max(0,Math.min(maxScroll,posY+wheelPending));
+    wheelPending=0;
+    scroller.style.transform=`translateY(${-posY}px)`;
+    scheduleUI();
+  }
+
+  /* ── تحميل النص ── */
+  async function loadSurahText() {
+    try {
+      const res=await fetch('surah.json');
+      if (!res.ok) throw new Error();
+      const data=await res.json();
+      quranText.innerHTML=data.content+
+        '<br><br><br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p>';
+      requestAnimationFrame(()=>{ recalcMax(); scheduleUI(); });
+    } catch {
+      quranText.innerHTML='<span style="color:red">خطأ: تعذر تحميل نص السورة.</span>';
+    }
+  }
+
+  window.addEventListener('resize', ()=>{ recalcMax(); scheduleUI(); });
+
+  /* ── Slider السرعة ── */
+  function updateSliderUI() {
+    const val=parseFloat(speedSlider.value);
+    const pct=((val - +speedSlider.min)/(+speedSlider.max - +speedSlider.min))*100;
+    speedSlider.style.background=
+      `linear-gradient(to left, rgba(200,169,110,0.8) ${pct}%, rgba(255,255,255,0.07) ${pct}%)`;
+    speedBadge.textContent=`×${val.toFixed(1)}`;
+    scheduleUI();
+  }
+
+  /* ── الأزرار ── */
+  scrollBtn.addEventListener('click', (e)=>{ e.stopPropagation(); isScrolling?stopScroll():startScroll(); });
+  plusBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    speedSlider.value=Math.min(parseFloat(speedSlider.value)+0.1,+speedSlider.max).toFixed(2);
+    updateSliderUI();
+  });
+  minusBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    speedSlider.value=Math.max(parseFloat(speedSlider.value)-0.1,+speedSlider.min).toFixed(2);
+    updateSliderUI();
+  });
+  speedSlider.addEventListener('click',(e)=>e.stopPropagation());
+  speedSlider.addEventListener('input', updateSliderUI);
+  seekBar.addEventListener('click',(e)=>e.stopPropagation());
+
+  document.body.addEventListener('click', (e)=>{
+    if (!scrollPanel.contains(e.target)) scrollPanel.classList.toggle('hidden');
+  });
+
+  window.addEventListener('load', ()=>{ loadSurahText(); updateSliderUI(); });
 </script>
 
-</body>
+
+  </body>
 </html>
