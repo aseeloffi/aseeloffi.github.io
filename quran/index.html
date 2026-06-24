@@ -246,27 +246,10 @@ b { font-weight: 400; }
 بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
 </div>
 <div class="quran-container">
-<div style="font-size:2.2em;text-align:justify;font-family:conv_original-hafs;color:#17274a;font-weight:400;line-height:1.65em;margin:0 0 1em">
 
-الٓمٓ <label>(1)</label> ذَٰلِكَ ٱلۡكِتَٰبُ لَا رَيۡبَۛ فِيهِۛ هُدٗى
-لِّلۡمُتَّقِينَ <label>(2)</label> ٱلَّذِينَ يُؤۡمِنُونَ بِٱلۡغَيۡبِ وَيُقِيمُونَ ٱلصَّلَوٰةَ
-وَمِمَّا رَزَقۡنَٰهُمۡ يُنفِقُونَ <label>(3)</label> وَٱلَّذِينَ يُؤۡمِنُونَ بِمَآ أُنزِلَ
-إِلَيۡكَ وَمَآ أُنزِلَ مِن قَبۡلِكَ وَبِٱلۡأٓخِرَةِ هُمۡ يُوقِنُونَ <label>(4)</label>
-أُوْلَٰٓئِكَ عَلَىٰ هُدٗى مِّن <b style="color:#c8a96e">رَّبِّهِمۡۖ</b> وَأُوْلَٰٓئِكَ
-هُمُ ٱلۡمُفۡلِحُونَ <label>(5)</label>
-إِنَّ ٱلَّذِينَ كَفَرُواْ سَوَآءٌ عَلَيۡهِمۡ ءَأَنذَرۡتَهُمۡ أَمۡ لَمۡ تُنذِرۡهُمۡ
-لَا يُؤۡمِنُونَ <label>(6)</label> خَتَمَ <b style="color:#c8a96e">ٱللَّهُ</b> عَلَىٰ قُلُوبِهِمۡ وَعَلَىٰ سَمۡعِهِمۡۖ وَعَلَىٰٓ
-أَبۡصَٰرِهِمۡ غِشَٰوَةٞۖ وَلَهُمۡ عَذَابٌ عَظِيمٞ <label>(7)</label> وَمِنَ ٱلنَّاسِ
-مَن يَقُولُ ءَامَنَّا <b style="color:#c8a96e">بِٱللَّهِ</b> وَبِٱلۡيَوۡمِ ٱلۡأَخِرِ وَمَا هُم بِمُؤۡمِنِينَ <label>(8)</label>
-يُخَٰدِعُونَ <b style="color:#c8a96e">ٱللَّهَ</b> وَٱلَّذِينَ ءَامَنُواْ وَمَا يَخۡدَعُونَ إِلَّآ أَنفُسَهُمۡ
-وَمَا يَشۡعُرُونَ <label>(9)</label> فِي قُلُوبِهِم مَّرَضٞ فَزَادَهُم مِنۡهَا جَمِيعٗاۖ فَإِمَّا يَأۡتِيَنَّكُم مِّنِّي هُدٗى فَمَن تَبِعَ هُدَايَ فَلَا خَوۡفٌ عَلَيۡهِمۡ وَلَا هُمۡ يَحۡزَنُونَ <label>(38)</label> 
-وَٱلَّذِينَ كَفَرُواْ وَكَذَّبُواْ بِـَٔايَٰتِنَآ أُوْلَٰٓئِكَ أَصۡحَٰبُ ٱلنَّارِۖ هُمۡ فِيهَا خَٰلِدُونَ <label>(39)</label>
 
-<br>
-<br>
-<br>
-
-<p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p>
+<div id="quranText" style="font-size:2.2em;text-align:justify;font-family:conv_original-hafs;color:#17274a;font-weight:400;line-height:1.65em;margin:0 0 1em">
+جاري تحميل نص السورة...
 </div>
 </div>
 
@@ -298,8 +281,27 @@ const speedSlider = document.getElementById('speedSlider');
 const speedBadge = document.getElementById('speedBadge');
 const timeRemaining = document.getElementById('timeRemaining');
 const progressBar = document.getElementById('myProgressBar');
+const quranText = document.getElementById('quranText');
 
 let isScrolling = false;
+
+
+async function loadSurahText() {
+  try {
+    const response = await fetch('surah.json');
+    if (!response.ok) throw new Error('فشل تحميل الملف');
+    const data = await response.json();
+    
+
+    quranText.innerHTML = data.content + '<br><br><br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p>';
+    
+
+    calculateTimeRemaining();
+  } catch (error) {
+    quranText.innerHTML = '<span style="color: red;">خطأ: تعذر تحميل نص السورة.</span>';
+    console.error(error);
+  }
+}
 
 document.addEventListener('touchstart', function (event) {
   if (event.touches.length > 1) {
@@ -412,6 +414,7 @@ document.body.addEventListener('click', (e) => {
 });
 
 window.addEventListener('load', () => {
+  loadSurahText();
   updateSliderUI();
 });
 </script>
