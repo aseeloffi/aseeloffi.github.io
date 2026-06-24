@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -12,257 +13,230 @@
   font-weight: normal;
   font-style: normal;
 }
-* { 
-  box-sizing: border-box; 
-  margin: 0; 
-  padding: 0;
-  touch-action: pan-y; 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── نمنع التمرير الأصلي تماماً ─── */
+html, body {
+overflow: hidden;
+height: 100%;
+width: 100%;
+background-color: #1a1a1a;
+color: #e8e8e8;
+direction: rtl;
+touch-action: none;
 }
-body { background-color: #1a1a1a; color: #e8e8e8; direction: rtl; }
+
+/* ─── الحاوية الثابتة التي تملأ الشاشة ─── */
+#viewport {
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+overflow: hidden;
+}
+
+/* ─── المحتوى يتحرك بـ transform فقط ─── */
+#scroller {
+will-change: transform;
+transform: translateY(0px);
+/* will-change يضع العنصر على layer منفصل في GPU */
+}
+
 .page-header {
-  background-color: #111;
-  padding: 18px 20px;
-  text-align: center;
-  border-bottom: 1px solid #333;
+background-color: #111;
+padding: 18px 20px;
+text-align: center;
+border-bottom: 1px solid #333;
 }
 .page-header h1 {
-  font-family: Conv_original-hafs, serif;
-  font-size: 1.4em;
-  font-weight: 400;
-  color: #c8a96e;
+font-family: Conv_original-hafs, serif;
+font-size: 1.4em;
+font-weight: 400;
+color: #c8a96e;
 }
 .page-header p {
-  color: #888; font-size: 0.75em; margin-top: 5px; font-family: sans-serif;
+color: #888; font-size: 0.75em; margin-top: 5px; font-family: sans-serif;
 }
 .basmalah {
-  text-align: center;
-  padding: 30px 20px 10px;
-  font-family: Conv_original-hafs, serif;
-  font-size: 2.2em;
-  color: #e8e8e8;
-  line-height: 1.8em;
+text-align: center;
+padding: 30px 20px 10px;
+font-family: Conv_original-hafs, serif;
+font-size: 2.2em;
+color: #e8e8e8;
+line-height: 1.8em;
 }
 .quran-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 10px 25px 60px;
+max-width: 900px;
+margin: 0 auto;
+padding: 10px 25px 120px;
 }
-.quran-container > div {
-  font-size: 2em !important;
-  text-align: justify !important;
-  font-family: Conv_original-hafs, serif !important;
-  color: #e8e8e8 !important;
-  font-weight: 400 !important;
-  line-height: 1.75em !important;
-  margin: 0 !important;
+#quranText {
+font-size: 2em;
+text-align: justify;
+font-family: Conv_original-hafs, serif;
+color: #e8e8e8;
+font-weight: 400;
+line-height: 1.75em;
 }
-label {
-  font-family: Conv_original-hafs, serif;
-  color: #4caf7d;
-  font-size: 0.75em;
-}
-b { font-weight: 400; }
 .p5 {
-  text-align: center; color: #555; font-size: 0.4em;
-  margin-top: 30px; font-family: sans-serif;
+text-align: center; color: #555; font-size: 0.4em;
+margin-top: 30px; font-family: sans-serif;
 }
 @media (max-width: 600px) {
-  .quran-container > div { font-size: 1.6em !important; }
-  .quran-container { padding: 10px 15px 40px; }
-  .basmalah { font-size: 1.6em; }
+#quranText { font-size: 1.6em; }
+.quran-container { padding: 10px 15px 100px; }
+.basmalah { font-size: 1.6em; }
 }
 
+/* ─── Progress bar ─── */
 .progress-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5px;
-  background-color: #2a2a2a;
-  z-index: 2000;
+position: fixed;
+top: 0; left: 0;
+width: 100%; height: 5px;
+background-color: #2a2a2a;
+z-index: 2000;
+pointer-events: none;
 }
 .progress-bar {
-  height: 100%;
-  width: 0%;
-  background-color: #c8a96e;
-  box-shadow: 0 0 8px #c8a96e;
-  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+height: 100%;
+width: 0%;
+background-color: #c8a96e;
+box-shadow: 0 0 8px #c8a96e;
+will-change: width;
 }
 
+/* ─── لوحة التحكم ─── */
 .scroll-panel {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0); 
-  backdrop-filter: blur(30px); 
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.08); 
-  border-radius: 24px;
-  padding: 20px 25px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  z-index: 1000;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-  font-family: system-ui, -apple-system, sans-serif;
-  width: 90%;
-  max-width: 380px;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+position: fixed;
+bottom: 30px;
+left: 50%;
+transform: translateX(-50%);
+background-color: rgba(10,10,10,0.6);
+backdrop-filter: blur(30px);
+-webkit-backdrop-filter: blur(30px);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 24px;
+padding: 20px 25px;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+z-index: 1000;
+box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+font-family: system-ui, -apple-system, sans-serif;
+width: 90%;
+max-width: 380px;
+transition: opacity 0.3s ease;
 }
-
 .scroll-panel.hidden {
-  opacity: 0;
-  transform: translate(-50%, 30px);
-  pointer-events: none;
+opacity: 0;
+pointer-events: none;
 }
-
 .main-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 25px;
-  width: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 25px;
+width: 100%;
 }
-
 .step-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: none;
-  color: #e8e8e8;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2em;
-  transition: background 0.2s;
+background: rgba(255,255,255,0.06);
+border: none;
+color: #e8e8e8;
+width: 40px; height: 40px;
+border-radius: 50%;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.2em;
+transition: background 0.2s;
 }
-.step-btn:hover {
-  background: rgba(200, 169, 110, 0.2);
-  color: #c8a96e;
-}
-
+.step-btn:hover { background: rgba(200,169,110,0.2); color: #c8a96e; }
 .scroll-btn {
-  background-color: #c8a96e;
-  color: #111;
-  border: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.4em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(200, 169, 110, 0.25);
-  transition: all 0.2s ease;
+background-color: #c8a96e;
+color: #111;
+border: none;
+width: 60px; height: 60px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 1.4em;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 4px 15px rgba(200,169,110,0.25);
+transition: background-color 0.2s;
 }
-.scroll-btn:hover {
-  background-color: #e4c48a;
-  transform: scale(1.05);
-}
-
+.scroll-btn:hover { background-color: #e4c48a; }
 .pause-icon {
-  display: none; 
-  width: 16px;
-  height: 18px;
-  border-left: 5px solid #111;
-  border-right: 5px solid #111;
-  justify-content: space-between;
+display: none;
+width: 16px; height: 18px;
+border-left: 5px solid #111;
+border-right: 5px solid #111;
 }
+.scroll-btn.active { background-color: rgba(255,255,255,0.9); }
+.scroll-btn.active .play-text { display: none; }
+.scroll-btn.active .pause-icon { display: inline-block; }
 
-.scroll-btn.active {
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-}
-.scroll-btn.active .play-text {
-  display: none; 
-}
-.scroll-btn.active .pause-icon {
-  display: inline-block; 
-}
-
-.slider-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.speed-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
+.slider-container { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.speed-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
 .speed-badge {
-  background: rgba(200, 169, 110, 0.15);
-  color: #c8a96e;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 0.8em;
-  font-weight: 600;
+background: rgba(200,169,110,0.15);
+color: #c8a96e;
+padding: 3px 8px;
+border-radius: 6px;
+font-size: 0.8em;
+font-weight: 600;
 }
-.time-remaining {
-  color: #b0b0b0;
-  font-size: 0.85em;
-}
-
+.time-remaining { color: #b0b0b0; font-size: 0.85em; }
 .speed-slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  outline: none;
-  background: linear-gradient(to left, #c8a96e 0%, rgba(255, 255, 255, 0.1) 0%); 
+-webkit-appearance: none;
+width: 100%; height: 6px;
+border-radius: 4px;
+outline: none;
+background: rgba(255,255,255,0.1);
 }
 .speed-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #c8a96e;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+-webkit-appearance: none;
+width: 16px; height: 16px;
+border-radius: 50%;
+background: #ffffff;
+border: 2px solid #c8a96e;
+cursor: pointer;
+box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 </style>
+
 </head>
 <body>
 
 <div class="progress-container">
-  <div class="progress-bar" id="myProgressBar"></div>
+  <div class="progress-bar" id="progressBar"></div>
 </div>
 
-<div class="page-header">
-  <h1>سورة البقرة مكتوبة كاملة بالتشكيل</h1>
-  <p>كتابة وقراءة | رواية حفص عن عاصم</p>
-</div>
-<div class="basmalah">
-بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ
-</div>
-<div class="quran-container">
+<!-- الحاوية الثابتة -->
 
-
-<div id="quranText" style="font-size:2.2em;text-align:justify;font-family:conv_original-hafs;color:#17274a;font-weight:400;line-height:1.65em;margin:0 0 1em">
-جاري تحميل نص السورة...
-</div>
+<div id="viewport">
+  <!-- هذا العنصر يتحرك بـ GPU transform -->
+  <div id="scroller">
+    <div class="page-header">
+      <h1>سورة البقرة مكتوبة كاملة بالتشكيل</h1>
+      <p>كتابة وقراءة | رواية حفص عن عاصم</p>
+    </div>
+    <div class="basmalah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
+    <div class="quran-container">
+      <div id="quranText">جاري تحميل نص السورة...</div>
+    </div>
+  </div>
 </div>
 
 <div class="scroll-panel" id="scrollPanel">
   <div class="main-controls">
     <button class="step-btn" id="minusBtn">−</button>
     <button class="scroll-btn" id="scrollBtn">
-       <span class="play-text">▶</span>
-       <span class="pause-icon"></span>
+      <span class="play-text">▶</span>
+      <span class="pause-icon"></span>
     </button>
     <button class="step-btn" id="plusBtn">+</button>
   </div>
-  
   <div class="slider-container">
     <div class="speed-row">
       <div class="time-remaining" id="timeRemaining">متبقي: --:--</div>
@@ -273,150 +247,216 @@ b { font-weight: 400; }
 </div>
 
 <script>
-const scrollPanel = document.getElementById('scrollPanel');
-const scrollBtn = document.getElementById('scrollBtn');
-const plusBtn = document.getElementById('plusBtn');
-const minusBtn = document.getElementById('minusBtn');
-const speedSlider = document.getElementById('speedSlider');
-const speedBadge = document.getElementById('speedBadge');
-const timeRemaining = document.getElementById('timeRemaining');
-const progressBar = document.getElementById('myProgressBar');
-const quranText = document.getElementById('quranText');
+const scrollPanel   = document.getElementById('scrollPanel');
+const scrollBtn     = document.getElementById('scrollBtn');
+const plusBtn       = document.getElementById('plusBtn');
+const minusBtn      = document.getElementById('minusBtn');
+const speedSlider   = document.getElementById('speedSlider');
+const speedBadge    = document.getElementById('speedBadge');
+const timeRemainingEl = document.getElementById('timeRemaining');
+const progressBar   = document.getElementById('progressBar');
+const quranText     = document.getElementById('quranText');
+const scroller      = document.getElementById('scroller');
+const viewport      = document.getElementById('viewport');
 
-let isScrolling = false;
+const BASE_SPEED = 40; // px/s عند ×1.0
 
+let isScrolling  = false;
+let rafId        = null;
+let lastTime     = null;
+let posY         = 0;   // الموضع الحالي (موجب = تحريك للأعلى)
+let maxScroll    = 0;   // أقصى مسافة تمرير
+let uiFrame      = 0;
 
-async function loadSurahText() {
-  try {
-    const response = await fetch('surah.json');
-    if (!response.ok) throw new Error('فشل تحميل الملف');
-    const data = await response.json();
-    
-
-    quranText.innerHTML = data.content + '<br><br><br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p>';
-    
-
-    calculateTimeRemaining();
-  } catch (error) {
-    quranText.innerHTML = '<span style="color: red;">خطأ: تعذر تحميل نص السورة.</span>';
-    console.error(error);
-  }
+// ─── حساب maxScroll بعد تحميل المحتوى ───────────────────────────────────────
+function recalcMax() {
+  maxScroll = scroller.offsetHeight - viewport.offsetHeight;
 }
 
-document.addEventListener('touchstart', function (event) {
-  if (event.touches.length > 1) {
-    event.preventDefault();
-  }
-}, { passive: false });
-
-document.addEventListener('touchmove', function (event) {
-  if (event.touches.length > 1) {
-    event.preventDefault();
-  }
-}, { passive: false });
-
-window.onscroll = function() { 
-  updateProgressBar();
-  calculateTimeRemaining();
-};
-
-function updateProgressBar() {
-  const winScroll = window.scrollY;
-  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
-  progressBar.style.width = scrolled + "%";
-}
-
-function updateSliderUI() {
-  const val = speedSlider.value;
-  const min = speedSlider.min;
-  const max = speedSlider.max;
-  
-  const percentage = ((val - min) / (max - min)) * 100;
-  speedSlider.style.background = `linear-gradient(to left, #c8a96e ${percentage}%, rgba(255,255,255,0.1) ${percentage}%)`;
-  
-  speedBadge.textContent = `×${parseFloat(val).toFixed(2)}`;
-  calculateTimeRemaining();
-}
-
-function calculateTimeRemaining() {
-  const currentScroll = window.scrollY;
-  const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const remainingPixels = totalHeight - currentScroll;
-
-  if (remainingPixels <= 5) {
-    timeRemaining.textContent = "تمت القراءة";
-    return;
-  }
-
-  const speed = parseFloat(speedSlider.value);
-  const totalSeconds = remainingPixels / (speed * 15); 
-  
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-  const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
-
-  timeRemaining.textContent = `متبقي: ${minutes}:${formattedSeconds} د`;
-}
-
-function autoScroll() {
+// ─── حلقة التحريك الرئيسية ───────────────────────────────────────────────────
+function tick(timestamp) {
   if (!isScrolling) return;
-  
+
+  if (lastTime === null) lastTime = timestamp;
+  const delta = Math.min(timestamp - lastTime, 64);
+  lastTime = timestamp;
+
+  posY += (parseFloat(speedSlider.value) * BASE_SPEED * delta) / 1000;
+  if (posY > maxScroll) posY = maxScroll;
+
+  // ─ GPU composite-only: لا layout، لا paint ─
+  scroller.style.transform = `translateY(${-posY}px)`;
+
+  // UI كل 12 frame (~5 مرات/ثانية) لا يسبب jank
+  if (++uiFrame % 12 === 0) updateUI();
+
+  if (posY >= maxScroll) { stopScroll(); return; }
+  rafId = requestAnimationFrame(tick);
+}
+
+function updateUI() {
+  const pct = maxScroll > 0 ? (posY / maxScroll) * 100 : 0;
+  progressBar.style.width = pct + '%';
+
+  const remaining = maxScroll - posY;
+  if (remaining <= 2) { timeRemainingEl.textContent = 'تمت القراءة'; return; }
   const speed = parseFloat(speedSlider.value);
-  window.scrollBy(0, speed * 0.45); 
-  
-  if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 1) {
-    stopScroll();
-  } else {
-    requestAnimationFrame(autoScroll);
-  }
+  const secs  = remaining / (speed * BASE_SPEED);
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  timeRemainingEl.textContent = `متبقي: ${m}:${s < 10 ? '0'+s : s} د`;
 }
 
 function startScroll() {
+  if (isScrolling) return;
   isScrolling = true;
+  lastTime    = null;
+  uiFrame     = 0;
   scrollBtn.classList.add('active');
-  requestAnimationFrame(autoScroll);
+  rafId = requestAnimationFrame(tick);
 }
 
 function stopScroll() {
   isScrolling = false;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   scrollBtn.classList.remove('active');
+  updateUI();
 }
 
+// ─── سحب اللمس اليدوي مع inertia ────────────────────────────────────────────
+let touchStartY   = 0;
+let touchStartPos = 0;
+let touchLastY    = 0;
+let touchLastTime = 0;
+let touchVelocity = 0;   // px/ms
+let isTouching    = false;
+let movedEnough   = false;  // هل تجاوز 8px → سحب حقيقي
+let inertiaId     = null;
+
+function cancelInertia() {
+  if (inertiaId) { cancelAnimationFrame(inertiaId); inertiaId = null; }
+}
+
+viewport.addEventListener('touchstart', (e) => {
+  if (e.touches.length > 1) return;
+  cancelInertia();
+  isTouching    = true;
+  movedEnough   = false;
+  touchVelocity = 0;
+  touchStartY   = e.touches[0].clientY;
+  touchLastY    = touchStartY;
+  touchLastTime = performance.now();
+  touchStartPos = posY;
+  // لا نوقف التمرير التلقائي هنا — ننتظر لنرى هل هو سحب أم ضغطة
+}, { passive: true });
+
+viewport.addEventListener('touchmove', (e) => {
+  if (!isTouching || e.touches.length > 1) return;
+
+  const cy  = e.touches[0].clientY;
+  const now = performance.now();
+  const dy  = touchStartY - cy;
+
+  // إذا تحرك أكثر من 8px → سحب حقيقي، أوقف التمرير التلقائي
+  if (!movedEnough && Math.abs(dy) > 8) {
+    movedEnough = true;
+    stopScroll();
+    touchStartPos = posY; // نعيد الحساب من الموضع الحالي
+  }
+
+  if (!movedEnough) return;
+
+  // حساب السرعة اللحظية
+  const dtms = now - touchLastTime;
+  if (dtms > 0) touchVelocity = (touchLastY - cy) / dtms;
+  touchLastY    = cy;
+  touchLastTime = now;
+
+  posY = Math.max(0, Math.min(maxScroll, touchStartPos + (touchStartY - cy)));
+  scroller.style.transform = `translateY(${-posY}px)`;
+  updateUI();
+}, { passive: true });
+
+viewport.addEventListener('touchend', (e) => {
+  if (!isTouching) return;
+  isTouching = false;
+
+  if (!movedEnough) return; // ضغطة بدون سحب → لا شيء
+
+  // Momentum / inertia
+  let velocity = touchVelocity; // px/ms
+  const friction = 0.95;
+
+  function inertia() {
+    velocity *= friction;
+    if (Math.abs(velocity) < 0.02) return; // توقف طبيعي
+    posY = Math.max(0, Math.min(maxScroll, posY + velocity * 16));
+    scroller.style.transform = `translateY(${-posY}px)`;
+    updateUI();
+    inertiaId = requestAnimationFrame(inertia);
+  }
+  inertiaId = requestAnimationFrame(inertia);
+}, { passive: true });
+
+// ─── عجلة الماوس ─────────────────────────────────────────────────────────────
+viewport.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  stopScroll();
+  posY = Math.max(0, Math.min(maxScroll, posY + e.deltaY));
+  scroller.style.transform = `translateY(${-posY}px)`;
+  updateUI();
+}, { passive: false });
+
+// ─── تحميل النص ──────────────────────────────────────────────────────────────
+async function loadSurahText() {
+  try {
+    const res  = await fetch('surah.json');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    quranText.innerHTML = data.content +
+      '<br><br><br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p>';
+    // نتأخر frame واحد حتى يُحسب الـ layout
+    requestAnimationFrame(() => { recalcMax(); updateUI(); });
+  } catch {
+    quranText.innerHTML = '<span style="color:red">خطأ: تعذر تحميل نص السورة.</span>';
+  }
+}
+
+window.addEventListener('resize', () => { recalcMax(); updateUI(); });
+
+// ─── Slider UI ───────────────────────────────────────────────────────────────
+function updateSliderUI() {
+  const val = parseFloat(speedSlider.value);
+  const pct = ((val - +speedSlider.min) / (+speedSlider.max - +speedSlider.min)) * 100;
+  speedSlider.style.background =
+    `linear-gradient(to left, #c8a96e ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+  speedBadge.textContent = `×${val.toFixed(2)}`;
+  updateUI();
+}
+
+// ─── الأزرار ─────────────────────────────────────────────────────────────────
 scrollBtn.addEventListener('click', (e) => {
   e.stopPropagation();
-  if (isScrolling) stopScroll(); else startScroll();
+  isScrolling ? stopScroll() : startScroll();
 });
-
 plusBtn.addEventListener('click', (e) => {
   e.stopPropagation();
-  let val = parseFloat(speedSlider.value) + 0.1;
-  if (val > parseFloat(speedSlider.max)) val = speedSlider.max;
-  speedSlider.value = val.toFixed(2);
+  speedSlider.value = Math.min(parseFloat(speedSlider.value) + 0.1, +speedSlider.max).toFixed(2);
   updateSliderUI();
 });
-
 minusBtn.addEventListener('click', (e) => {
   e.stopPropagation();
-  let val = parseFloat(speedSlider.value) - 0.1;
-  if (val < parseFloat(speedSlider.min)) val = speedSlider.min;
-  speedSlider.value = val.toFixed(2);
+  speedSlider.value = Math.max(parseFloat(speedSlider.value) - 0.1, +speedSlider.min).toFixed(2);
   updateSliderUI();
 });
-
 speedSlider.addEventListener('click', (e) => e.stopPropagation());
 speedSlider.addEventListener('input', updateSliderUI);
 
 document.body.addEventListener('click', (e) => {
-  if (!scrollPanel.contains(e.target)) {
-    scrollPanel.classList.toggle('hidden');
-  }
+  if (!scrollPanel.contains(e.target)) scrollPanel.classList.toggle('hidden');
 });
 
-window.addEventListener('load', () => {
-  loadSurahText();
-  updateSliderUI();
-});
+window.addEventListener('load', () => { loadSurahText(); updateSliderUI(); });
 </script>
 
 </body>
