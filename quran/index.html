@@ -517,7 +517,7 @@
       if (!res.ok) throw new Error();
       const data=await res.json();
       quranText.innerHTML=data.content+
-        '<br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p><br><br><br>';
+        '<br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p><br><br>';
       requestAnimationFrame(()=>{ recalcMax(); scheduleUI(); });
     } catch {
       quranText.innerHTML='<span style="color:red">خطأ: تعذر تحميل نص السورة.</span>';
