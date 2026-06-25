@@ -3,8 +3,8 @@ const CACHE_NAME = ‘quran-v1’;
 
 
 const PRECACHE = [
-‘/’,
-‘/index.html’,
+‘/quran/’,
+‘/quran/index.html’,
 ‘https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2’,
 ];
 
