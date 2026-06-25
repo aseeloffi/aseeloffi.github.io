@@ -5,12 +5,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>القرآن الكريم</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a1a1a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preload" href="https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     @font-face {
@@ -39,6 +41,7 @@
       --sidebar-bg: #0e0e0e;
       --sidebar-item-hover: rgba(255,255,255,0.05);
       --sidebar-item-active: rgba(200,169,110,0.12);
+      --header-h: 70px;
     }
 
     body.light {
@@ -69,7 +72,6 @@
       background-color: var(--bg);
       color: var(--text);
       direction: rtl;
-      touch-action: none;
       transition: background-color 0.3s, color 0.3s;
     }
 
@@ -98,10 +100,10 @@
       justify-content: space-between;
     }
     .sidebar-header h2 {
-      font-family: Conv_original-hafs, serif;
-      font-size: 1.1em;
+      font-family: 'Amiri', serif;
+      font-size: 1.15em;
       color: var(--gold);
-      font-weight: 400;
+      font-weight: 700;
     }
     .sidebar-close {
       background: none; border: none;
@@ -160,8 +162,9 @@
       font-variant-numeric: tabular-nums;
     }
     .surah-name {
-      font-family: Conv_original-hafs, serif;
-      font-size: 1em;
+      font-family: 'Amiri', serif;
+      font-size: 1.05em;
+      font-weight: 700;
       color: var(--text);
       flex: 1;
     }
@@ -182,20 +185,11 @@
     }
     #sidebarOverlay.visible { opacity: 1; pointer-events: all; }
 
-    /* ====== MAIN ====== */
-    #viewport {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      overflow: hidden;
-    }
-
-    #scroller {
-      will-change: transform;
-      transform: translateY(0px);
-      contain: layout style;
-    }
-
+    /* ====== HEADER — hides/shows on scroll ====== */
     .page-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
       background-color: var(--bg2);
       padding: 14px 20px;
       text-align: center;
@@ -204,14 +198,19 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      will-change: transform;
+    }
+    .page-header.hidden-header {
+      transform: translateY(-100%);
     }
     .header-center { flex: 1; }
     .page-header h1 {
-      font-family: Conv_original-hafs, serif;
-      font-size: 1.3em;
-      font-weight: 400;
+      font-family: 'Amiri', serif;
+      font-size: 1.35em;
+      font-weight: 700;
       color: var(--gold);
+      letter-spacing: 0.01em;
     }
     .header-meta {
       display: flex;
@@ -267,10 +266,7 @@
       transition: background 0.2s, color 0.2s;
     }
     .font-btn:hover { background: var(--sidebar-item-hover); color: var(--text); }
-    .font-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
+    .font-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
     .basmalah {
       text-align: center;
@@ -284,7 +280,7 @@
     .quran-container {
       max-width: 900px;
       margin: 0 auto;
-      padding: 10px 25px 170px;
+      padding: 10px 25px 40px;
     }
 
     #quranText {
@@ -297,18 +293,32 @@
     }
 
     b { font-weight: 400; color: var(--gold); }
+
+    /* ── Ayah number — clickable, no transition color change ── */
     label {
       font-family: Conv_original-hafs, serif;
       color: var(--green);
       font-size: 0.75em;
-      cursor: default;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      border-radius: 50%;
+      padding: 0 2px;
+      transition: background 0.15s;
     }
-
-    /* Highlighted ayah — NO transition to prevent flicker */
-    .ayah-highlight {
+    label:hover {
       background: var(--highlight-bg);
-      border-radius: 6px;
-      outline: 1.5px solid var(--highlight-border);
+    }
+    label:active {
+      background: rgba(200,169,110,0.25);
+    }
+    /* Bookmarked ayah number highlight */
+    label.bm-active {
+      background: rgba(200,169,110,0.28);
+      color: var(--gold);
+      box-shadow: 0 0 0 2px var(--gold2);
+      border-radius: 50%;
+      font-weight: 700;
     }
 
     .p5 {
@@ -317,6 +327,75 @@
       font-size: 0.5em;
       margin-top: 30px;
       font-family: sans-serif;
+    }
+
+    /* ====== SURAH NAV (bottom) ====== */
+    .surah-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 25px;
+      gap: 12px;
+      max-width: 900px;
+      margin: 0 auto;
+      margin-bottom: 200px;
+    }
+    .surah-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      padding: 10px 18px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: Conv_original-hafs, serif;
+      font-size: 0.85em;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .surah-nav-btn:hover {
+      background: var(--sidebar-item-active);
+      border-color: var(--gold2);
+      color: var(--gold);
+    }
+    .surah-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .surah-nav-btn .nav-arrow {
+      font-size: 1em;
+      color: var(--gold);
+    }
+
+    /* ====== MAIN VIEWPORT ====== */
+    #viewport {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+    }
+
+    /* ✅ Native-feeling scroll container */
+    #scrollContainer {
+      position: absolute;
+      inset: 0;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: auto;
+      overscroll-behavior: contain;
+      will-change: scroll-position;
+    }
+    /* hide scrollbar but keep functional */
+    #scrollContainer::-webkit-scrollbar { width: 0; }
+
+    #scroller {
+      contain: layout style;
+      min-height: 100%;
+      transform: translateZ(0);
     }
 
     /* ====== SCROLL PANEL ====== */
@@ -339,7 +418,7 @@
       box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
       font-family: system-ui, -apple-system, sans-serif;
       width: 88%;
-      max-width: 320px;
+      max-width: 340px;
       transition: opacity 0.3s ease, transform 0.3s ease;
       contain: layout style;
     }
@@ -376,7 +455,7 @@
 
     .main-controls {
       display: flex; align-items: center;
-      justify-content: center; gap: 16px; width: 100%;
+      justify-content: center; gap: 10px; width: 100%;
     }
 
     .step-btn {
@@ -391,12 +470,26 @@
       flex-shrink: 0;
     }
     .step-btn:hover:not(:disabled) { background: rgba(200,169,110,0.14); color: var(--gold); }
-    /* ✅ FIX: Disabled state for speed buttons */
-    .step-btn:disabled {
-      opacity: 0.25;
-      cursor: not-allowed;
-      pointer-events: none;
+    .step-btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+    /* Jump buttons */
+    .jump-btn {
+      background: var(--track);
+      border: 1px solid var(--panel-border);
+      color: rgba(128,128,128,0.7);
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.65em;
+      font-family: system-ui, sans-serif;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
     }
+    .jump-btn:hover { background: rgba(200,169,110,0.14); color: var(--gold); }
+    .jump-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
 
     .scroll-btn {
       background: rgba(200,169,110,0.9);
@@ -413,14 +506,18 @@
     .scroll-btn:active { transform: scale(0.92); }
     .scroll-btn.active { background: rgba(255,255,255,0.88); }
 
-    .pause-icon {
-      display: none;
-      width: 11px; height: 13px;
-      border-left: 3.5px solid #111;
-      border-right: 3.5px solid #111;
+    .play-icon, .pause-icon {
+      width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
     }
-    .scroll-btn.active .play-text  { display: none; }
-    .scroll-btn.active .pause-icon { display: inline-block; }
+    .play-icon svg, .pause-icon svg {
+      width: 20px; height: 20px;
+      display: block;
+    }
+    .pause-icon { display: none; }
+    .scroll-btn.active .play-icon  { display: none; }
+    .scroll-btn.active .pause-icon { display: flex; }
 
     .speed-section { width: 100%; display: flex; align-items: center; gap: 8px; }
     .speed-label { font-size: 0.62em; color: rgba(128,128,128,0.45); flex-shrink: 0; letter-spacing: 0.02em; }
@@ -451,9 +548,8 @@
     .time-remaining { font-size: 0.62em; color: rgba(128,128,128,0.4); font-variant-numeric: tabular-nums; }
 
     /* ====== BOOKMARK BUTTON ====== */
-    #bookmarkBtn {
-      position: relative;
-    }
+    #bookmarkBtn { position: relative; }
+    #bookmarkBtn svg { width: 16px; height: 16px; }
     #bookmarkBtn .bm-dot {
       position: absolute;
       top: 4px; left: 4px;
@@ -463,6 +559,10 @@
       display: none;
     }
     #bookmarkBtn.has-bookmark .bm-dot { display: block; }
+    #bookmarkBtn.has-bookmark svg { fill: var(--gold); color: var(--gold); }
+
+    /* ====== THEME BUTTON ====== */
+    #themeBtn svg { width: 16px; height: 16px; }
 
     /* ====== BOOKMARK PANEL ====== */
     #bookmarkPanel {
@@ -489,12 +589,15 @@
       transform: translateX(-50%) translateY(0);
     }
     .bm-panel-title {
-      font-size: 0.78em;
       color: var(--gold);
       margin-bottom: 8px;
       font-family: Conv_original-hafs, serif;
       font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+    .bm-panel-title svg { width: 14px; height: 14px; }
     .bm-list {
       display: flex;
       flex-direction: column;
@@ -605,16 +708,8 @@
       transition: opacity 0.4s;
     }
     #loadingScreen.hidden { opacity: 0; pointer-events: none; }
-    .loader-text {
-      font-family: Conv_original-hafs, serif;
-      font-size: 1.8em;
-      color: var(--gold);
-    }
-    .loader-sub {
-      font-family: system-ui, sans-serif;
-      font-size: 0.75em;
-      color: var(--muted);
-    }
+    .loader-text { font-family: Conv_original-hafs, serif; font-size: 1.8em; color: var(--gold); }
+    .loader-sub { font-family: system-ui, sans-serif; font-size: 0.75em; color: var(--muted); }
     .spinner {
       width: 32px; height: 32px;
       border: 3px solid var(--track);
@@ -627,7 +722,7 @@
     /* ====== RESPONSIVE ====== */
     @media (max-width: 600px) {
       #quranText { font-size: 1.6em; }
-      .quran-container { padding: 10px 15px 165px; }
+      .quran-container { padding: 10px 15px 30px; }
       .basmalah { font-size: 1.6em; }
       #sidebar { width: 260px; }
     }
@@ -640,11 +735,7 @@
 </head>
 <body>
 
-<!-- Offline Badge -->
-
 <div id="offlineBadge">⚡ وضع عدم الاتصال</div>
-
-<!-- Loading Screen -->
 
 <div id="loadingScreen">
   <div class="loader-text">القرآن الكريم</div>
@@ -652,11 +743,7 @@
   <div class="loader-sub">جاري تحميل السور...</div>
 </div>
 
-<!-- Sidebar Overlay -->
-
 <div id="sidebarOverlay"></div>
-
-<!-- Sidebar -->
 
 <div id="sidebar">
   <div class="sidebar-header">
@@ -669,47 +756,64 @@
   <div id="surahList"></div>
 </div>
 
-<!-- Bookmark Panel -->
-
 <div id="bookmarkPanel">
-  <div class="bm-panel-title">🔖 العلامات المرجعية</div>
+  <div class="bm-panel-title">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17l-6-4-6 4V4z"/></svg>
+    العلامات المرجعية
+  </div>
   <div class="bm-list" id="bmList"></div>
   <button class="bm-add-btn" id="bmAddBtn">+ إضافة علامة هنا</button>
 </div>
 
-<!-- Main Viewport -->
+<!-- Main Viewport — native scroll -->
 
 <div id="viewport">
-  <div id="scroller">
-    <div class="page-header">
-      <div class="header-btns">
-        <button class="hbtn" id="menuBtn" title="قائمة السور">☰</button>
-      </div>
-      <div class="header-center">
-        <h1 id="surahTitle">سورة البقرة</h1>
-        <div class="header-meta">
-          <span id="surahInfo">٢٨٦ آية</span>
-          <span>·</span>
-          <span class="ayah-indicator" id="ayahIndicator">الآية ١</span>
-        </div>
-      </div>
-      <div class="header-btns">
-        <button class="hbtn" id="bookmarkBtn" title="العلامات المرجعية">
-          🔖
-          <span class="bm-dot"></span>
-        </button>
-        <div class="font-controls">
-          <button class="font-btn" id="fontMinus" title="تصغير الخط">A−</button>
-          <button class="font-btn" id="fontPlus" title="تكبير الخط">A+</button>
-        </div>
-        <button class="hbtn" id="themeBtn" title="تبديل المظهر">🌙</button>
+  <div id="scrollContainer">
+    <div id="scroller">
+
+
+  <div class="page-header" id="pageHeader">
+    <div class="header-btns">
+      <button class="hbtn" id="menuBtn" title="قائمة السور">☰</button>
+    </div>
+    <div class="header-center">
+      <h1 id="surahTitle">سورة البقرة</h1>
+      <div class="header-meta">
+        <span id="surahInfo">٢٨٦ آية</span>
+        <span>·</span>
+        <span class="ayah-indicator" id="ayahIndicator">الآية ١</span>
       </div>
     </div>
+    <div class="header-btns">
+      <button class="hbtn" id="bookmarkBtn" title="العلامات المرجعية">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17l-6-4-6 4V4z"/></svg>
+        <span class="bm-dot"></span>
+      </button>
+      <div class="font-controls">
+        <button class="font-btn" id="fontMinus" title="تصغير الخط">A−</button>
+        <button class="font-btn" id="fontPlus" title="تكبير الخط">A+</button>
+      </div>
+      <button class="hbtn" id="themeBtn" title="تبديل المظهر"></button>
+    </div>
+  </div>
 
+  <div class="basmalah" id="basmalah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
+  <div class="quran-container">
+    <div id="quranText"></div>
+  </div>
 
-<div class="basmalah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
-<div class="quran-container">
-  <div id="quranText"></div>
+  <!-- Bottom surah navigation -->
+  <div class="surah-nav" id="surahNav">
+    <button class="surah-nav-btn" id="prevSurahBtn">
+      <span class="nav-arrow">›</span>
+      <span id="prevSurahName">السورة السابقة</span>
+    </button>
+    <button class="surah-nav-btn" id="nextSurahBtn">
+      <span id="nextSurahName">السورة التالية</span>
+      <span class="nav-arrow">‹</span>
+    </button>
+  </div>
+
 </div>
 
 
@@ -728,12 +832,24 @@
   </div>
   <div class="divider"></div>
   <div class="main-controls">
+    <button class="jump-btn" id="jumpTopBtn" title="الأعلى">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      الأعلى
+    </button>
     <button class="step-btn" id="minusBtn" title="تبطيء">−</button>
     <button class="scroll-btn" id="scrollBtn">
-      <span class="play-text">▶</span>
-      <span class="pause-icon"></span>
+      <span class="play-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.52.85l11-7.5a1 1 0 0 0 0-1.7l-11-7.5A1 1 0 0 0 7 4.5z"/></svg>
+      </span>
+      <span class="pause-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4.5" height="16" rx="1"/><rect x="13.5" y="4" width="4.5" height="16" rx="1"/></svg>
+      </span>
     </button>
     <button class="step-btn" id="plusBtn" title="تسريع">+</button>
+    <button class="jump-btn" id="jumpBottomBtn" title="الأسفل">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      الأسفل
+    </button>
   </div>
   <div class="speed-section">
     <span class="speed-label">السرعة</span>
@@ -742,8 +858,6 @@
   </div>
   <div class="time-remaining" id="timeRemaining">متبقي: --:--</div>
 </div>
-
-<!-- Toast -->
 
 <div id="toast"></div>
 
@@ -790,11 +904,17 @@ const SURAHS = [
   {n:112,name:"الإخلاص",ayat:4},{n:113,name:"الفلق",ayat:5},{n:114,name:"الناس",ayat:6}
 ];
 
+// ====== ICON TEMPLATES ======
+const ICON_MOON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.7A8.5 8.5 0 0 1 9.3 3.5a.6.6 0 0 0-.77-.78A10 10 0 1 0 21.27 15.5a.6.6 0 0 0-.77-.8z"/></svg>';
+const ICON_SUN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.3M19.2 12h2.3M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>';
+
 // ====== DOM REFS ======
 const scrollPanel     = document.getElementById('scrollPanel');
 const scrollBtn       = document.getElementById('scrollBtn');
 const plusBtn         = document.getElementById('plusBtn');
 const minusBtn        = document.getElementById('minusBtn');
+const jumpTopBtn      = document.getElementById('jumpTopBtn');
+const jumpBottomBtn   = document.getElementById('jumpBottomBtn');
 const speedSlider     = document.getElementById('speedSlider');
 const speedBadge      = document.getElementById('speedBadge');
 const timeRemainingEl = document.getElementById('timeRemaining');
@@ -802,7 +922,9 @@ const progressPct     = document.getElementById('progressPct');
 const seekBar         = document.getElementById('seekBar');
 const quranText       = document.getElementById('quranText');
 const scroller        = document.getElementById('scroller');
+const scrollContainer = document.getElementById('scrollContainer');
 const viewport        = document.getElementById('viewport');
+const pageHeader      = document.getElementById('pageHeader');
 const themeBtn        = document.getElementById('themeBtn');
 const fontPlus        = document.getElementById('fontPlus');
 const fontMinus       = document.getElementById('fontMinus');
@@ -822,15 +944,19 @@ const bookmarkPanel   = document.getElementById('bookmarkPanel');
 const bmList          = document.getElementById('bmList');
 const bmAddBtn        = document.getElementById('bmAddBtn');
 const offlineBadge    = document.getElementById('offlineBadge');
+const prevSurahBtn    = document.getElementById('prevSurahBtn');
+const nextSurahBtn    = document.getElementById('nextSurahBtn');
+const prevSurahName   = document.getElementById('prevSurahName');
+const nextSurahName   = document.getElementById('nextSurahName');
+const basmalahEl      = document.getElementById('basmalah');
 
 // ====== STATE ======
 const BASE_SPEED = 40;
 let isScrolling = false;
 let rafId = null;
 let lastTime = null;
-let posY = 0;
-let maxScroll = 0;
-let uiFrame = 0;
+let scrollAccum = 0; // floating-point scroll position accumulator (fixes sub-pixel stall at low speeds)
+let scrollWhole = 0; // last integer px written to scrollTop (avoids redundant DOM writes)
 let isSeeking = false;
 let uiRafId = null;
 let uiDirty = false;
@@ -839,10 +965,44 @@ let fontSize = parseFloat(localStorage.getItem('fontSize') || '2');
 const FONT_MIN = 1.2, FONT_MAX = 3.5;
 let ayahPositions = [];
 let currentAyah = 1;
-let highlightedEl = null;
-// ✅ Ayah indicator debounce — prevents flicker
 let ayahUpdateScheduled = false;
 let pendingAyah = null;
+
+// ====== HEADER HIDE/SHOW on scroll ======
+let lastScrollY = 0;
+let headerVisible = true;
+let headerRafId = null;
+
+function updateHeader(scrollY) {
+  const delta = scrollY - lastScrollY;
+  lastScrollY = scrollY;
+  if (scrollY < 60) {
+    // Always show near top
+    if (!headerVisible) {
+      headerVisible = true;
+      pageHeader.classList.remove('hidden-header');
+    }
+    return;
+  }
+  if (delta > 4 && headerVisible) {
+    headerVisible = false;
+    pageHeader.classList.add('hidden-header');
+  } else if (delta < -4 && !headerVisible) {
+    headerVisible = true;
+    pageHeader.classList.remove('hidden-header');
+  }
+}
+
+scrollContainer.addEventListener('scroll', () => {
+  const sy = scrollContainer.scrollTop;
+  if (!headerRafId) {
+    headerRafId = requestAnimationFrame(() => {
+      headerRafId = null;
+      updateHeader(sy);
+      scheduleUI();
+    });
+  }
+}, { passive: true });
 
 // ====== TOAST ======
 let toastTimer = null;
@@ -856,7 +1016,7 @@ function showToast(msg, duration = 2000) {
 // ====== THEME ======
 function applyTheme(light) {
   document.body.classList.toggle('light', light);
-  themeBtn.textContent = light ? '☀️' : '🌙';
+  themeBtn.innerHTML = light ? ICON_SUN : ICON_MOON;
   localStorage.setItem('theme', light ? 'light' : 'dark');
 }
 const savedTheme = localStorage.getItem('theme');
@@ -871,20 +1031,15 @@ function applyFontSize(size) {
   fontSize = Math.max(FONT_MIN, Math.min(FONT_MAX, size));
   quranText.style.fontSize = fontSize + 'em';
   localStorage.setItem('fontSize', fontSize);
-  // ✅ FIX: disable font buttons at limits
   fontMinus.disabled = fontSize <= FONT_MIN;
   fontPlus.disabled  = fontSize >= FONT_MAX;
-  // ✅ FIX: recalc time remaining after font change
-  recalcMax();
   scheduleUI();
 }
 applyFontSize(fontSize);
-
-fontPlus.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(fontSize + 0.15); });
+fontPlus.addEventListener('click',  (e) => { e.stopPropagation(); applyFontSize(fontSize + 0.15); });
 fontMinus.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(fontSize - 0.15); });
 
-// ====== SPEED BUTTON LIMITS ======
-// ✅ FIX: disable +/− when at min/max speed
+// ====== SPEED BUTTONS ======
 function updateSpeedBtnStates() {
   const val = parseFloat(speedSlider.value);
   minusBtn.disabled = val <= parseFloat(speedSlider.min) + 0.001;
@@ -903,7 +1058,6 @@ function buildSurahList(filter = '') {
     surahList.appendChild(div);
   });
 }
-
 function openSidebar() {
   sidebar.classList.add('open');
   sidebarOverlay.classList.add('visible');
@@ -915,70 +1069,97 @@ function closeSidebar() {
   sidebar.classList.remove('open');
   sidebarOverlay.classList.remove('visible');
 }
-
 menuBtn.addEventListener('click', (e) => { e.stopPropagation(); openSidebar(); });
 sidebarClose.addEventListener('click', closeSidebar);
 sidebarOverlay.addEventListener('click', closeSidebar);
 surahSearch.addEventListener('input', () => buildSurahList(surahSearch.value.trim()));
 
-// ====== AYAH TRACKING (no-flicker) ======
-function buildAyahPositions() {
-  ayahPositions = [];
-  const labels = quranText.querySelectorAll('label');
-  labels.forEach(label => {
-    const text = label.textContent.trim();
-    const match = text.match(/\d+/);
-    if (match) {
-      ayahPositions.push({ el: label.parentElement || label, num: parseInt(match[0]) });
-    }
-  });
-}
-
+// ====== HELPER ======
 function toArabicNum(n) {
   return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 }
 
-// ✅ FIX: debounced ayah update — avoids DOM flicker on rapid scroll
+// ====== AYAH TRACKING ======
+function buildAyahPositions() {
+  ayahPositions = [];
+  const labels = quranText.querySelectorAll('label');
+  labels.forEach(label => {
+    const match = label.textContent.trim().match(/\d+/);
+    if (match) {
+      ayahPositions.push({ el: label.closest('span[data-ayah]') || label, num: parseInt(match[0]) });
+    }
+  });
+}
+
+// ① Ayah number tap → save bookmark (no transition color change)
+function attachAyahTapHandlers() {
+  quranText.querySelectorAll('label').forEach(label => {
+    label.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const match = label.textContent.trim().match(/\d+/);
+      if (!match) return;
+      const ayahNum = parseInt(match[0]);
+      addBookmarkForAyah(ayahNum);
+    });
+  });
+}
+
+function addBookmarkForAyah(ayahNum) {
+  let bms = loadBookmarks();
+  // Remove any existing bookmark for this surah (one per surah)
+  bms = bms.filter(b => b.surah !== currentSurah);
+  const scrollY = scrollContainer.scrollTop;
+  bms.push({ id: Date.now(), surah: currentSurah, ayah: ayahNum, posY: Math.round(scrollY) });
+  saveBookmarks(bms);
+  updateBookmarkDot();
+  highlightBookmarkedAyah(ayahNum);
+  showToast('🔖 تم حفظ الآية ' + toArabicNum(ayahNum));
+}
+
+function highlightBookmarkedAyah(ayahNum) {
+  // Remove previous highlights
+  quranText.querySelectorAll('label.bm-active').forEach(l => l.classList.remove('bm-active'));
+  // Highlight the new one
+  quranText.querySelectorAll('label').forEach(label => {
+    const match = label.textContent.trim().match(/\d+/);
+    if (match && parseInt(match[0]) === ayahNum) {
+      label.classList.add('bm-active');
+    }
+  });
+}
+
+function refreshBookmarkHighlight() {
+  quranText.querySelectorAll('label.bm-active').forEach(l => l.classList.remove('bm-active'));
+  const bms = loadBookmarks();
+  const bm = bms.find(b => b.surah === currentSurah);
+  if (!bm) return;
+  highlightBookmarkedAyah(bm.ayah);
+}
+
 function updateAyahIndicator() {
   if (!ayahPositions.length) return;
-  const viewTop = posY;
+  const scrollY = scrollContainer.scrollTop;
+  const viewH = scrollContainer.clientHeight;
   let found = ayahPositions[0];
   for (const a of ayahPositions) {
-    const top = a.el.offsetTop;
-    if (top <= viewTop + viewport.offsetHeight * 0.35) found = a;
+    const top = a.el ? a.el.offsetTop : 0;
+    if (top <= scrollY + viewH * 0.35) found = a;
     else break;
   }
-  if (found.num === currentAyah) return; // no change, skip
+  if (found.num === currentAyah) return;
 
   pendingAyah = found;
-
   if (ayahUpdateScheduled) return;
   ayahUpdateScheduled = true;
 
-  // Defer the DOM write so it doesn't interrupt the scroll frame
   setTimeout(() => {
     ayahUpdateScheduled = false;
     if (!pendingAyah) return;
     const newAyah = pendingAyah;
     pendingAyah = null;
-
     if (newAyah.num === currentAyah) return;
     currentAyah = newAyah.num;
     ayahIndicator.textContent = 'الآية ' + toArabicNum(currentAyah);
-
-    // Remove old highlight without transition
-    if (highlightedEl) {
-      highlightedEl.classList.remove('ayah-highlight');
-      highlightedEl = null;
-    }
-
-    const spanEl = quranText.querySelector(`span[data-ayah="${currentAyah}"]`);
-    if (spanEl) {
-      highlightedEl = spanEl;
-      // Force layout before adding class to ensure paint is clean
-      spanEl.getBoundingClientRect();
-      spanEl.classList.add('ayah-highlight');
-    }
   }, 80);
 }
 
@@ -989,15 +1170,21 @@ function scheduleUI() {
   uiRafId = requestAnimationFrame(flushUI);
 }
 
+function getMaxScroll() {
+  return Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+}
+
 function flushUI() {
   uiRafId = null;
   uiDirty = false;
-  const pct = maxScroll > 0 ? posY / maxScroll : 0;
+  const scrollY = scrollContainer.scrollTop;
+  const maxS = getMaxScroll();
+  const pct = maxS > 0 ? scrollY / maxS : 0;
   const pctNum = Math.round(pct * 100);
   if (!isSeeking) seekBar.value = Math.round(pct * 1000);
   seekBar.style.background = `linear-gradient(to left, rgba(200,169,110,0.6) ${pctNum}%, var(--track) ${pctNum}%)`;
   progressPct.textContent = pctNum + '%';
-  const remaining = maxScroll - posY;
+  const remaining = maxS - scrollY;
   if (remaining <= 2) { timeRemainingEl.textContent = 'تمت القراءة ✓'; return; }
   const speed = parseFloat(speedSlider.value);
   const secs = remaining / (speed * BASE_SPEED);
@@ -1007,23 +1194,49 @@ function flushUI() {
   updateAyahIndicator();
 }
 
-// ====== SCROLL ENGINE ======
+// ====== AUTO-SCROLL ENGINE — sub-pixel smooth ======
+// We keep a float accumulator (scrollAccum) as the true position,
+// and write it directly to scrollTop every frame.
+// To avoid the jitter caused by the browser rounding scrollTop to integers
+// on read-back, we NEVER read scrollTop inside the tick loop — we only write it.
+// For very low speeds the per-frame delta is < 1 px, so we batch it until
+// it crosses an integer boundary before committing, keeping the DOM write
+// to whole pixels while the logical position advances smoothly.
+
+let scrollWhole = 0; // last integer value written to scrollTop
+
 function tick(timestamp) {
   if (!isScrolling) return;
-  if (lastTime === null) lastTime = timestamp;
-  const delta = Math.min(timestamp - lastTime, 64);
+  if (lastTime === null) { lastTime = timestamp; rafId = requestAnimationFrame(tick); return; }
+
+  const delta = Math.min(timestamp - lastTime, 50); // cap at 50 ms (handles tab switch / slow frames)
   lastTime = timestamp;
-  posY += (parseFloat(speedSlider.value) * BASE_SPEED * delta) / 1000;
-  if (posY > maxScroll) posY = maxScroll;
-  scroller.style.transform = `translateY(${-posY}px)`;
-  if (++uiFrame % 12 === 0) scheduleUI();
-  if (posY >= maxScroll) { stopScroll(); return; }
+
+  const speed = parseFloat(speedSlider.value);
+  const dy = (speed * BASE_SPEED * delta) / 1000;
+  const maxS = getMaxScroll();
+
+  scrollAccum = Math.min(scrollAccum + dy, maxS);
+
+  // Only touch the DOM when the integer part changes — eliminates sub-pixel flicker
+  const newWhole = Math.floor(scrollAccum);
+  if (newWhole !== scrollWhole) {
+    scrollWhole = newWhole;
+    scrollContainer.scrollTop = scrollWhole;
+  }
+
+  scheduleUI();
+
+  if (scrollAccum >= maxS) { stopScroll(); return; }
   rafId = requestAnimationFrame(tick);
 }
 
 function startScroll() {
   if (isScrolling) return;
-  isScrolling = true; lastTime = null; uiFrame = 0;
+  isScrolling = true;
+  lastTime = null;
+  scrollAccum = scrollContainer.scrollTop;
+  scrollWhole = Math.floor(scrollAccum);
   scrollBtn.classList.add('active');
   rafId = requestAnimationFrame(tick);
 }
@@ -1031,26 +1244,31 @@ function startScroll() {
 function stopScroll() {
   isScrolling = false;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  lastTime = null;
   scrollBtn.classList.remove('active');
   scheduleUI();
   saveProgress();
 }
 
-function recalcMax() {
-  maxScroll = scroller.offsetHeight - viewport.offsetHeight;
-  if (maxScroll < 0) maxScroll = 0;
-}
+// ====== JUMP BUTTONS ======
+jumpTopBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  stopScroll();
+  scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('انتقل إلى الأعلى');
+});
+jumpBottomBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  stopScroll();
+  scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+  showToast('انتقل إلى الأسفل');
+});
 
 // ====== SAVE / RESTORE ======
 function saveProgress() {
-  const data = {
-    surah: currentSurah,
-    posY: Math.round(posY),
-    speed: speedSlider.value
-  };
+  const data = { surah: currentSurah, posY: Math.round(scrollContainer.scrollTop), speed: speedSlider.value };
   localStorage.setItem('quranProgress', JSON.stringify(data));
 }
-
 function restoreProgress(surah) {
   try {
     const raw = localStorage.getItem('quranProgress');
@@ -1066,9 +1284,7 @@ function loadBookmarks() {
   try { return JSON.parse(localStorage.getItem('quranBookmarks') || '[]'); }
   catch { return []; }
 }
-function saveBookmarks(bms) {
-  localStorage.setItem('quranBookmarks', JSON.stringify(bms));
-}
+function saveBookmarks(bms) { localStorage.setItem('quranBookmarks', JSON.stringify(bms)); }
 
 function renderBookmarkPanel() {
   const bms = loadBookmarks();
@@ -1076,9 +1292,9 @@ function renderBookmarkPanel() {
   bmList.innerHTML = '';
   const forThis = bms.filter(b => b.surah === currentSurah);
   if (forThis.length === 0) {
-    bmList.innerHTML = '<div class="bm-empty">لا توجد علامات في هذه السورة</div>';
+    bmList.innerHTML = '<div class="bm-empty">لا توجد علامات في هذه السورة<br><small style="color:var(--muted);font-size:0.85em">اضغط على رقم الآية لحفظها</small></div>';
   } else {
-    forThis.forEach((bm, idx) => {
+    forThis.forEach((bm) => {
       const meta = SURAHS.find(s => s.n === bm.surah);
       const div = document.createElement('div');
       div.className = 'bm-item';
@@ -1088,10 +1304,7 @@ function renderBookmarkPanel() {
       `;
       div.addEventListener('click', (e) => {
         if (e.target.classList.contains('bm-item-del')) return;
-        // Jump to bookmark position
-        posY = Math.min(bm.posY, maxScroll);
-        scroller.style.transform = `translateY(${-posY}px)`;
-        scheduleUI();
+        scrollContainer.scrollTo({ top: Math.min(bm.posY, getMaxScroll()), behavior: 'smooth' });
         closeBookmarkPanel();
         showToast('انتقلت إلى العلامة المرجعية');
       });
@@ -1108,43 +1321,44 @@ function renderBookmarkPanel() {
 }
 
 function addBookmark() {
-  const bms = loadBookmarks();
-  // Check duplicate (same surah + ayah)
-  const exists = bms.find(b => b.surah === currentSurah && b.ayah === currentAyah);
-  if (exists) { showToast('علامة مرجعية موجودة بالفعل لهذه الآية'); return; }
-  bms.push({ id: Date.now(), surah: currentSurah, ayah: currentAyah, posY: Math.round(posY) });
-  saveBookmarks(bms);
-  renderBookmarkPanel();
-  showToast('✅ أضيفت العلامة المرجعية · الآية ' + toArabicNum(currentAyah));
+  addBookmarkForAyah(currentAyah);
 }
 
 let bookmarkPanelOpen = false;
-function openBookmarkPanel() {
-  renderBookmarkPanel();
-  bookmarkPanel.classList.add('show');
-  bookmarkPanelOpen = true;
-}
-function closeBookmarkPanel() {
-  bookmarkPanel.classList.remove('show');
-  bookmarkPanelOpen = false;
-}
-
-bookmarkBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  bookmarkPanelOpen ? closeBookmarkPanel() : openBookmarkPanel();
-});
+function openBookmarkPanel() { renderBookmarkPanel(); bookmarkPanel.classList.add('show'); bookmarkPanelOpen = true; }
+function closeBookmarkPanel() { bookmarkPanel.classList.remove('show'); bookmarkPanelOpen = false; }
+bookmarkBtn.addEventListener('click', (e) => { e.stopPropagation(); bookmarkPanelOpen ? closeBookmarkPanel() : openBookmarkPanel(); });
 bmAddBtn.addEventListener('click', (e) => { e.stopPropagation(); addBookmark(); });
 bookmarkPanel.addEventListener('click', (e) => e.stopPropagation());
+
+// ====== SURAH NAV (bottom) ======
+function updateSurahNavButtons() {
+  const prev = SURAHS.find(s => s.n === currentSurah - 1);
+  const next = SURAHS.find(s => s.n === currentSurah + 1);
+  prevSurahBtn.disabled = !prev;
+  nextSurahBtn.disabled = !next;
+  prevSurahName.textContent = prev ? 'سورة ' + prev.name : 'السورة السابقة';
+  nextSurahName.textContent = next ? 'سورة ' + next.name : 'السورة التالية';
+}
+
+prevSurahBtn.addEventListener('click', () => {
+  if (currentSurah > 1) loadSurah(currentSurah - 1);
+});
+nextSurahBtn.addEventListener('click', () => {
+  if (currentSurah < 114) loadSurah(currentSurah + 1);
+});
 
 // ====== LOAD SURAH ======
 async function loadSurah(surahNum) {
   stopScroll();
   currentSurah = surahNum;
-  posY = 0;
-  scroller.style.transform = 'translateY(0px)';
+  scrollContainer.scrollTop = 0;
+  scrollAccum = 0;
+  lastScrollY = 0;
+  headerVisible = true;
+  pageHeader.classList.remove('hidden-header');
   ayahPositions = [];
   currentAyah = 1;
-  if (highlightedEl) { highlightedEl.classList.remove('ayah-highlight'); highlightedEl = null; }
 
   const meta = SURAHS.find(s => s.n === surahNum);
   surahTitle.textContent = 'سورة ' + (meta ? meta.name : '');
@@ -1156,8 +1370,8 @@ async function loadSurah(surahNum) {
   loadingScreen.style.opacity = '1';
   loadingScreen.style.pointerEvents = 'all';
 
-  const basmalah = document.querySelector('.basmalah');
-  basmalah.style.display = (surahNum === 9) ? 'none' : '';
+  basmalahEl.style.display = (surahNum === 9) ? 'none' : '';
+  updateSurahNavButtons();
 
   try {
     const res = await fetch(`surah/${surahNum}.json`);
@@ -1165,10 +1379,10 @@ async function loadSurah(surahNum) {
     const data = await res.json();
 
     quranText.innerHTML = data.content +
-      '<br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p><br><br>';
+      '<br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p><br>';
 
-    const labels = quranText.querySelectorAll('label');
-    labels.forEach(label => {
+    // Wrap each ayah label in a span for tracking
+    quranText.querySelectorAll('label').forEach(label => {
       const match = label.textContent.trim().match(/\d+/);
       if (match) {
         const span = document.createElement('span');
@@ -1179,26 +1393,29 @@ async function loadSurah(surahNum) {
       }
     });
 
+    // Attach tap-to-bookmark on ayah numbers
+    attachAyahTapHandlers();
+
     requestAnimationFrame(() => {
-      recalcMax();
-      buildAyahPositions();
-
-      const saved = restoreProgress(surahNum);
-      if (saved && saved.posY > 0) {
-        posY = Math.min(saved.posY, maxScroll);
-        scroller.style.transform = `translateY(${-posY}px)`;
-        speedSlider.value = saved.speed || 0.5;
-        updateSliderUI();
-        showToast('استُؤنفت القراءة من حيث توقفت');
-      }
-      scheduleUI();
-      updateBookmarkDot();
-
-      loadingScreen.style.opacity = '0';
-      setTimeout(() => {
-        loadingScreen.classList.add('hidden');
-        loadingScreen.style.pointerEvents = 'none';
-      }, 400);
+      requestAnimationFrame(() => {
+        buildAyahPositions();
+        const saved = restoreProgress(surahNum);
+        if (saved && saved.posY > 0) {
+          scrollContainer.scrollTop = Math.min(saved.posY, getMaxScroll());
+          scrollAccum = scrollContainer.scrollTop;
+          speedSlider.value = saved.speed || 0.5;
+          updateSliderUI();
+          showToast('استُؤنفت القراءة من حيث توقفت');
+        }
+        scheduleUI();
+        updateBookmarkDot();
+        refreshBookmarkHighlight();
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+          loadingScreen.classList.add('hidden');
+          loadingScreen.style.pointerEvents = 'none';
+        }, 400);
+      });
     });
 
   } catch (err) {
@@ -1225,95 +1442,28 @@ function updateBookmarkDot() {
 // ====== SEEK BAR ======
 seekBar.addEventListener('mousedown',  () => { isSeeking = true; });
 seekBar.addEventListener('touchstart', () => { isSeeking = true; }, { passive: true });
-seekBar.addEventListener('touchmove',  (e) => e.stopPropagation(), { passive: true });
 seekBar.addEventListener('input', () => {
-  posY = Math.max(0, Math.min(maxScroll, (parseInt(seekBar.value) / 1000) * maxScroll));
-  scroller.style.transform = `translateY(${-posY}px)`;
+  const maxS = getMaxScroll();
+  const newY = (parseInt(seekBar.value) / 1000) * maxS;
+  scrollContainer.scrollTop = newY;
+  scrollAccum = newY;
   scheduleUI();
 });
 seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); saveProgress(); });
 seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); saveProgress(); }, { passive: true });
 
-// ====== TOUCH SCROLL (improved inertia) ======
-let touchStartY=0, touchStartPos=0, touchLastY=0, touchLastTime=0;
-let touchVelocity=0, isTouching=false, movedEnough=false;
-let inertiaId=null, pendingDY=null;
-
-function cancelInertia() {
-  if (inertiaId) { cancelAnimationFrame(inertiaId); inertiaId = null; }
-}
-
-viewport.addEventListener('touchstart', (e) => {
-  if (e.touches.length > 1) return;
-  cancelInertia();
-  isTouching=true; movedEnough=false; touchVelocity=0; pendingDY=null;
-  touchStartY=e.touches[0].clientY; touchLastY=touchStartY;
-  touchLastTime=performance.now(); touchStartPos=posY;
+// ====== WHEEL / TOUCH — stop auto-scroll only on actual manual swipe ======
+let touchStartY = 0;
+scrollContainer.addEventListener('wheel', () => {
+  if (isScrolling) stopScroll();
 }, { passive: true });
-
-viewport.addEventListener('touchmove', (e) => {
-  if (!isTouching || e.touches.length > 1) return;
-  const cy=e.touches[0].clientY, now=performance.now(), dy=touchStartY-cy;
-  if (!movedEnough && Math.abs(dy) > 8) { movedEnough=true; stopScroll(); touchStartPos=posY; }
-  if (!movedEnough) return;
-  const dtms=now-touchLastTime;
-  if (dtms>0) touchVelocity=(touchLastY-cy)/dtms;
-  touchLastY=cy; touchLastTime=now; pendingDY=touchStartY-cy;
-  if (!rafId) rafId=requestAnimationFrame(applyTouch);
+scrollContainer.addEventListener('touchstart', (e) => {
+  touchStartY = e.touches[0].clientY;
 }, { passive: true });
-
-function applyTouch() {
-  rafId=null;
-  if (pendingDY===null) return;
-  posY=Math.max(0,Math.min(maxScroll,touchStartPos+pendingDY));
-  scroller.style.transform=`translateY(${-posY}px)`;
-  scheduleUI();
-}
-
-// ✅ FIX: smoother inertia with better friction curve
-viewport.addEventListener('touchend', () => {
-  if (!isTouching) return;
-  isTouching=false;
-  if (!movedEnough) return;
-  let velocity=touchVelocity * 16; // pixels per frame at 60fps
-  let lastTs = null;
-
-  function inertia(ts) {
-    if (!lastTs) lastTs = ts;
-    const dt = Math.min(ts - lastTs, 32); // cap delta
-    lastTs = ts;
-
-    // ✅ frame-independent decay: smoother and more natural
-    const decay = Math.pow(0.94, dt / 16.67);
-    velocity *= decay;
-
-    if (Math.abs(velocity) < 0.5) {
-      saveProgress();
-      return;
-    }
-    posY = Math.max(0, Math.min(maxScroll, posY + velocity * (dt / 16.67)));
-    scroller.style.transform = `translateY(${-posY}px)`;
-    scheduleUI();
-    inertiaId = requestAnimationFrame(inertia);
-  }
-  inertiaId = requestAnimationFrame(inertia);
+scrollContainer.addEventListener('touchmove', (e) => {
+  const dy = Math.abs(e.touches[0].clientY - touchStartY);
+  if (dy > 8 && isScrolling) stopScroll();
 }, { passive: true });
-
-// ====== WHEEL ======
-let wheelPending=0, wheelRafId=null;
-viewport.addEventListener('wheel', (e) => {
-  e.preventDefault(); stopScroll();
-  wheelPending+=e.deltaY;
-  if (!wheelRafId) wheelRafId=requestAnimationFrame(applyWheel);
-}, { passive: false });
-function applyWheel() {
-  wheelRafId=null;
-  posY=Math.max(0,Math.min(maxScroll,posY+wheelPending));
-  wheelPending=0;
-  scroller.style.transform=`translateY(${-posY}px)`;
-  scheduleUI();
-  saveProgress();
-}
 
 // ====== KEYBOARD SHORTCUTS ======
 document.addEventListener('keydown', (e) => {
@@ -1337,17 +1487,9 @@ document.addEventListener('keydown', (e) => {
       updateSliderUI();
       showToast('السرعة: ×' + parseFloat(speedSlider.value).toFixed(1));
       break;
-    case 'KeyM':
-      openSidebar();
-      break;
-    case 'Escape':
-      closeSidebar();
-      closeBookmarkPanel();
-      break;
-    case 'KeyB':
-      e.preventDefault();
-      addBookmark();
-      break;
+    case 'KeyM': openSidebar(); break;
+    case 'Escape': closeSidebar(); closeBookmarkPanel(); break;
+    case 'KeyB': e.preventDefault(); addBookmark(); break;
   }
 });
 
@@ -1376,7 +1518,18 @@ speedSlider.addEventListener('click', (e) => e.stopPropagation());
 speedSlider.addEventListener('input', updateSliderUI);
 seekBar.addEventListener('click', (e) => e.stopPropagation());
 
+// Close bookmark panel when user scrolls
+let isScrollingTouch = false;
+scrollContainer.addEventListener('touchstart', () => { isScrollingTouch = false; }, { passive: true });
+scrollContainer.addEventListener('touchmove', () => {
+  if (!isScrollingTouch) {
+    isScrollingTouch = true;
+    if (bookmarkPanelOpen) closeBookmarkPanel();
+  }
+}, { passive: true });
+
 document.body.addEventListener('click', (e) => {
+  if (isScrollingTouch) { isScrollingTouch = false; return; }
   if (bookmarkPanelOpen && !bookmarkPanel.contains(e.target) && e.target !== bookmarkBtn) {
     closeBookmarkPanel();
     return;
@@ -1386,27 +1539,19 @@ document.body.addEventListener('click', (e) => {
   }
 });
 
-window.addEventListener('resize', () => { recalcMax(); scheduleUI(); });
+window.addEventListener('resize', scheduleUI);
 window.addEventListener('beforeunload', saveProgress);
 
-// ====== OFFLINE DETECTION ======
-function handleOnline() {
-  offlineBadge.classList.remove('show');
-}
-function handleOffline() {
-  offlineBadge.classList.add('show');
-}
-window.addEventListener('online', handleOnline);
-window.addEventListener('offline', handleOffline);
-if (!navigator.onLine) handleOffline();
+// ====== OFFLINE ======
+window.addEventListener('online', () => offlineBadge.classList.remove('show'));
+window.addEventListener('offline', () => offlineBadge.classList.add('show'));
+if (!navigator.onLine) offlineBadge.classList.add('show');
 
-// ====== SERVICE WORKER (PWA) ======
+// ====== SERVICE WORKER ======
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.addEventListener('updatefound', () => {
-        showToast('🔄 تحديث متاح، أعد تحميل الصفحة');
-      });
+      reg.addEventListener('updatefound', () => showToast('🔄 تحديث متاح، أعد تحميل الصفحة'));
     }).catch(() => {});
   });
 }
@@ -1417,7 +1562,7 @@ window.addEventListener('load', () => {
     const raw = localStorage.getItem('quranProgress');
     if (raw) {
       const data = JSON.parse(raw);
-      if (data.speed) { speedSlider.value = data.speed; }
+      if (data.speed) speedSlider.value = data.speed;
       if (data.surah) currentSurah = data.surah;
     }
   } catch {}
