@@ -737,12 +737,12 @@
 </head>
 <body>
 
-<div id="offlineBadge">⚡ وضع عدم الاتصال</div>
+<div id="offlineBadge">وضع عدم الاتصال</div>
 
 <div id="loadingScreen">
   <div class="loader-text">القرآن الكريم</div>
   <div class="spinner"></div>
-  <div class="loader-sub">جاري تحميل السور...</div>
+  <div class="loader-sub">جاري التحميل ...</div>
 </div>
 
 <div id="sidebarOverlay"></div>
@@ -1285,13 +1285,13 @@ jumpTopBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   stopScroll();
   scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-  showToast('انتقل إلى الأعلى');
+
 });
 jumpBottomBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   stopScroll();
   scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
-  showToast('انتقل إلى الأسفل');
+
 });
 
 // ====== SAVE / RESTORE ======
@@ -1336,14 +1336,13 @@ function renderBookmarkPanel() {
         if (e.target.classList.contains('bm-item-del')) return;
         scrollContainer.scrollTo({ top: Math.min(bm.posY, getMaxScroll()), behavior: 'smooth' });
         closeBookmarkPanel();
-        showToast('انتقلت إلى العلامة المرجعية');
       });
       div.querySelector('.bm-item-del').addEventListener('click', (e) => {
         e.stopPropagation();
         const all = loadBookmarks().filter(b => b.id !== bm.id);
         saveBookmarks(all);
         renderBookmarkPanel();
-        showToast('حُذفت العلامة');
+
       });
       bmList.appendChild(div);
     });
