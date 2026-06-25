@@ -895,8 +895,14 @@ async function loadSurah(surahNum) {
   basmalah.style.display = (surahNum === 9) ? 'none' : '';
 
   try {
-    const url = `https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/surah/${surahNum}.json`;
-    const res = await fetch(url);
+    let res;
+    if (surahNum === 2) {
+      // سورة البقرة من الملف المحلي
+      res = await fetch('surah.json');
+    } else {
+      const url = `https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/surah/${surahNum}.json`;
+      res = await fetch(url);
+    }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
 
