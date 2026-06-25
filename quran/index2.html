@@ -737,7 +737,6 @@ function openSidebar() {
   sidebar.classList.add('open');
   sidebarOverlay.classList.add('visible');
   buildSurahList();
-  // scroll active item into view
   const active = surahList.querySelector('.active');
   if (active) active.scrollIntoView({ block: 'center' });
 }
@@ -780,11 +779,9 @@ function updateAyahIndicator() {
   if (found.num !== currentAyah) {
     currentAyah = found.num;
     ayahIndicator.textContent = 'الآية ' + toArabicNum(currentAyah);
-    // Highlight current ayah span
     if (highlightedEl) highlightedEl.classList.remove('ayah-highlight');
     highlightedEl = found.el.closest ? found.el.closest('span[data-ayah]') : null;
     if (!highlightedEl) {
-      // find span by ayah num
       highlightedEl = quranText.querySelector(`span[data-ayah="${currentAyah}"]`);
     }
     if (highlightedEl) highlightedEl.classList.add('ayah-highlight');
@@ -890,19 +887,13 @@ async function loadSurah(surahNum) {
   loadingScreen.style.opacity = '1';
   loadingScreen.style.pointerEvents = 'all';
 
-  // Show/hide basmalah (no basmalah for At-Tawbah #9)
+  // إخفاء البسملة لسورة التوبة فقط
   const basmalah = document.querySelector('.basmalah');
   basmalah.style.display = (surahNum === 9) ? 'none' : '';
 
   try {
-    let res;
-    if (surahNum === 2) {
-      // سورة البقرة من الملف المحلي
-      res = await fetch('surah.json');
-    } else {
-      const url = `https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/surah/${surahNum}.json`;
-      res = await fetch(url);
-    }
+    // ====== التعديل: جلب كل السور من المجلد المحلي ======
+    const res = await fetch(`surah/${surahNum}.json`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
 
@@ -926,7 +917,6 @@ async function loadSurah(surahNum) {
       recalcMax();
       buildAyahPositions();
 
-      // restore saved position
       const saved = restoreProgress(surahNum);
       if (saved && saved.posY > 0) {
         posY = Math.min(saved.posY, maxScroll);
@@ -1102,13 +1092,10 @@ document.body.addEventListener('click', (e) => {
 });
 
 window.addEventListener('resize', () => { recalcMax(); scheduleUI(); });
-
-// Save before page unload
 window.addEventListener('beforeunload', saveProgress);
 
 // ====== INIT ======
 window.addEventListener('load', () => {
-  // restore saved speed
   try {
     const raw = localStorage.getItem('quranProgress');
     if (raw) {
