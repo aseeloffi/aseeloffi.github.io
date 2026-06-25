@@ -415,6 +415,7 @@
       contain: layout style;
       min-height: 100%;
       transform: translateZ(0);
+      will-change: transform;
     }
 
     /* ====== SCROLL PANEL ====== */
@@ -1245,14 +1246,12 @@ function flushUI() {
   updateAyahIndicator();
 }
 
-// ====== AUTO-SCROLL ENGINE — sub-pixel smooth ======
-// We keep a float accumulator (scrollAccum) as the true position,
-// and write it directly to scrollTop every frame.
-// To avoid the jitter caused by the browser rounding scrollTop to integers
-// on read-back, we NEVER read scrollTop inside the tick loop — we only write it.
-// For very low speeds the per-frame delta is < 1 px, so we batch it until
-// it crosses an integer boundary before committing, keeping the DOM write
-// to whole pixels while the logical position advances smoothly.
+// ====== AUTO-SCROLL ENGINE — true sub-pixel smooth ======
+// We keep scrollAccum as the floating-point logical position.
+// scrollWhole = the last integer written to scrollTop.
+// subPixelOffset = the fractional remainder (0..1) applied as a CSS
+//   translateY on #scroller so the eye sees continuous motion even when
+//   the integer part hasn't changed yet.
 
 function tick(timestamp) {
   if (!isScrolling) return;
@@ -1267,16 +1266,25 @@ function tick(timestamp) {
 
   scrollAccum = Math.min(scrollAccum + dy, maxS);
 
-  // Only touch the DOM when the integer part changes — eliminates sub-pixel flicker
   const newWhole = Math.floor(scrollAccum);
+  const frac = scrollAccum - newWhole; // 0.0 – 0.999...
+
+  // Commit integer part to scrollTop only when it changes
   if (newWhole !== scrollWhole) {
     scrollWhole = newWhole;
     scrollContainer.scrollTop = scrollWhole;
   }
 
+  // Apply fractional offset via transform so motion is visually continuous
+  scroller.style.transform = frac > 0 ? `translateY(-${frac.toFixed(3)}px) translateZ(0)` : 'translateZ(0)';
+
   scheduleUI();
 
-  if (scrollAccum >= maxS) { stopScroll(); return; }
+  if (scrollAccum >= maxS) {
+    scroller.style.transform = 'translateZ(0)';
+    stopScroll();
+    return;
+  }
   rafId = requestAnimationFrame(tick);
 }
 
@@ -1300,6 +1308,9 @@ function stopScroll() {
   clearTimeout(resumeTimer);
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   lastTime = null;
+  // Snap scroll to the committed integer position and clear fractional offset
+  scrollContainer.scrollTop = scrollWhole;
+  scroller.style.transform = 'translateZ(0)';
   scrollBtn.classList.remove('active');
   // Show header when auto-scroll stops
   headerVisible = true;
@@ -1544,6 +1555,7 @@ function scheduleResumeIfNotTouching() {
     isPausedForManual = false;
     scrollAccum = scrollContainer.scrollTop;
     scrollWhole = Math.floor(scrollAccum);
+    scroller.style.transform = 'translateZ(0)';
     lastTime = null;
     rafId = requestAnimationFrame(tick);
   }, 1000);
