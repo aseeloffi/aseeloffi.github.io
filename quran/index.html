@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -987,6 +988,10 @@ let currentAyah = 1;
 let ayahUpdateScheduled = false;
 let pendingAyah = null;
 
+// Pause-and-resume state (for manual scroll during auto-scroll)
+let isPausedForManual = false;
+let resumeTimer = null;
+
 // ====== HEADER HIDE/SHOW on scroll ======
 let lastScrollY = 0;
 let headerVisible = true;
@@ -1139,6 +1144,7 @@ function addBookmarkForAyah(ayahNum) {
         label.classList.remove('bm-active');
       }
     });
+    if (bookmarkPanelOpen) renderBookmarkPanel();
 
   } else {
     bms = bms.filter(b => b.surah !== currentSurah); 
@@ -1148,6 +1154,7 @@ function addBookmarkForAyah(ayahNum) {
     saveBookmarks(bms);
     updateBookmarkDot();
     highlightBookmarkedAyah(ayahNum);
+    if (bookmarkPanelOpen) renderBookmarkPanel();
     //refreshBookmarkHighlight();
     
   }
@@ -1288,6 +1295,9 @@ function startScroll() {
 
 function stopScroll() {
   isScrolling = false;
+  isPausedForManual = false;
+  isTouching = false;
+  clearTimeout(resumeTimer);
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   lastTime = null;
   scrollBtn.classList.remove('active');
@@ -1397,7 +1407,7 @@ nextSurahBtn.addEventListener('click', () => {
 });
 
 // ====== LOAD SURAH ======
-async function loadSurah(surahNum) {
+async function loadSurah(surahNum, isInitialLoad = false) {
   stopScroll();
   currentSurah = surahNum;
   scrollContainer.scrollTop = 0;
@@ -1417,6 +1427,7 @@ async function loadSurah(surahNum) {
   loadingScreen.classList.remove('hidden');
   loadingScreen.style.opacity = '1';
   loadingScreen.style.pointerEvents = 'all';
+  scrollPanel.classList.add('hidden'); // hide controls while loading
 
   basmalahEl.style.display = (surahNum === 9) ? 'none' : '';
   updateSurahNavButtons();
@@ -1447,23 +1458,33 @@ async function loadSurah(surahNum) {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         buildAyahPositions();
-        const saved = restoreProgress(surahNum);
-        if (saved && saved.posY > 0) {
-          scrollContainer.scrollTop = Math.min(saved.posY, getMaxScroll());
-          scrollAccum = scrollContainer.scrollTop;
-          speedSlider.value = saved.speed || 0.8;
-          updateSliderUI();
-          showToast('استُؤنفت القراءة من حيث توقفت');
+        const doRestore = () => {
+          const saved = restoreProgress(surahNum);
+          if (saved && saved.posY > 0) {
+            const targetY = Math.min(saved.posY, getMaxScroll());
+            scrollContainer.scrollTop = targetY;
+            scrollAccum = targetY;
+            speedSlider.value = saved.speed || 0.8;
+            updateSliderUI();
+            showToast('استُؤنفت القراءة من حيث توقفت');
+          }
+          scheduleUI();
+          updateBookmarkDot();
+          refreshBookmarkHighlight();
+          // Hide loading screen
+          loadingScreen.style.opacity = '0';
+          loadingScreen.style.pointerEvents = 'none';
+          setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            scrollPanel.classList.remove('hidden'); // show controls after successful load
+          }, 420);
+        };
+        // On initial load, wait longer for fonts/layout to fully settle
+        if (isInitialLoad) {
+          setTimeout(doRestore, 300);
+        } else {
+          doRestore();
         }
-        scheduleUI();
-        updateBookmarkDot();
-        refreshBookmarkHighlight();
-        // Hide loading screen
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.pointerEvents = 'none';
-        setTimeout(() => {
-          loadingScreen.classList.add('hidden');
-        }, 420);
       });
     });
 
@@ -1480,6 +1501,7 @@ async function loadSurah(surahNum) {
       </div>`;
     loadingScreen.classList.add('hidden');
     loadingScreen.style.pointerEvents = 'none';
+    scrollPanel.classList.add('hidden'); // keep panel hidden on error
   }
 }
 
@@ -1501,17 +1523,67 @@ seekBar.addEventListener('input', () => {
 seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); saveProgress(); });
 seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); saveProgress(); }, { passive: true });
 
-// ====== WHEEL / TOUCH — stop auto-scroll only on actual manual swipe ======
+// ====== WHEEL / TOUCH — pause auto-scroll for 1s then resume ======
+let isTouching = false;
+
+function pauseAndResume() {
+  if (!isScrolling || isPausedForManual) return;
+  // Pause: freeze the engine but keep isScrolling=true and icon unchanged
+  isPausedForManual = true;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  lastTime = null;
+  // DO NOT change scrollBtn icon — scroll is still "active"
+  scheduleResumeIfNotTouching();
+}
+
+function scheduleResumeIfNotTouching() {
+  clearTimeout(resumeTimer);
+  if (isTouching) return; // wait until finger lifts
+  resumeTimer = setTimeout(() => {
+    if (!isPausedForManual) return;
+    isPausedForManual = false;
+    scrollAccum = scrollContainer.scrollTop;
+    scrollWhole = Math.floor(scrollAccum);
+    lastTime = null;
+    rafId = requestAnimationFrame(tick);
+  }, 1000);
+}
+
 let touchStartY = 0;
 scrollContainer.addEventListener('wheel', () => {
-  if (isScrolling) stopScroll();
+  if (isScrolling) pauseAndResume();
 }, { passive: true });
+
 scrollContainer.addEventListener('touchstart', (e) => {
   touchStartY = e.touches[0].clientY;
+  if (isScrolling && isPausedForManual) {
+    // Finger down again — keep holding, cancel resume timer
+    isTouching = true;
+    clearTimeout(resumeTimer);
+  }
 }, { passive: true });
+
 scrollContainer.addEventListener('touchmove', (e) => {
   const dy = Math.abs(e.touches[0].clientY - touchStartY);
-  if (dy > 8 && isScrolling) stopScroll();
+  if (dy > 8 && isScrolling) {
+    isTouching = true;
+    clearTimeout(resumeTimer);
+    pauseAndResume();
+  }
+}, { passive: true });
+
+scrollContainer.addEventListener('touchend', () => {
+  if (isTouching) {
+    isTouching = false;
+    if (isPausedForManual) scheduleResumeIfNotTouching();
+  }
+}, { passive: true });
+
+scrollContainer.addEventListener('touchcancel', () => {
+  if (isTouching) {
+    isTouching = false;
+    if (isPausedForManual) scheduleResumeIfNotTouching();
+  }
 }, { passive: true });
 
 // ====== KEYBOARD SHORTCUTS ======
@@ -1616,7 +1688,7 @@ window.addEventListener('load', () => {
     }
   } catch {}
   updateSliderUI();
-  loadSurah(currentSurah);
+  loadSurah(currentSurah, true);
 });
 </script>
 
