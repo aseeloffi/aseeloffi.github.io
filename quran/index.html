@@ -1106,25 +1106,32 @@ function attachAyahTapHandlers() {
 
 function addBookmarkForAyah(ayahNum) {
   let bms = loadBookmarks();
-  // Check if a bookmark for this ayah already exists in this surah
-  const exists = bms.find(b => b.surah === currentSurah && b.ayah === ayahNum);
-  if (exists) {
-    showToast('هذه الآية محفوظة مسبقاً');
-    highlightBookmarkedAyah(ayahNum);
-    return;
-  }
-  const scrollY = scrollContainer.scrollTop;
-  bms.push({ id: Date.now(), surah: currentSurah, ayah: ayahNum, posY: Math.round(scrollY) });
-  // Keep max 5 bookmarks — remove oldest if exceeded
-  if (bms.length > 5) {
-    bms.shift();
-    showToast('تمت إضافة العلامة وحُذفت الأقدم (الحد الأقصى ٥)');
+  
+  const existingIndex = bms.findIndex(b => b.surah === currentSurah && b.ayah === ayahNum);
+  
+  if (existingIndex !== -1) {
+    bms.splice(existingIndex, 1);
+    saveBookmarks(bms);
+    updateBookmarkDot();
+    
+    quranText.querySelectorAll('label').forEach(label => {
+      const match = label.textContent.trim().match(/\d+/);
+      if (match && parseInt(match[0]) === ayahNum) {
+        label.classList.remove('bm-active');
+      }
+    });
+
   } else {
-    showToast('تمت إضافة العلامة المرجعية ✓');
+    bms = bms.filter(b => b.surah !== currentSurah); 
+    
+    const scrollY = scrollContainer.scrollTop;
+    bms.push({ id: Date.now(), surah: currentSurah, ayah: ayahNum, posY: Math.round(scrollY) });
+    saveBookmarks(bms);
+    updateBookmarkDot();
+    highlightBookmarkedAyah(ayahNum);
+    //refreshBookmarkHighlight();
+    
   }
-  saveBookmarks(bms);
-  updateBookmarkDot();
-  refreshBookmarkHighlight();
 }
 
 function highlightBookmarkedAyah(ayahNum) {
