@@ -513,7 +513,7 @@
 <div id="loadingScreen">
   <div class="loader-text">القرآن الكريم</div>
   <div class="spinner"></div>
-  <div class="loader-sub">جاري تحميل السورة...</div>
+  <div class="loader-sub">جاري تحميل السور...</div>
 </div>
 
 <!-- Sidebar Overlay -->
@@ -558,12 +558,12 @@
       </div>
     </div>
 
-```
+
 <div class="basmalah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
 <div class="quran-container">
   <div id="quranText"></div>
 </div>
-```
+
 
   </div>
 </div>
@@ -892,7 +892,6 @@ async function loadSurah(surahNum) {
   basmalah.style.display = (surahNum === 9) ? 'none' : '';
 
   try {
-    // ====== التعديل: جلب كل السور من المجلد المحلي ======
     const res = await fetch(`surah/${surahNum}.json`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
