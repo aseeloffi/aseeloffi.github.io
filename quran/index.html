@@ -9,6 +9,25 @@
   <meta name="theme-color" content="#1a1a1a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- PWA Icons -->
+
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <meta name="apple-mobile-web-app-title" content="القرآن الكريم">
+
+  <!-- OG / Link Preview -->
+
+  <meta property="og:title" content="القرآن الكريم">
+  <meta property="og:description" content="اقرأ القرآن الكريم بتجربة أنيقة — ١١٤ سورة مع تشغيل تلقائي وحفظ موضع القراءة">
+  <meta property="og:image" content="og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="القرآن الكريم">
+  <meta name="twitter:description" content="اقرأ القرآن الكريم بتجربة أنيقة — ١١٤ سورة مع تشغيل تلقائي وحفظ موضع القراءة">
+  <meta name="twitter:image" content="og-image.png">
   <link rel="preload" href="https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -737,12 +756,12 @@
 </head>
 <body>
 
-<div id="offlineBadge">وضع عدم الاتصال</div>
+<div id="offlineBadge">⚡ وضع عدم الاتصال</div>
 
 <div id="loadingScreen">
   <div class="loader-text">القرآن الكريم</div>
   <div class="spinner"></div>
-  <div class="loader-sub">جاري التحميل ...</div>
+  <div class="loader-sub">جاري تحميل السور...</div>
 </div>
 
 <div id="sidebarOverlay"></div>
@@ -1285,13 +1304,13 @@ jumpTopBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   stopScroll();
   scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-
+  showToast('انتقل إلى الأعلى');
 });
 jumpBottomBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   stopScroll();
   scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
-
+  showToast('انتقل إلى الأسفل');
 });
 
 // ====== SAVE / RESTORE ======
@@ -1336,13 +1355,14 @@ function renderBookmarkPanel() {
         if (e.target.classList.contains('bm-item-del')) return;
         scrollContainer.scrollTo({ top: Math.min(bm.posY, getMaxScroll()), behavior: 'smooth' });
         closeBookmarkPanel();
+        showToast('انتقلت إلى العلامة المرجعية');
       });
       div.querySelector('.bm-item-del').addEventListener('click', (e) => {
         e.stopPropagation();
         const all = loadBookmarks().filter(b => b.id !== bm.id);
         saveBookmarks(all);
         renderBookmarkPanel();
-
+        showToast('حُذفت العلامة');
       });
       bmList.appendChild(div);
     });
