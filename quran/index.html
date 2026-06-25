@@ -1442,35 +1442,9 @@ async function loadSurah(surahNum) {
         // Hide loading screen
         loadingScreen.style.opacity = '0';
         loadingScreen.style.pointerEvents = 'none';
-
-
-        setTimeout(async () => {
-          if (document.fonts) {
-          await document.fonts.ready;
-          }
-      
-          buildAyahPositions();
-          const saved = restoreProgress(surahNum);
-      
-          if (saved && saved.posY > 0) {
-            scrollContainer.scrollTop = saved.posY;
-            scrollAccum = saved.posY;
-            if (saved.speed) speedSlider.value = saved.speed;
-            updateSliderUI();
-            showToast('استُؤنفت القراءة من حيث توقفت');
-          }
-      
-          scheduleUI();
-          updateBookmarkDot();
-          refreshBookmarkHighlight();
-          loadingScreen.style.opacity = '0';
-          loadingScreen.style.pointerEvents = 'none';
-          setTimeout(() => {
-            loadingScreen.classList.add('hidden');
-          }, 420);
-        }, 60); 
-
-        
+        setTimeout(() => {
+          loadingScreen.classList.add('hidden');
+        }, 420);
       });
     });
 
