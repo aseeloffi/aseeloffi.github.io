@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>القرآن الكريم</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preload" href="https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2" as="font" type="font/woff2" crossorigin>
 
   <style>
@@ -18,7 +22,6 @@
       font-display: swap;
     }
 
-    /* ====== CSS VARIABLES (THEMES) ====== */
     :root {
       --bg: #1a1a1a;
       --bg2: #111;
@@ -264,6 +267,10 @@
       transition: background 0.2s, color 0.2s;
     }
     .font-btn:hover { background: var(--sidebar-item-hover); color: var(--text); }
+    .font-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
 
     .basmalah {
       text-align: center;
@@ -297,12 +304,11 @@
       cursor: default;
     }
 
-    /* Highlighted ayah */
+    /* Highlighted ayah — NO transition to prevent flicker */
     .ayah-highlight {
       background: var(--highlight-bg);
       border-radius: 6px;
       outline: 1.5px solid var(--highlight-border);
-      transition: background 0.3s, outline 0.3s;
     }
 
     .p5 {
@@ -381,10 +387,16 @@
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.05em;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, color 0.2s, opacity 0.2s;
       flex-shrink: 0;
     }
-    .step-btn:hover { background: rgba(200,169,110,0.14); color: var(--gold); }
+    .step-btn:hover:not(:disabled) { background: rgba(200,169,110,0.14); color: var(--gold); }
+    /* ✅ FIX: Disabled state for speed buttons */
+    .step-btn:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
 
     .scroll-btn {
       background: rgba(200,169,110,0.9);
@@ -437,6 +449,126 @@
     }
 
     .time-remaining { font-size: 0.62em; color: rgba(128,128,128,0.4); font-variant-numeric: tabular-nums; }
+
+    /* ====== BOOKMARK BUTTON ====== */
+    #bookmarkBtn {
+      position: relative;
+    }
+    #bookmarkBtn .bm-dot {
+      position: absolute;
+      top: 4px; left: 4px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: none;
+    }
+    #bookmarkBtn.has-bookmark .bm-dot { display: block; }
+
+    /* ====== BOOKMARK PANEL ====== */
+    #bookmarkPanel {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      z-index: 1500;
+      width: 88%;
+      max-width: 300px;
+      font-family: system-ui, sans-serif;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    #bookmarkPanel.show {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+    .bm-panel-title {
+      font-size: 0.78em;
+      color: var(--gold);
+      margin-bottom: 8px;
+      font-family: Conv_original-hafs, serif;
+      font-size: 0.9em;
+    }
+    .bm-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .bm-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--track);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .bm-item:hover { background: var(--sidebar-item-hover); }
+    .bm-item-text {
+      font-size: 0.75em;
+      color: var(--text);
+      font-family: Conv_original-hafs, serif;
+    }
+    .bm-item-del {
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 0.8em;
+      padding: 2px 5px;
+      border-radius: 6px;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .bm-item-del:hover { color: #e55; }
+    .bm-add-btn {
+      width: 100%;
+      margin-top: 8px;
+      background: var(--sidebar-item-active);
+      border: 1px solid var(--gold2);
+      color: var(--gold);
+      padding: 7px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: Conv_original-hafs, serif;
+      font-size: 0.82em;
+      transition: background 0.2s;
+    }
+    .bm-add-btn:hover { background: rgba(200,169,110,0.18); }
+    .bm-empty {
+      font-size: 0.72em;
+      color: var(--muted);
+      text-align: center;
+      padding: 8px 0;
+      font-family: system-ui, sans-serif;
+    }
+
+    /* ====== OFFLINE BADGE ====== */
+    #offlineBadge {
+      position: fixed;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(200,169,110,0.85);
+      color: #111;
+      font-size: 0.7em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-family: system-ui, sans-serif;
+      z-index: 5000;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    #offlineBadge.show { opacity: 1; }
 
     /* ====== TOAST ====== */
     #toast {
@@ -508,6 +640,10 @@
 </head>
 <body>
 
+<!-- Offline Badge -->
+
+<div id="offlineBadge">⚡ وضع عدم الاتصال</div>
+
 <!-- Loading Screen -->
 
 <div id="loadingScreen">
@@ -533,6 +669,14 @@
   <div id="surahList"></div>
 </div>
 
+<!-- Bookmark Panel -->
+
+<div id="bookmarkPanel">
+  <div class="bm-panel-title">🔖 العلامات المرجعية</div>
+  <div class="bm-list" id="bmList"></div>
+  <button class="bm-add-btn" id="bmAddBtn">+ إضافة علامة هنا</button>
+</div>
+
 <!-- Main Viewport -->
 
 <div id="viewport">
@@ -550,6 +694,10 @@
         </div>
       </div>
       <div class="header-btns">
+        <button class="hbtn" id="bookmarkBtn" title="العلامات المرجعية">
+          🔖
+          <span class="bm-dot"></span>
+        </button>
         <div class="font-controls">
           <button class="font-btn" id="fontMinus" title="تصغير الخط">A−</button>
           <button class="font-btn" id="fontPlus" title="تكبير الخط">A+</button>
@@ -669,6 +817,11 @@ const surahInfo       = document.getElementById('surahInfo');
 const ayahIndicator   = document.getElementById('ayahIndicator');
 const toastEl         = document.getElementById('toast');
 const loadingScreen   = document.getElementById('loadingScreen');
+const bookmarkBtn     = document.getElementById('bookmarkBtn');
+const bookmarkPanel   = document.getElementById('bookmarkPanel');
+const bmList          = document.getElementById('bmList');
+const bmAddBtn        = document.getElementById('bmAddBtn');
+const offlineBadge    = document.getElementById('offlineBadge');
 
 // ====== STATE ======
 const BASE_SPEED = 40;
@@ -683,9 +836,13 @@ let uiRafId = null;
 let uiDirty = false;
 let currentSurah = 2;
 let fontSize = parseFloat(localStorage.getItem('fontSize') || '2');
+const FONT_MIN = 1.2, FONT_MAX = 3.5;
 let ayahPositions = [];
 let currentAyah = 1;
 let highlightedEl = null;
+// ✅ Ayah indicator debounce — prevents flicker
+let ayahUpdateScheduled = false;
+let pendingAyah = null;
 
 // ====== TOAST ======
 let toastTimer = null;
@@ -707,18 +864,32 @@ applyTheme(savedTheme === 'light');
 themeBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   applyTheme(!document.body.classList.contains('light'));
-
 });
 
 // ====== FONT SIZE ======
 function applyFontSize(size) {
-  fontSize = Math.max(1.2, Math.min(3.5, size));
+  fontSize = Math.max(FONT_MIN, Math.min(FONT_MAX, size));
   quranText.style.fontSize = fontSize + 'em';
   localStorage.setItem('fontSize', fontSize);
+  // ✅ FIX: disable font buttons at limits
+  fontMinus.disabled = fontSize <= FONT_MIN;
+  fontPlus.disabled  = fontSize >= FONT_MAX;
+  // ✅ FIX: recalc time remaining after font change
+  recalcMax();
+  scheduleUI();
 }
 applyFontSize(fontSize);
-fontPlus.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(fontSize + 0.15); recalcMax(); });
-fontMinus.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(fontSize - 0.15); recalcMax(); });
+
+fontPlus.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(fontSize + 0.15); });
+fontMinus.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(fontSize - 0.15); });
+
+// ====== SPEED BUTTON LIMITS ======
+// ✅ FIX: disable +/− when at min/max speed
+function updateSpeedBtnStates() {
+  const val = parseFloat(speedSlider.value);
+  minusBtn.disabled = val <= parseFloat(speedSlider.min) + 0.001;
+  plusBtn.disabled  = val >= parseFloat(speedSlider.max) - 0.001;
+}
 
 // ====== SIDEBAR ======
 function buildSurahList(filter = '') {
@@ -750,7 +921,7 @@ sidebarClose.addEventListener('click', closeSidebar);
 sidebarOverlay.addEventListener('click', closeSidebar);
 surahSearch.addEventListener('input', () => buildSurahList(surahSearch.value.trim()));
 
-// ====== AYAH TRACKING ======
+// ====== AYAH TRACKING (no-flicker) ======
 function buildAyahPositions() {
   ayahPositions = [];
   const labels = quranText.querySelectorAll('label');
@@ -767,6 +938,7 @@ function toArabicNum(n) {
   return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 }
 
+// ✅ FIX: debounced ayah update — avoids DOM flicker on rapid scroll
 function updateAyahIndicator() {
   if (!ayahPositions.length) return;
   const viewTop = posY;
@@ -776,16 +948,38 @@ function updateAyahIndicator() {
     if (top <= viewTop + viewport.offsetHeight * 0.35) found = a;
     else break;
   }
-  if (found.num !== currentAyah) {
-    currentAyah = found.num;
+  if (found.num === currentAyah) return; // no change, skip
+
+  pendingAyah = found;
+
+  if (ayahUpdateScheduled) return;
+  ayahUpdateScheduled = true;
+
+  // Defer the DOM write so it doesn't interrupt the scroll frame
+  setTimeout(() => {
+    ayahUpdateScheduled = false;
+    if (!pendingAyah) return;
+    const newAyah = pendingAyah;
+    pendingAyah = null;
+
+    if (newAyah.num === currentAyah) return;
+    currentAyah = newAyah.num;
     ayahIndicator.textContent = 'الآية ' + toArabicNum(currentAyah);
-    if (highlightedEl) highlightedEl.classList.remove('ayah-highlight');
-    highlightedEl = found.el.closest ? found.el.closest('span[data-ayah]') : null;
-    if (!highlightedEl) {
-      highlightedEl = quranText.querySelector(`span[data-ayah="${currentAyah}"]`);
+
+    // Remove old highlight without transition
+    if (highlightedEl) {
+      highlightedEl.classList.remove('ayah-highlight');
+      highlightedEl = null;
     }
-    if (highlightedEl) highlightedEl.classList.add('ayah-highlight');
-  }
+
+    const spanEl = quranText.querySelector(`span[data-ayah="${currentAyah}"]`);
+    if (spanEl) {
+      highlightedEl = spanEl;
+      // Force layout before adding class to ensure paint is clean
+      spanEl.getBoundingClientRect();
+      spanEl.classList.add('ayah-highlight');
+    }
+  }, 80);
 }
 
 // ====== PROGRESS UI ======
@@ -867,6 +1061,81 @@ function restoreProgress(surah) {
   return null;
 }
 
+// ====== BOOKMARKS ======
+function loadBookmarks() {
+  try { return JSON.parse(localStorage.getItem('quranBookmarks') || '[]'); }
+  catch { return []; }
+}
+function saveBookmarks(bms) {
+  localStorage.setItem('quranBookmarks', JSON.stringify(bms));
+}
+
+function renderBookmarkPanel() {
+  const bms = loadBookmarks();
+  bookmarkBtn.classList.toggle('has-bookmark', bms.some(b => b.surah === currentSurah));
+  bmList.innerHTML = '';
+  const forThis = bms.filter(b => b.surah === currentSurah);
+  if (forThis.length === 0) {
+    bmList.innerHTML = '<div class="bm-empty">لا توجد علامات في هذه السورة</div>';
+  } else {
+    forThis.forEach((bm, idx) => {
+      const meta = SURAHS.find(s => s.n === bm.surah);
+      const div = document.createElement('div');
+      div.className = 'bm-item';
+      div.innerHTML = `
+        <span class="bm-item-text">سورة ${meta ? meta.name : ''} · الآية ${toArabicNum(bm.ayah)}</span>
+        <button class="bm-item-del" data-id="${bm.id}" title="حذف">✕</button>
+      `;
+      div.addEventListener('click', (e) => {
+        if (e.target.classList.contains('bm-item-del')) return;
+        // Jump to bookmark position
+        posY = Math.min(bm.posY, maxScroll);
+        scroller.style.transform = `translateY(${-posY}px)`;
+        scheduleUI();
+        closeBookmarkPanel();
+        showToast('انتقلت إلى العلامة المرجعية');
+      });
+      div.querySelector('.bm-item-del').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const all = loadBookmarks().filter(b => b.id !== bm.id);
+        saveBookmarks(all);
+        renderBookmarkPanel();
+        showToast('حُذفت العلامة');
+      });
+      bmList.appendChild(div);
+    });
+  }
+}
+
+function addBookmark() {
+  const bms = loadBookmarks();
+  // Check duplicate (same surah + ayah)
+  const exists = bms.find(b => b.surah === currentSurah && b.ayah === currentAyah);
+  if (exists) { showToast('علامة مرجعية موجودة بالفعل لهذه الآية'); return; }
+  bms.push({ id: Date.now(), surah: currentSurah, ayah: currentAyah, posY: Math.round(posY) });
+  saveBookmarks(bms);
+  renderBookmarkPanel();
+  showToast('✅ أضيفت العلامة المرجعية · الآية ' + toArabicNum(currentAyah));
+}
+
+let bookmarkPanelOpen = false;
+function openBookmarkPanel() {
+  renderBookmarkPanel();
+  bookmarkPanel.classList.add('show');
+  bookmarkPanelOpen = true;
+}
+function closeBookmarkPanel() {
+  bookmarkPanel.classList.remove('show');
+  bookmarkPanelOpen = false;
+}
+
+bookmarkBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  bookmarkPanelOpen ? closeBookmarkPanel() : openBookmarkPanel();
+});
+bmAddBtn.addEventListener('click', (e) => { e.stopPropagation(); addBookmark(); });
+bookmarkPanel.addEventListener('click', (e) => e.stopPropagation());
+
 // ====== LOAD SURAH ======
 async function loadSurah(surahNum) {
   stopScroll();
@@ -887,7 +1156,6 @@ async function loadSurah(surahNum) {
   loadingScreen.style.opacity = '1';
   loadingScreen.style.pointerEvents = 'all';
 
-  // إخفاء البسملة لسورة التوبة فقط
   const basmalah = document.querySelector('.basmalah');
   basmalah.style.display = (surahNum === 9) ? 'none' : '';
 
@@ -899,7 +1167,6 @@ async function loadSurah(surahNum) {
     quranText.innerHTML = data.content +
       '<br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p><br><br>';
 
-    // Tag ayah spans for highlighting
     const labels = quranText.querySelectorAll('label');
     labels.forEach(label => {
       const match = label.textContent.trim().match(/\d+/);
@@ -925,6 +1192,7 @@ async function loadSurah(surahNum) {
         showToast('استُؤنفت القراءة من حيث توقفت');
       }
       scheduleUI();
+      updateBookmarkDot();
 
       loadingScreen.style.opacity = '0';
       setTimeout(() => {
@@ -949,6 +1217,11 @@ async function loadSurah(surahNum) {
   }
 }
 
+function updateBookmarkDot() {
+  const bms = loadBookmarks();
+  bookmarkBtn.classList.toggle('has-bookmark', bms.some(b => b.surah === currentSurah));
+}
+
 // ====== SEEK BAR ======
 seekBar.addEventListener('mousedown',  () => { isSeeking = true; });
 seekBar.addEventListener('touchstart', () => { isSeeking = true; }, { passive: true });
@@ -961,7 +1234,7 @@ seekBar.addEventListener('input', () => {
 seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); saveProgress(); });
 seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); saveProgress(); }, { passive: true });
 
-// ====== TOUCH SCROLL ======
+// ====== TOUCH SCROLL (improved inertia) ======
 let touchStartY=0, touchStartPos=0, touchLastY=0, touchLastTime=0;
 let touchVelocity=0, isTouching=false, movedEnough=false;
 let inertiaId=null, pendingDY=null;
@@ -997,20 +1270,33 @@ function applyTouch() {
   scheduleUI();
 }
 
+// ✅ FIX: smoother inertia with better friction curve
 viewport.addEventListener('touchend', () => {
   if (!isTouching) return;
   isTouching=false;
   if (!movedEnough) return;
-  let velocity=touchVelocity;
-  function inertia() {
-    velocity*=0.93;
-    if (Math.abs(velocity)<0.05) { saveProgress(); return; }
-    posY=Math.max(0,Math.min(maxScroll,posY+velocity*16));
-    scroller.style.transform=`translateY(${-posY}px)`;
+  let velocity=touchVelocity * 16; // pixels per frame at 60fps
+  let lastTs = null;
+
+  function inertia(ts) {
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min(ts - lastTs, 32); // cap delta
+    lastTs = ts;
+
+    // ✅ frame-independent decay: smoother and more natural
+    const decay = Math.pow(0.94, dt / 16.67);
+    velocity *= decay;
+
+    if (Math.abs(velocity) < 0.5) {
+      saveProgress();
+      return;
+    }
+    posY = Math.max(0, Math.min(maxScroll, posY + velocity * (dt / 16.67)));
+    scroller.style.transform = `translateY(${-posY}px)`;
     scheduleUI();
-    inertiaId=requestAnimationFrame(inertia);
+    inertiaId = requestAnimationFrame(inertia);
   }
-  inertiaId=requestAnimationFrame(inertia);
+  inertiaId = requestAnimationFrame(inertia);
 }, { passive: true });
 
 // ====== WHEEL ======
@@ -1056,6 +1342,11 @@ document.addEventListener('keydown', (e) => {
       break;
     case 'Escape':
       closeSidebar();
+      closeBookmarkPanel();
+      break;
+    case 'KeyB':
+      e.preventDefault();
+      addBookmark();
       break;
   }
 });
@@ -1066,6 +1357,7 @@ function updateSliderUI() {
   const pct = ((val - +speedSlider.min) / (+speedSlider.max - +speedSlider.min)) * 100;
   speedSlider.style.background = `linear-gradient(to left, rgba(200,169,110,0.8) ${pct}%, var(--track) ${pct}%)`;
   speedBadge.textContent = `×${val.toFixed(1)}`;
+  updateSpeedBtnStates();
   scheduleUI();
 }
 
@@ -1085,13 +1377,39 @@ speedSlider.addEventListener('input', updateSliderUI);
 seekBar.addEventListener('click', (e) => e.stopPropagation());
 
 document.body.addEventListener('click', (e) => {
-  if (!scrollPanel.contains(e.target) && !sidebar.contains(e.target)) {
+  if (bookmarkPanelOpen && !bookmarkPanel.contains(e.target) && e.target !== bookmarkBtn) {
+    closeBookmarkPanel();
+    return;
+  }
+  if (!scrollPanel.contains(e.target) && !sidebar.contains(e.target) && !bookmarkPanel.contains(e.target)) {
     scrollPanel.classList.toggle('hidden');
   }
 });
 
 window.addEventListener('resize', () => { recalcMax(); scheduleUI(); });
 window.addEventListener('beforeunload', saveProgress);
+
+// ====== OFFLINE DETECTION ======
+function handleOnline() {
+  offlineBadge.classList.remove('show');
+}
+function handleOffline() {
+  offlineBadge.classList.add('show');
+}
+window.addEventListener('online', handleOnline);
+window.addEventListener('offline', handleOffline);
+if (!navigator.onLine) handleOffline();
+
+// ====== SERVICE WORKER (PWA) ======
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.addEventListener('updatefound', () => {
+        showToast('🔄 تحديث متاح، أعد تحميل الصفحة');
+      });
+    }).catch(() => {});
+  });
+}
 
 // ====== INIT ======
 window.addEventListener('load', () => {
