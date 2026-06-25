@@ -707,7 +707,7 @@
       gap: 16px;
       transition: opacity 0.4s;
     }
-    #loadingScreen.hidden { opacity: 0; pointer-events: none; }
+    #loadingScreen.hidden { opacity: 0; pointer-events: none; display: none; }
     .loader-text { font-family: Conv_original-hafs, serif; font-size: 1.8em; color: var(--gold); }
     .loader-sub { font-family: system-ui, sans-serif; font-size: 0.75em; color: var(--muted); }
     .spinner {
@@ -771,7 +771,6 @@
   <div id="scrollContainer">
     <div id="scroller">
 
-
   <div class="page-header" id="pageHeader">
     <div class="header-btns">
       <button class="hbtn" id="menuBtn" title="قائمة السور">☰</button>
@@ -803,6 +802,7 @@
   </div>
 
   <!-- Bottom surah navigation -->
+
   <div class="surah-nav" id="surahNav">
     <button class="surah-nav-btn" id="prevSurahBtn">
       <span class="nav-arrow">›</span>
@@ -815,7 +815,6 @@
   </div>
 
 </div>
-
 
   </div>
 </div>
@@ -1203,8 +1202,6 @@ function flushUI() {
 // it crosses an integer boundary before committing, keeping the DOM write
 // to whole pixels while the logical position advances smoothly.
 
-let scrollWhole = 0; // last integer value written to scrollTop
-
 function tick(timestamp) {
   if (!isScrolling) return;
   if (lastTime === null) { lastTime = timestamp; rafId = requestAnimationFrame(tick); return; }
@@ -1410,11 +1407,12 @@ async function loadSurah(surahNum) {
         scheduleUI();
         updateBookmarkDot();
         refreshBookmarkHighlight();
+        // Hide loading screen
         loadingScreen.style.opacity = '0';
+        loadingScreen.style.pointerEvents = 'none';
         setTimeout(() => {
           loadingScreen.classList.add('hidden');
-          loadingScreen.style.pointerEvents = 'none';
-        }, 400);
+        }, 420);
       });
     });
 
