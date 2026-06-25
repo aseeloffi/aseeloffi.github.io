@@ -1150,19 +1150,20 @@ function updateAyahIndicator() {
   if (!ayahPositions.length) return;
   const scrollY = scrollContainer.scrollTop;
   
-  const headerHeight = pageHeader ? pageHeader.offsetHeight : 70;
-  
   let found = ayahPositions[0];
-  for (const a of ayahPositions) {
-    const top = a.el ? a.el.offsetTop : 0;
-    
-    if (top <= scrollY + headerHeight + 15) {
-      found = a;
-    } else {
-      break;
+
+  if (scrollY < 200) {
+    found = ayahPositions[0];
+  } else {
+
+    const viewH = scrollContainer.clientHeight;
+    for (const a of ayahPositions) {
+      const top = a.el ? a.el.offsetTop : 0;
+      if (top <= scrollY + viewH * 0.35) found = a;
+      else break;
     }
   }
-  
+
   if (found.num === currentAyah) return;
 
   pendingAyah = found;
@@ -1179,7 +1180,6 @@ function updateAyahIndicator() {
     ayahIndicator.textContent = 'الآية ' + toArabicNum(currentAyah);
   }, 80);
 }
-
 
 // ====== PROGRESS UI ======
 function scheduleUI() {
