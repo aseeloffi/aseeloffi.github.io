@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -62,43 +63,154 @@
     /* ── UPLOAD ── */
     #uploadScreen {
       position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 22px; z-index: 500;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      grid-template-columns: 1fr;
+      z-index: 500;
       background: var(--bg);
       transition: opacity 0.4s;
+      overflow: hidden;
     }
     #uploadScreen.hidden { opacity: 0; pointer-events: none; }
 
-    .upload-logo { font-size: 3rem; }
-    .upload-title { font-size: 1.55rem; font-weight: 700; color: var(--gold); }
-    .upload-sub { font-size: 0.84rem; color: var(--muted); text-align: center; max-width: 260px; line-height: 1.6; }
+    /* decorative background glow */
+    #uploadScreen::before {
+      content: '';
+      position: absolute;
+      top: -20%; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(200,169,110,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body.light #uploadScreen::before {
+      background: radial-gradient(ellipse, rgba(138,92,40,0.06) 0%, transparent 70%);
+    }
+
+    /* top section: logo + title */
+    .upload-top {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 32px; gap: 14px;
+    }
+
+    .upload-logo-wrap {
+      width: 80px; height: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+      font-size: 2.4rem;
+    }
+    body.light .upload-logo-wrap {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .upload-title {
+      font-size: 1.9rem; font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+    }
+    .upload-sub {
+      font-size: 0.88rem; color: var(--muted);
+      text-align: center; max-width: 260px;
+      line-height: 1.7;
+    }
+
+    /* middle section: drop zone */
+    .upload-mid {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      padding: 0 20px;
+    }
 
     .drop-zone {
-      width: 280px; border: 2px dashed var(--border);
-      border-radius: 18px; padding: 30px 20px;
+      width: 100%; max-width: 420px;
+      border: 1.5px dashed var(--border);
+      border-radius: 20px;
+      padding: 40px 28px;
       text-align: center; cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.25s, background 0.25s, transform 0.2s;
       position: relative;
+      background: var(--surface);
     }
-    .drop-zone:hover, .drop-zone.dragover { border-color: var(--gold); background: rgba(200,169,110,0.06); }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--gold);
+      background: rgba(200,169,110,0.05);
+      transform: translateY(-2px);
+    }
+    body.light .drop-zone:hover, body.light .drop-zone.dragover {
+      background: rgba(138,92,40,0.04);
+    }
     .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-    .drop-icon { font-size: 2rem; margin-bottom: 10px; }
-    .drop-text { font-size: 0.86rem; color: var(--muted); line-height: 1.6; }
-    .drop-text span { color: var(--gold); font-weight: 600; }
 
-    .recent-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
-    #recentList { display: flex; flex-direction: column; gap: 7px; width: 280px; max-height: 140px; overflow-y: auto; }
-    .recent-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 12px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px;
-      cursor: pointer; transition: background 0.15s, border-color 0.15s;
-      font-size: 0.82rem; color: var(--text);
+    .drop-icon-wrap {
+      width: 56px; height: 56px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin: 0 auto 16px;
     }
-    .recent-item:hover { background: var(--surface2); border-color: var(--gold); }
-    .recent-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .recent-item-pg { font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
+
+    .drop-text { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+    .drop-text span { color: var(--gold); font-weight: 600; }
+    .drop-formats {
+      margin-top: 10px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 0.72rem; color: var(--muted);
+    }
+
+    /* bottom section: recent books */
+    .upload-bottom {
+      padding-top: 28px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+      overflow: hidden;
+    }
+
+    .recent-label {
+      font-size: 0.7rem; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    #recentList {
+      display: flex; flex-direction: column; gap: 8px;
+      width: 100%; max-width: 420px;
+      padding: 0 20px;
+      max-height: calc(100% - 60px); overflow-y: auto;
+    }
+
+    .recent-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      font-size: 0.84rem; color: var(--text);
+    }
+    .recent-item:hover {
+      background: var(--surface2);
+      border-color: var(--gold);
+      transform: translateX(-2px);
+    }
+    .recent-item-icon {
+      width: 32px; height: 32px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .recent-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .recent-item-pg {
+      font-size: 0.7rem; color: var(--muted); flex-shrink: 0;
+      background: var(--surface2); padding: 2px 8px;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
 
     /* ── LOADING ── */
     #loadingScreen {
@@ -197,135 +309,221 @@
       color: var(--border); font-size: 0.72rem;
     }
 
-    /* ── SCROLL PANEL (same structure as quran site) ── */
+    /* ── SCROLL PANEL ── */
     #scrollPanel {
-      position: fixed; bottom: 18px; left: 50%;
+      position: fixed; bottom: 20px; left: 50%;
       transform: translateX(-50%);
-      background: var(--panel-bg);
-      backdrop-filter: blur(22px) saturate(1.8) brightness(1.1);
-      -webkit-backdrop-filter: blur(22px) saturate(1.8) brightness(1.1);
-      border: 1px solid var(--panel-border);
-      border-radius: 22px;
-      padding: 13px 18px 12px;
+      background: rgba(22, 22, 22, 0.9);
+      backdrop-filter: blur(28px) saturate(1.6);
+      -webkit-backdrop-filter: blur(28px) saturate(1.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 28px;
+      padding: 18px 20px 16px;
       display: flex; flex-direction: column;
-      align-items: center; gap: 10px;
+      align-items: center; gap: 14px;
       z-index: 1000;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.07);
-      width: 90%; max-width: 340px;
-      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07);
+      width: 92%; max-width: 380px;
+      transition: opacity 0.3s, transform 0.3s, background 0.3s, border-color 0.3s;
       contain: layout style;
     }
     body.light #scrollPanel {
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+      background: rgba(250, 247, 242, 0.94);
+      border-color: rgba(0,0,0,0.1);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.14), 0 3px 10px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
     }
     #scrollPanel.hidden {
       opacity: 0; pointer-events: none;
-      transform: translateX(-50%) translateY(12px);
+      transform: translateX(-50%) translateY(16px);
     }
 
-    /* Progress row */
-    .progress-section { width: 100%; display: flex; flex-direction: column; gap: 5px; }
-    .progress-labels { display: flex; justify-content: space-between; align-items: center; }
-    .progress-label { font-size: 0.62em; color: var(--gold2); letter-spacing: 0.03em; font-family: system-ui, sans-serif; }
-    .progress-pct { font-size: 0.62em; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; font-family: system-ui, sans-serif; }
+    /* ── PROGRESS SECTION ── */
+    .progress-section { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
+    .progress-labels {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .progress-label {
+      font-size: 0.72rem; color: var(--muted);
+      letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .progress-label svg { opacity: 0.6; }
+    .progress-pct {
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--gold); font-variant-numeric: tabular-nums;
+    }
+    .time-remaining {
+      font-size: 0.72rem; color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* seek bar — taller, easier to tap */
     .seek-bar {
-      -webkit-appearance: none; width: 100%; height: 5px;
-      border-radius: 4px; outline: none; cursor: pointer;
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 6px; outline: none; cursor: pointer;
       background: var(--track);
     }
     .seek-bar::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px; height: 16px; border-radius: 50%;
-      background: #fff; border: 2px solid var(--gold2);
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--gold);
+      border: 3px solid var(--bg2);
       cursor: pointer;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.5);
-      transition: transform 0.15s;
+      box-shadow: 0 2px 8px rgba(200,169,110,0.5);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .seek-bar:active::-webkit-slider-thumb { transform: scale(1.25); }
+    .seek-bar:active::-webkit-slider-thumb {
+      transform: scale(1.2);
+      box-shadow: 0 3px 16px rgba(200,169,110,0.7);
+    }
 
-    .panel-divider { width: 100%; height: 1px; background: rgba(128,128,128,0.1); }
+    /* ── DIVIDER ── */
+    .panel-divider {
+      width: calc(100% + 40px); margin: 0 -20px;
+      height: 1px; background: var(--p-divider, rgba(255,255,255,0.08));
+    }
 
-    /* Main controls row */
+    /* Panel-scoped variables for dark mode */
+    #scrollPanel {
+      --p-btn-bg:     rgba(255,255,255,0.07);
+      --p-btn-border: rgba(255,255,255,0.11);
+      --p-btn-color:  rgba(210,205,195,0.8);
+      --p-divider:    rgba(255,255,255,0.08);
+    }
+    body.light #scrollPanel {
+      --p-btn-bg:     rgba(0,0,0,0.06);
+      --p-btn-border: rgba(0,0,0,0.1);
+      --p-btn-color:  rgba(60,50,35,0.7);
+      --p-divider:    rgba(0,0,0,0.08);
+    }
+
+    /* ── MAIN CONTROLS ── */
     .main-controls {
       display: flex; align-items: center;
-      justify-content: center; gap: 10px; width: 100%;
+      justify-content: space-between;
+      gap: 8px; width: 100%;
     }
 
+    /* jump buttons — bigger, pill shaped */
+    .jump-btn {
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      height: 40px; padding: 0 14px;
+      border-radius: 20px; cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.78rem; font-family: 'Tajawal', sans-serif;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .jump-btn:hover {
+      background: rgba(200,169,110,0.18);
+      color: var(--gold); border-color: var(--gold2);
+    }
+    .jump-btn:active { transform: scale(0.95); }
+
+    /* speed step buttons */
     .step-btn {
-      background: var(--track); border: 1px solid var(--panel-border);
-      color: rgba(128,128,128,0.6);
-      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      width: 40px; height: 40px; border-radius: 50%;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1em; font-family: system-ui, sans-serif;
-      transition: background 0.2s, color 0.2s;
+      font-size: 1.2rem; font-family: system-ui, sans-serif; font-weight: 300;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
       flex-shrink: 0;
     }
-    .step-btn:hover { background: rgba(200,169,110,0.14); color: var(--gold); }
-    .step-btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
-
-    .jump-btn {
-      background: var(--track); border: 1px solid var(--panel-border);
-      color: rgba(128,128,128,0.65);
-      height: 28px; padding: 0 10px;
-      border-radius: 20px; cursor: pointer;
-      display: flex; align-items: center; gap: 4px;
-      font-size: 0.64em; font-family: 'Tajawal', sans-serif;
-      white-space: nowrap;
-      transition: background 0.2s, color 0.2s;
-      flex-shrink: 0;
+    .step-btn:hover {
+      background: rgba(200,169,110,0.18);
+      color: var(--gold); border-color: var(--gold2);
     }
-    .jump-btn:hover { background: rgba(200,169,110,0.14); color: var(--gold); }
+    .step-btn:active { transform: scale(0.9); }
+    .step-btn:disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
 
-    /* Big play/pause button */
+    /* play/pause — main CTA button */
     .scroll-btn {
-      background: rgba(200,169,110,0.92);
+      background: var(--gold);
       color: #111; border: none;
-      width: 48px; height: 48px; border-radius: 50%;
-      cursor: pointer; font-size: 1.1em;
+      width: 60px; height: 60px; border-radius: 50%;
+      cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 16px rgba(200,169,110,0.3), inset 0 1px 0 rgba(255,255,255,0.25);
-      transition: transform 0.15s, background 0.2s;
+      box-shadow: 0 4px 20px rgba(200,169,110,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
       flex-shrink: 0;
+      position: relative;
     }
-    .scroll-btn:active { transform: scale(0.92); }
-    .scroll-btn.active { background: rgba(255,255,255,0.88); }
+    .scroll-btn::after {
+      content: '';
+      position: absolute; inset: -4px;
+      border-radius: 50%;
+      border: 2px solid rgba(200,169,110,0);
+      transition: border-color 0.3s, inset 0.3s;
+    }
+    .scroll-btn.active::after {
+      border-color: rgba(200,169,110,0.35);
+      inset: -6px;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { inset: -4px; border-color: rgba(200,169,110,0.5); }
+      100% { inset: -14px; border-color: rgba(200,169,110,0); }
+    }
+    .scroll-btn:active { transform: scale(0.9); box-shadow: 0 2px 10px rgba(200,169,110,0.35); }
+    .scroll-btn.active { background: var(--surface2); color: var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 
     .play-icon, .pause-icon {
-      width: 20px; height: 20px; pointer-events: none;
+      pointer-events: none;
       display: flex; align-items: center; justify-content: center;
     }
     .pause-icon { display: none; }
     .scroll-btn.active .play-icon  { display: none; }
     .scroll-btn.active .pause-icon { display: flex; }
 
-    /* Speed row */
-    .speed-section { width: 100%; display: flex; align-items: center; gap: 8px; }
-    .speed-label { font-size: 0.6em; color: var(--gold2); flex-shrink: 0; letter-spacing: 0.02em; font-family: system-ui, sans-serif; }
+    /* ── SPEED SECTION ── */
+    .speed-section {
+      width: 100%;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      border-radius: 14px;
+      padding: 10px 14px;
+    }
+    .speed-label {
+      font-size: 0.72rem; color: var(--p-btn-color);
+      flex-shrink: 0; letter-spacing: 0.03em;
+      display: flex; align-items: center; gap: 5px;
+    }
 
     .speed-slider {
-      -webkit-appearance: none; flex: 1; height: 3px;
-      border-radius: 2px; outline: none; cursor: pointer;
+      -webkit-appearance: none; flex: 1; height: 4px;
+      border-radius: 4px; outline: none; cursor: pointer;
       background: var(--track);
     }
     .speed-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 11px; height: 11px; border-radius: 50%;
-      background: var(--gold); cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--bg2);
+      cursor: pointer;
+      box-shadow: 0 1px 6px rgba(200,169,110,0.5);
       transition: transform 0.15s;
     }
-    .speed-slider:active::-webkit-slider-thumb { transform: scale(1.4); }
+    .speed-slider:active::-webkit-slider-thumb { transform: scale(1.3); }
 
     .speed-badge {
-      font-size: 0.62em; font-weight: 700;
+      font-size: 0.82rem; font-weight: 700;
       color: var(--gold);
       font-variant-numeric: tabular-nums;
-      min-width: 30px; text-align: left;
-      flex-shrink: 0; font-family: system-ui, sans-serif;
+      min-width: 36px; text-align: center;
+      flex-shrink: 0;
+      background: rgba(200,169,110,0.1);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 8px; padding: 2px 6px;
     }
-    .time-remaining { font-size: 0.62em; color: var(--gold2); font-variant-numeric: tabular-nums; font-family: system-ui, sans-serif; }
 
     /* ── THUMBNAILS SIDEBAR ── */
     #thumbSidebar {
@@ -386,26 +584,49 @@
     }
     #offlineBadge.show { opacity: 1; }
   </style>
+
 </head>
 <body>
 
 <!-- UPLOAD -->
+
 <div id="uploadScreen">
-  <div class="upload-logo">📖</div>
-  <div class="upload-title">قارئ الكتب</div>
-  <div class="upload-sub">افتح أي كتاب PDF مع سكرول تلقائي</div>
-  <div class="drop-zone" id="dropZone">
-    <input type="file" accept=".pdf" id="fileInput">
-    <div class="drop-icon">📂</div>
-    <div class="drop-text">اسحب ملف PDF هنا<br>أو <span>اضغط للاختيار</span></div>
+
+  <!-- Top: logo + title -->
+
+  <div class="upload-top">
+    <div class="upload-logo-wrap">📖</div>
+    <div class="upload-title">قارئ الكتب</div>
+    <div class="upload-sub">افتح أي كتاب PDF واقرأه بتمرير تلقائي سلس</div>
   </div>
-  <div id="recentSection" style="display:none;flex-direction:column;align-items:center;gap:10px;">
+
+  <!-- Middle: drop zone -->
+
+  <div class="upload-mid">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" accept=".pdf" id="fileInput">
+      <div class="drop-icon-wrap">📂</div>
+      <div class="drop-text">
+        اسحب ملف PDF هنا<br>أو <span>اضغط للاختيار من جهازك</span>
+      </div>
+      <div class="drop-formats">
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        PDF فقط
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: recent books -->
+
+  <div class="upload-bottom" id="recentSection" style="display:none;">
     <div class="recent-label">آخر الكتب</div>
     <div id="recentList"></div>
   </div>
+
 </div>
 
 <!-- LOADING -->
+
 <div id="loadingScreen">
   <div class="spinner"></div>
   <div id="loadingText">جاري تحميل الكتاب…</div>
@@ -413,9 +634,11 @@
 </div>
 
 <!-- READER -->
+
 <div id="readerScreen">
 
   <!-- Header -->
+
   <div id="pageHeader">
     <button class="hbtn" id="closeBtn" title="إغلاق">✕</button>
     <div id="headerCenter">
@@ -443,6 +666,7 @@
   </div>
 
   <!-- Scroll area -->
+
   <div id="viewport">
     <div id="scrollContainer">
       <div id="scroller"></div>
@@ -450,62 +674,84 @@
   </div>
 
   <!-- Control panel -->
+
   <div id="scrollPanel" class="hidden">
-    <!-- Seek row -->
-    <div class="progress-section">
-      <div class="progress-labels">
-        <span class="progress-label">الموضع</span>
-        <span class="progress-pct" id="progressPct">0%</span>
-        <span class="time-remaining" id="timeRemaining">—</span>
-      </div>
-      <input type="range" class="seek-bar" id="seekBar" min="0" max="1000" value="0">
-    </div>
 
-    <div class="panel-divider"></div>
+```
+<!-- Progress row -->
+<div class="progress-section">
+  <div class="progress-labels">
+    <span class="progress-label">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      التقدم
+    </span>
+    <span class="progress-pct" id="progressPct">0%</span>
+    <span class="time-remaining" id="timeRemaining">
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      —
+    </span>
+  </div>
+  <input type="range" class="seek-bar" id="seekBar" min="0" max="1000" value="0">
+</div>
 
-    <!-- Buttons row -->
-    <div class="main-controls">
-      <button class="jump-btn" id="jumpTopBtn">
-        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-        الأعلى
-      </button>
+<div class="panel-divider"></div>
 
-      <button class="step-btn" id="minusBtn" title="أبطأ">−</button>
+<!-- Main controls -->
+<div class="main-controls">
 
-      <button class="scroll-btn" id="scrollBtn">
-        <span class="play-icon">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-        </span>
-        <span class="pause-icon">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-        </span>
-      </button>
+  <button class="jump-btn" id="jumpTopBtn">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+    الأعلى
+  </button>
 
-      <button class="step-btn" id="plusBtn" title="أسرع">+</button>
+  <button class="step-btn" id="minusBtn" title="أبطأ">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="4" y="11" width="16" height="2" rx="1"/></svg>
+  </button>
 
-      <button class="jump-btn" id="jumpBottomBtn">
-        النهاية
-        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-    </div>
+  <button class="scroll-btn" id="scrollBtn">
+    <span class="play-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+    </span>
+    <span class="pause-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg>
+    </span>
+  </button>
 
-    <div class="panel-divider"></div>
+  <button class="step-btn" id="plusBtn" title="أسرع">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 4a1 1 0 011 1v6h6a1 1 0 010 2h-6v6a1 1 0 01-2 0v-6H5a1 1 0 010-2h6V5a1 1 0 011-1z"/></svg>
+  </button>
 
-    <!-- Speed row -->
-    <div class="speed-section">
-      <span class="speed-label">السرعة</span>
-      <input type="range" class="speed-slider" id="speedSlider" min="0.2" max="3" step="0.1" value="0.8">
-      <span class="speed-badge" id="speedBadge">×0.8</span>
-    </div>
+  <button class="jump-btn" id="jumpBottomBtn">
+    النهاية
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+
+</div>
+
+<div class="panel-divider"></div>
+
+<!-- Speed row -->
+<div class="speed-section">
+  <span class="speed-label">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    السرعة
+  </span>
+  <input type="range" class="speed-slider" id="speedSlider" min="0.2" max="3" step="0.1" value="0.8">
+  <span class="speed-badge" id="speedBadge">×0.8</span>
+</div>
+```
+
   </div>
 
 </div>
 
 <!-- THUMBNAILS -->
+
 <div id="thumbOverlay"></div>
 <div id="thumbSidebar"></div>
 
 <!-- TOAST + OFFLINE -->
+
 <div id="toast"></div>
 <div id="offlineBadge">لا يوجد اتصال بالإنترنت</div>
 
@@ -606,7 +852,7 @@ function renderRecentList() {
   list.forEach(r => {
     const el = document.createElement('div');
     el.className = 'recent-item';
-    el.innerHTML = `<span>📄</span><span class="recent-item-name">${r.name}</span><span class="recent-item-pg">ص ${r.page}</span>`;
+    el.innerHTML = `<div class="recent-item-icon">📄</div><span class="recent-item-name">${r.name}</span><span class="recent-item-pg">ص ${r.page}</span>`;
     el.addEventListener('click', () => { showToast('اختر الملف من جهازك لاستكمال القراءة'); fileInput.click(); });
     ul.appendChild(el);
   });
@@ -1040,5 +1286,6 @@ if (!navigator.onLine) offlineBadge.classList.add('show');
 
 window.addEventListener('beforeunload', saveProgress);
 </script>
+
 </body>
 </html>
