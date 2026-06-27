@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -12,28 +11,40 @@
 
   <style>
     :root {
-      --bg:        #141414;
-      --bg2:       #0d0d0d;
-      --surface:   #1e1e1e;
-      --surface2:  #272727;
-      --text:      #ddd8ce;
-      --muted:     #6b6560;
-      --accent:    #b07d4a;
-      --accent2:   rgba(176,125,74,0.18);
-      --border:    #2a2a2a;
-      --page-shadow: 0 4px 32px rgba(0,0,0,0.6);
+      --bg:          #141414;
+      --bg2:         #0d0d0d;
+      --surface:     #1c1c1c;
+      --surface2:    #252525;
+      --text:        #ddd8ce;
+      --muted:       #666;
+      --gold:        #c8a96e;
+      --gold2:       rgba(200,169,110,0.55);
+      --border:      #2c2c2c;
+      --track:       rgba(255,255,255,0.07);
+      --panel-bg:    rgba(255,255,255,0.045);
+      --panel-border:rgba(255,255,255,0.09);
+      --sidebar-bg:  #0e0e0e;
+      --sidebar-hover: rgba(255,255,255,0.05);
+      --sidebar-active: rgba(200,169,110,0.12);
+      --page-shadow: 0 4px 40px rgba(0,0,0,0.7);
     }
     body.light {
-      --bg:       #f0ebe3;
-      --bg2:      #e8e2d9;
-      --surface:  #faf7f2;
-      --surface2: #ede8df;
-      --text:     #1a1710;
-      --muted:    #8a8070;
-      --accent:   #8a5c28;
-      --accent2:  rgba(138,92,40,0.12);
-      --border:   #d8d0c4;
-      --page-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      --bg:          #f0ebe3;
+      --bg2:         #e8e2d9;
+      --surface:     #faf7f2;
+      --surface2:    #ede8df;
+      --text:        #1a1710;
+      --muted:       #8a8070;
+      --gold:        #8a5c28;
+      --gold2:       rgba(138,92,40,0.45);
+      --border:      #d5cfc5;
+      --track:       rgba(0,0,0,0.08);
+      --panel-bg:    rgba(0,0,0,0.04);
+      --panel-border:rgba(0,0,0,0.1);
+      --sidebar-bg:  #ede8df;
+      --sidebar-hover: rgba(0,0,0,0.04);
+      --sidebar-active: rgba(138,92,40,0.1);
+      --page-shadow: 0 4px 24px rgba(0,0,0,0.15);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,84 +56,49 @@
       font-family: 'Tajawal', sans-serif;
       overflow: hidden;
       transition: background 0.3s, color 0.3s;
+      touch-action: manipulation;
     }
 
-    /* ── UPLOAD SCREEN ── */
+    /* ── UPLOAD ── */
     #uploadScreen {
       position: fixed; inset: 0;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 28px; z-index: 500;
+      gap: 22px; z-index: 500;
       background: var(--bg);
       transition: opacity 0.4s;
     }
     #uploadScreen.hidden { opacity: 0; pointer-events: none; }
 
-    .upload-logo {
-      font-size: 3.2rem;
-      line-height: 1;
-    }
-    .upload-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 0.02em;
-    }
-    .upload-sub {
-      font-size: 0.88rem;
-      color: var(--muted);
-      text-align: center;
-      max-width: 280px;
-      line-height: 1.6;
-    }
+    .upload-logo { font-size: 3rem; }
+    .upload-title { font-size: 1.55rem; font-weight: 700; color: var(--gold); }
+    .upload-sub { font-size: 0.84rem; color: var(--muted); text-align: center; max-width: 260px; line-height: 1.6; }
+
     .drop-zone {
-      width: 300px;
-      border: 2px dashed var(--border);
-      border-radius: 18px;
-      padding: 36px 24px;
-      text-align: center;
-      cursor: pointer;
+      width: 280px; border: 2px dashed var(--border);
+      border-radius: 18px; padding: 30px 20px;
+      text-align: center; cursor: pointer;
       transition: border-color 0.2s, background 0.2s;
       position: relative;
     }
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: var(--accent);
-      background: var(--accent2);
-    }
-    .drop-zone input[type="file"] {
-      position: absolute; inset: 0;
-      opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
-    .drop-icon { font-size: 2.4rem; margin-bottom: 10px; }
-    .drop-text { font-size: 0.9rem; color: var(--muted); }
-    .drop-text span { color: var(--accent); font-weight: 600; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--gold); background: rgba(200,169,110,0.06); }
+    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .drop-icon { font-size: 2rem; margin-bottom: 10px; }
+    .drop-text { font-size: 0.86rem; color: var(--muted); line-height: 1.6; }
+    .drop-text span { color: var(--gold); font-weight: 600; }
 
-    .recent-label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-    #recentList {
-      display: flex; flex-direction: column; gap: 8px;
-      width: 300px; max-height: 160px; overflow-y: auto;
-    }
+    .recent-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    #recentList { display: flex; flex-direction: column; gap: 7px; width: 280px; max-height: 140px; overflow-y: auto; }
     .recent-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-      font-size: 0.85rem;
-      color: var(--text);
-      text-align: right;
+      padding: 8px 12px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      cursor: pointer; transition: background 0.15s, border-color 0.15s;
+      font-size: 0.82rem; color: var(--text);
     }
-    .recent-item:hover { background: var(--surface2); border-color: var(--accent); }
-    .recent-item-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .recent-item:hover { background: var(--surface2); border-color: var(--gold); }
     .recent-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .recent-item-pg { font-size: 0.72rem; color: var(--muted); flex-shrink: 0; }
+    .recent-item-pg { font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
 
     /* ── LOADING ── */
     #loadingScreen {
@@ -130,29 +106,15 @@
       background: var(--bg);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 16px; opacity: 0; pointer-events: none;
+      gap: 14px; opacity: 0; pointer-events: none;
       transition: opacity 0.3s;
     }
     #loadingScreen.show { opacity: 1; pointer-events: all; }
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+    .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.75s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #loadingText { font-size: 0.9rem; color: var(--muted); }
-    #loadingProgress {
-      width: 200px; height: 3px;
-      background: var(--border); border-radius: 2px; overflow: hidden;
-    }
-    #loadingBar {
-      height: 100%; width: 0%;
-      background: var(--accent);
-      border-radius: 2px;
-      transition: width 0.2s;
-    }
+    #loadingText { font-size: 0.86rem; color: var(--muted); }
+    #loadingProgress { width: 200px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    #loadingBar { height: 100%; width: 0%; background: var(--gold); border-radius: 2px; transition: width 0.12s; }
 
     /* ── READER ── */
     #readerScreen {
@@ -164,254 +126,286 @@
     #readerScreen.show { opacity: 1; pointer-events: all; }
 
     /* Header */
-    #header {
-      height: 52px; flex-shrink: 0;
+    #pageHeader {
+      position: relative; z-index: 100;
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
-      display: flex; align-items: center;
-      padding: 0 14px; gap: 10px;
-      z-index: 100;
+      padding: 11px 14px;
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
       transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
       will-change: transform;
     }
-    #header.hide { transform: translateY(-100%); }
+    #pageHeader.hidden-header { transform: translateY(-100%); }
 
     .hbtn {
-      background: none; border: none;
-      color: var(--muted); font-size: 1.1rem;
-      cursor: pointer; padding: 6px 8px;
-      border-radius: 8px;
-      transition: background 0.15s, color 0.15s;
-      line-height: 1;
-    }
-    .hbtn:hover { background: var(--surface2); color: var(--text); }
-
-    #bookTitle {
-      flex: 1;
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      text-align: center;
-    }
-    #pageInfo {
-      font-size: 0.78rem;
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-
-    /* Canvas area */
-    #canvasContainer {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 12px;
-      gap: 16px;
-      scroll-behavior: auto;
-    }
-    #canvasContainer::-webkit-scrollbar { width: 5px; }
-    #canvasContainer::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    .page-wrapper {
-      position: relative;
-      flex-shrink: 0;
-      box-shadow: var(--page-shadow);
-      border-radius: 4px;
-      overflow: hidden;
-      background: #fff;
-    }
-    .page-wrapper canvas { display: block; }
-
-    /* ── CONTROLS PANEL ── */
-    #controls {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 200;
-      background: rgba(14,14,14,0.88);
-      border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-radius: 50px;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: opacity 0.3s, transform 0.3s;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-    }
-    body.light #controls {
-      background: rgba(245,240,232,0.9);
-      border-color: rgba(0,0,0,0.12);
-    }
-    #controls.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(12px); }
-
-    .cbtn {
-      background: none; border: none;
-      color: var(--muted); font-size: 1.1rem;
-      cursor: pointer; padding: 5px 8px;
-      border-radius: 50%; width: 34px; height: 34px;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s, color 0.15s;
-      flex-shrink: 0;
-    }
-    .cbtn:hover { background: var(--surface2); color: var(--text); }
-    .cbtn.active { color: var(--accent); }
-
-    #scrollToggle { font-size: 1.2rem; }
-
-    .speed-group {
-      display: flex; align-items: center; gap: 6px;
-    }
-    .speed-group .cbtn { font-size: 0.9rem; width: 28px; height: 28px; }
-
-    #speedSlider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 80px; height: 4px;
-      border-radius: 2px;
-      background: var(--border);
-      outline: none; cursor: pointer;
-    }
-    #speedSlider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-    }
-    #speedBadge {
-      font-size: 0.72rem;
-      color: var(--accent);
-      font-variant-numeric: tabular-nums;
-      min-width: 26px;
-    }
-
-    .ctrl-divider {
-      width: 1px; height: 22px;
-      background: var(--border); flex-shrink: 0;
-    }
-
-    /* Seek bar */
-    #seekBar {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 90px; height: 4px;
-      border-radius: 2px;
-      background: var(--border);
-      outline: none; cursor: pointer;
-    }
-    #seekBar::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-    }
-
-    /* Toast */
-    #toast {
-      position: fixed;
-      bottom: 90px; left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      background: var(--surface);
+      background: var(--track);
       border: 1px solid var(--border);
-      color: var(--text);
-      padding: 8px 18px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      opacity: 0;
-      transition: opacity 0.25s, transform 0.25s;
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 999;
+      color: var(--muted);
+      width: 34px; height: 34px; border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.88rem;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
     }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .hbtn:hover { background: var(--sidebar-hover); color: var(--text); }
+    .hbtn.active { background: var(--sidebar-active); color: var(--gold); border-color: var(--gold2); }
 
-    /* Thumbnail sidebar */
+    #headerCenter { flex: 1; text-align: center; min-width: 0; }
+    #bookTitle {
+      font-size: 0.92rem; font-weight: 600; color: var(--gold);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #headerMeta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2px; }
+    #headerMeta span { font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #pageIndicator { color: var(--gold) !important; font-weight: 600; }
+
+    /* Viewport */
+    #viewport { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
+
+    #scrollContainer {
+      position: absolute; inset: 0;
+      overflow-y: scroll; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: auto;
+      overscroll-behavior: contain;
+      will-change: scroll-position;
+    }
+    #scrollContainer::-webkit-scrollbar { width: 0; }
+
+    /* The inner scroller — translateY sub-pixel trick lives here */
+    #scroller {
+      contain: layout style;
+      min-height: 100%;
+      transform: translateZ(0);
+      will-change: transform;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 16px 8px 240px;
+      gap: 14px;
+    }
+
+    .page-slot {
+      flex-shrink: 0; position: relative;
+      background: var(--surface); border-radius: 3px;
+      overflow: hidden; box-shadow: var(--page-shadow);
+    }
+    .page-slot canvas { display: block; }
+    .page-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--border); font-size: 0.72rem;
+    }
+
+    /* ── SCROLL PANEL (same structure as quran site) ── */
+    #scrollPanel {
+      position: fixed; bottom: 18px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--panel-bg);
+      backdrop-filter: blur(22px) saturate(1.8) brightness(1.1);
+      -webkit-backdrop-filter: blur(22px) saturate(1.8) brightness(1.1);
+      border: 1px solid var(--panel-border);
+      border-radius: 22px;
+      padding: 13px 18px 12px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 10px;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.07);
+      width: 90%; max-width: 340px;
+      transition: opacity 0.3s, transform 0.3s;
+      contain: layout style;
+    }
+    body.light #scrollPanel {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    #scrollPanel.hidden {
+      opacity: 0; pointer-events: none;
+      transform: translateX(-50%) translateY(12px);
+    }
+
+    /* Progress row */
+    .progress-section { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+    .progress-labels { display: flex; justify-content: space-between; align-items: center; }
+    .progress-label { font-size: 0.62em; color: var(--gold2); letter-spacing: 0.03em; font-family: system-ui, sans-serif; }
+    .progress-pct { font-size: 0.62em; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; font-family: system-ui, sans-serif; }
+
+    .seek-bar {
+      -webkit-appearance: none; width: 100%; height: 5px;
+      border-radius: 4px; outline: none; cursor: pointer;
+      background: var(--track);
+    }
+    .seek-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--gold2);
+      cursor: pointer;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.5);
+      transition: transform 0.15s;
+    }
+    .seek-bar:active::-webkit-slider-thumb { transform: scale(1.25); }
+
+    .panel-divider { width: 100%; height: 1px; background: rgba(128,128,128,0.1); }
+
+    /* Main controls row */
+    .main-controls {
+      display: flex; align-items: center;
+      justify-content: center; gap: 10px; width: 100%;
+    }
+
+    .step-btn {
+      background: var(--track); border: 1px solid var(--panel-border);
+      color: rgba(128,128,128,0.6);
+      width: 32px; height: 32px; border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1em; font-family: system-ui, sans-serif;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .step-btn:hover { background: rgba(200,169,110,0.14); color: var(--gold); }
+    .step-btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+    .jump-btn {
+      background: var(--track); border: 1px solid var(--panel-border);
+      color: rgba(128,128,128,0.65);
+      height: 28px; padding: 0 10px;
+      border-radius: 20px; cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.64em; font-family: 'Tajawal', sans-serif;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .jump-btn:hover { background: rgba(200,169,110,0.14); color: var(--gold); }
+
+    /* Big play/pause button */
+    .scroll-btn {
+      background: rgba(200,169,110,0.92);
+      color: #111; border: none;
+      width: 48px; height: 48px; border-radius: 50%;
+      cursor: pointer; font-size: 1.1em;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 16px rgba(200,169,110,0.3), inset 0 1px 0 rgba(255,255,255,0.25);
+      transition: transform 0.15s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .scroll-btn:active { transform: scale(0.92); }
+    .scroll-btn.active { background: rgba(255,255,255,0.88); }
+
+    .play-icon, .pause-icon {
+      width: 20px; height: 20px; pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pause-icon { display: none; }
+    .scroll-btn.active .play-icon  { display: none; }
+    .scroll-btn.active .pause-icon { display: flex; }
+
+    /* Speed row */
+    .speed-section { width: 100%; display: flex; align-items: center; gap: 8px; }
+    .speed-label { font-size: 0.6em; color: var(--gold2); flex-shrink: 0; letter-spacing: 0.02em; font-family: system-ui, sans-serif; }
+
+    .speed-slider {
+      -webkit-appearance: none; flex: 1; height: 3px;
+      border-radius: 2px; outline: none; cursor: pointer;
+      background: var(--track);
+    }
+    .speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 11px; height: 11px; border-radius: 50%;
+      background: var(--gold); cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      transition: transform 0.15s;
+    }
+    .speed-slider:active::-webkit-slider-thumb { transform: scale(1.4); }
+
+    .speed-badge {
+      font-size: 0.62em; font-weight: 700;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      min-width: 30px; text-align: left;
+      flex-shrink: 0; font-family: system-ui, sans-serif;
+    }
+    .time-remaining { font-size: 0.62em; color: var(--gold2); font-variant-numeric: tabular-nums; font-family: system-ui, sans-serif; }
+
+    /* ── THUMBNAILS SIDEBAR ── */
     #thumbSidebar {
-      position: fixed;
-      top: 0; right: 0;
-      width: 130px; height: 100%;
-      background: var(--bg2);
-      border-left: 1px solid var(--border);
-      z-index: 300;
-      transform: translateX(100%);
+      position: fixed; top: 0; right: 0;
+      width: 120px; height: 100%;
+      background: var(--sidebar-bg); border-left: 1px solid var(--border);
+      z-index: 300; transform: translateX(100%);
       transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      overflow-y: auto;
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      overflow-y: auto; padding: 8px;
+      display: flex; flex-direction: column; gap: 8px;
     }
     #thumbSidebar.open { transform: translateX(0); }
     #thumbSidebar::-webkit-scrollbar { width: 3px; }
     #thumbSidebar::-webkit-scrollbar-thumb { background: var(--border); }
 
     .thumb-item {
-      cursor: pointer;
-      border: 2px solid transparent;
-      border-radius: 6px;
-      overflow: hidden;
-      transition: border-color 0.15s;
-      position: relative;
+      cursor: pointer; border: 2px solid transparent;
+      border-radius: 5px; overflow: hidden;
+      transition: border-color 0.15s; position: relative; flex-shrink: 0;
     }
-    .thumb-item:hover { border-color: var(--accent); }
-    .thumb-item.active { border-color: var(--accent); }
+    .thumb-item:hover { border-color: var(--gold); }
+    .thumb-item.active { border-color: var(--gold); }
     .thumb-item canvas { width: 100% !important; height: auto !important; display: block; }
     .thumb-pg {
       position: absolute; bottom: 0; left: 0; right: 0;
-      background: rgba(0,0,0,0.55);
-      color: #fff; font-size: 0.65rem;
-      text-align: center; padding: 2px;
+      background: rgba(0,0,0,0.6); color: #fff;
+      font-size: 0.62rem; text-align: center; padding: 2px;
+      font-family: system-ui, sans-serif;
     }
+    .thumb-ph { width: 100%; aspect-ratio: 0.707; background: var(--surface); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.65rem; font-family: system-ui, sans-serif; }
 
     #thumbOverlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: 299;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.3s;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 299; opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
     #thumbOverlay.show { opacity: 1; pointer-events: all; }
 
-    @media (max-width: 480px) {
-      #speedSlider { width: 60px; }
-      #seekBar { width: 60px; }
-      #controls { padding: 6px 10px; gap: 6px; }
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 100px; left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 7px 18px;
+      border-radius: 20px; font-size: 0.8rem;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none; white-space: nowrap; z-index: 999;
     }
-  </style>
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── OFFLINE ── */
+    #offlineBadge {
+      position: fixed; top: 60px; left: 50%;
+      transform: translateX(-50%);
+      background: #c0392b; color: #fff;
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 0.75rem; z-index: 900;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    #offlineBadge.show { opacity: 1; }
+  </style>
 </head>
 <body>
 
-<!-- UPLOAD SCREEN -->
-
+<!-- UPLOAD -->
 <div id="uploadScreen">
   <div class="upload-logo">📖</div>
   <div class="upload-title">قارئ الكتب</div>
   <div class="upload-sub">افتح أي كتاب PDF مع سكرول تلقائي</div>
-
   <div class="drop-zone" id="dropZone">
     <input type="file" accept=".pdf" id="fileInput">
     <div class="drop-icon">📂</div>
     <div class="drop-text">اسحب ملف PDF هنا<br>أو <span>اضغط للاختيار</span></div>
   </div>
-
-  <div id="recentSection" style="display:none; flex-direction:column; align-items:center; gap:10px;">
+  <div id="recentSection" style="display:none;flex-direction:column;align-items:center;gap:10px;">
     <div class="recent-label">آخر الكتب</div>
     <div id="recentList"></div>
   </div>
 </div>
 
 <!-- LOADING -->
-
 <div id="loadingScreen">
   <div class="spinner"></div>
   <div id="loadingText">جاري تحميل الكتاب…</div>
@@ -419,95 +413,164 @@
 </div>
 
 <!-- READER -->
-
 <div id="readerScreen">
-  <div id="header">
+
+  <!-- Header -->
+  <div id="pageHeader">
     <button class="hbtn" id="closeBtn" title="إغلاق">✕</button>
-    <div id="bookTitle">—</div>
-    <div id="pageInfo">—</div>
-    <button class="hbtn" id="themeBtn" title="تبديل الوضع">🌙</button>
-    <button class="hbtn" id="thumbBtn" title="الصفحات">⊞</button>
-  </div>
-
-  <div id="canvasContainer"></div>
-
-  <div id="controls">
-    <button class="cbtn" id="scrollToggle" title="تشغيل السكرول">▶</button>
-    <div class="ctrl-divider"></div>
-    <div class="speed-group">
-      <button class="cbtn" id="minusBtn">−</button>
-      <input type="range" id="speedSlider" min="0.2" max="3" step="0.1" value="0.8">
-      <button class="cbtn" id="plusBtn">+</button>
-      <span id="speedBadge">×0.8</span>
+    <div id="headerCenter">
+      <div id="bookTitle">—</div>
+      <div id="headerMeta">
+        <span id="pageIndicator">ص 1</span>
+        <span>·</span>
+        <span id="pctIndicator">0%</span>
+      </div>
     </div>
-    <div class="ctrl-divider"></div>
-    <input type="range" id="seekBar" min="0" max="1000" value="0" title="موضع القراءة">
+    <button class="hbtn" id="themeBtn" title="الوضع">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <button class="hbtn" id="thumbBtn" title="الصفحات">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+      </svg>
+    </button>
   </div>
+
+  <!-- Scroll area -->
+  <div id="viewport">
+    <div id="scrollContainer">
+      <div id="scroller"></div>
+    </div>
+  </div>
+
+  <!-- Control panel -->
+  <div id="scrollPanel" class="hidden">
+    <!-- Seek row -->
+    <div class="progress-section">
+      <div class="progress-labels">
+        <span class="progress-label">الموضع</span>
+        <span class="progress-pct" id="progressPct">0%</span>
+        <span class="time-remaining" id="timeRemaining">—</span>
+      </div>
+      <input type="range" class="seek-bar" id="seekBar" min="0" max="1000" value="0">
+    </div>
+
+    <div class="panel-divider"></div>
+
+    <!-- Buttons row -->
+    <div class="main-controls">
+      <button class="jump-btn" id="jumpTopBtn">
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+        الأعلى
+      </button>
+
+      <button class="step-btn" id="minusBtn" title="أبطأ">−</button>
+
+      <button class="scroll-btn" id="scrollBtn">
+        <span class="play-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        </span>
+        <span class="pause-icon">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </span>
+      </button>
+
+      <button class="step-btn" id="plusBtn" title="أسرع">+</button>
+
+      <button class="jump-btn" id="jumpBottomBtn">
+        النهاية
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+
+    <div class="panel-divider"></div>
+
+    <!-- Speed row -->
+    <div class="speed-section">
+      <span class="speed-label">السرعة</span>
+      <input type="range" class="speed-slider" id="speedSlider" min="0.2" max="3" step="0.1" value="0.8">
+      <span class="speed-badge" id="speedBadge">×0.8</span>
+    </div>
+  </div>
+
 </div>
 
 <!-- THUMBNAILS -->
-
 <div id="thumbOverlay"></div>
-<div id="thumbSidebar" id="thumbSidebar"></div>
+<div id="thumbSidebar"></div>
 
-<!-- TOAST -->
-
+<!-- TOAST + OFFLINE -->
 <div id="toast"></div>
+<div id="offlineBadge">لا يوجد اتصال بالإنترنت</div>
 
 <script>
-// PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// ── CONFIG ──
+const RENDER_WINDOW = 2;
+const UNLOAD_WINDOW = 7;
+const THUMB_SCALE   = 0.18;
+const BASE_SPEED    = 30;   // px/s at ×1.0
+const MAX_CSS_W     = 860;
+
 // ── STATE ──
-let pdfDoc = null;
-let totalPages = 0;
-let pageCanvases = []; // rendered canvas per page
-let thumbCanvases = [];
+let pdfDoc = null, totalPages = 0, bookName = '';
+let pageSlots = [], pageSizes = [], pageRendered = [], thumbItems = [];
 let currentPage = 1;
-let bookName = '';
 
-let isScrolling = false;
-let rafId = null;
-let lastTime = null;
-let scrollAccum = 0;
-let scrollWhole = 0;
-let isPaused = false;
-let isTouching = false;
-let resumeTimer = null;
+// scroll engine
+let isScrolling = false, rafId = null, lastTime = null;
+let scrollAccum = 0, scrollWhole = 0;
+let isPausedForManual = false, isTouching = false, resumeTimer = null;
+let isSeeking = false;
 
-const SCALE = window.devicePixelRatio >= 2 ? 2.5 : 2;
-const THUMB_SCALE = 0.25;
+// UI dirty flag (like quran site)
+let uiDirty = false, uiRafId = null;
 
 // ── ELEMENTS ──
-const uploadScreen   = document.getElementById('uploadScreen');
-const loadingScreen  = document.getElementById('loadingScreen');
-const readerScreen   = document.getElementById('readerScreen');
-const loadingBar     = document.getElementById('loadingBar');
-const loadingText    = document.getElementById('loadingText');
-const canvasContainer= document.getElementById('canvasContainer');
-const header         = document.getElementById('header');
-const bookTitle      = document.getElementById('bookTitle');
-const pageInfo       = document.getElementById('pageInfo');
-const scrollToggle   = document.getElementById('scrollToggle');
-const speedSlider    = document.getElementById('speedSlider');
-const speedBadge     = document.getElementById('speedBadge');
-const seekBar        = document.getElementById('seekBar');
-const minusBtn       = document.getElementById('minusBtn');
-const plusBtn        = document.getElementById('plusBtn');
-const closeBtn       = document.getElementById('closeBtn');
-const themeBtn       = document.getElementById('themeBtn');
-const thumbBtn       = document.getElementById('thumbBtn');
-const thumbSidebar   = document.getElementById('thumbSidebar');
-const thumbOverlay   = document.getElementById('thumbOverlay');
-const dropZone       = document.getElementById('dropZone');
-const fileInput      = document.getElementById('fileInput');
-const controls       = document.getElementById('controls');
-const toast          = document.getElementById('toast');
+const uploadScreen    = document.getElementById('uploadScreen');
+const loadingScreen   = document.getElementById('loadingScreen');
+const readerScreen    = document.getElementById('readerScreen');
+const loadingBar      = document.getElementById('loadingBar');
+const loadingText     = document.getElementById('loadingText');
+const pageHeader      = document.getElementById('pageHeader');
+const bookTitle       = document.getElementById('bookTitle');
+const pageIndicator   = document.getElementById('pageIndicator');
+const pctIndicator    = document.getElementById('pctIndicator');
+const viewport        = document.getElementById('viewport');
+const scrollContainer = document.getElementById('scrollContainer');
+const scroller        = document.getElementById('scroller');
+const scrollPanel     = document.getElementById('scrollPanel');
+const scrollBtn       = document.getElementById('scrollBtn');
+const speedSlider     = document.getElementById('speedSlider');
+const speedBadge      = document.getElementById('speedBadge');
+const seekBar         = document.getElementById('seekBar');
+const minusBtn        = document.getElementById('minusBtn');
+const plusBtn         = document.getElementById('plusBtn');
+const jumpTopBtn      = document.getElementById('jumpTopBtn');
+const jumpBottomBtn   = document.getElementById('jumpBottomBtn');
+const progressPct     = document.getElementById('progressPct');
+const timeRemaining   = document.getElementById('timeRemaining');
+const closeBtn        = document.getElementById('closeBtn');
+const themeBtn        = document.getElementById('themeBtn');
+const thumbBtn        = document.getElementById('thumbBtn');
+const thumbSidebar    = document.getElementById('thumbSidebar');
+const thumbOverlay    = document.getElementById('thumbOverlay');
+const dropZone        = document.getElementById('dropZone');
+const fileInput       = document.getElementById('fileInput');
+const toast           = document.getElementById('toast');
+const offlineBadge    = document.getElementById('offlineBadge');
 
 // ── TOAST ──
 let toastTimer;
-function showToast(msg, dur = 1800) {
+function showToast(msg, dur=1800) {
   toast.textContent = msg;
   toast.classList.add('show');
   clearTimeout(toastTimer);
@@ -515,31 +578,23 @@ function showToast(msg, dur = 1800) {
 }
 
 // ── THEME ──
-function toggleTheme() {
-  document.body.classList.toggle('light');
-  themeBtn.textContent = document.body.classList.contains('light') ? '☀️' : '🌙';
-  localStorage.setItem('readerTheme', document.body.classList.contains('light') ? 'light' : 'dark');
+function applyTheme(light) {
+  document.body.classList.toggle('light', light);
+  localStorage.setItem('readerTheme', light ? 'light' : 'dark');
 }
-themeBtn.addEventListener('click', toggleTheme);
-if (localStorage.getItem('readerTheme') === 'light') {
-  document.body.classList.add('light');
-  themeBtn.textContent = '☀️';
-}
+themeBtn.addEventListener('click', e => { e.stopPropagation(); applyTheme(!document.body.classList.contains('light')); });
+if (localStorage.getItem('readerTheme') === 'light') applyTheme(true);
 
-// ── RECENT BOOKS (metadata only, no file) ──
-function getRecent() {
-  try { return JSON.parse(localStorage.getItem('readerRecent') || '[]'); } catch { return []; }
-}
+// ── RECENT ──
+function getRecent() { try { return JSON.parse(localStorage.getItem('readerRecent') || '[]'); } catch { return []; } }
 function saveRecent(name, page) {
   let list = getRecent().filter(r => r.name !== name);
-  list.unshift({ name, page });
-  list = list.slice(0, 6);
+  list.unshift({ name, page }); list = list.slice(0, 5);
   localStorage.setItem('readerRecent', JSON.stringify(list));
 }
 function updateRecentPage(name, page) {
-  let list = getRecent();
-  const idx = list.findIndex(r => r.name === name);
-  if (idx >= 0) { list[idx].page = page; localStorage.setItem('readerRecent', JSON.stringify(list)); }
+  let list = getRecent(); const i = list.findIndex(r => r.name === name);
+  if (i >= 0) { list[i].page = page; localStorage.setItem('readerRecent', JSON.stringify(list)); }
 }
 function renderRecentList() {
   const list = getRecent();
@@ -551,14 +606,8 @@ function renderRecentList() {
   list.forEach(r => {
     const el = document.createElement('div');
     el.className = 'recent-item';
-    el.innerHTML = `<span class="recent-item-icon">📄</span>
-      <span class="recent-item-name">${r.name}</span>
-      <span class="recent-item-pg">ص ${r.page}</span>`;
-    el.title = 'افتح الملف من جهازك';
-    el.addEventListener('click', () => {
-      showToast('اختر الملف من جهازك لاستكمال القراءة');
-      fileInput.click();
-    });
+    el.innerHTML = `<span>📄</span><span class="recent-item-name">${r.name}</span><span class="recent-item-pg">ص ${r.page}</span>`;
+    el.addEventListener('click', () => { showToast('اختر الملف من جهازك لاستكمال القراءة'); fileInput.click(); });
     ul.appendChild(el);
   });
 }
@@ -568,15 +617,12 @@ renderRecentList();
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
+  e.preventDefault(); dropZone.classList.remove('dragover');
   const file = e.dataTransfer.files[0];
   if (file && file.type === 'application/pdf') loadPDF(file);
   else showToast('يرجى اختيار ملف PDF فقط');
 });
-fileInput.addEventListener('change', () => {
-  if (fileInput.files[0]) loadPDF(fileInput.files[0]);
-});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadPDF(fileInput.files[0]); });
 
 // ── LOAD PDF ──
 async function loadPDF(file) {
@@ -588,291 +634,369 @@ async function loadPDF(file) {
   loadingBar.style.width = '0%';
   loadingText.textContent = 'جاري تحميل الكتاب…';
 
-  const arrayBuffer = await file.arrayBuffer();
-  const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+  const buf = await file.arrayBuffer();
+  const task = pdfjsLib.getDocument({ data: buf });
+  task.onProgress = p => { if (p.total) loadingBar.style.width = Math.round((p.loaded/p.total)*40)+'%'; };
 
-  loadingTask.onProgress = (p) => {
-    if (p.total) loadingBar.style.width = Math.round((p.loaded / p.total) * 50) + '%';
-  };
-
-  pdfDoc = await loadingTask.promise;
+  pdfDoc = await task.promise;
   totalPages = pdfDoc.numPages;
+  pageSlots = []; pageSizes = []; pageRendered = []; thumbItems = [];
+  scroller.innerHTML = ''; thumbSidebar.innerHTML = '';
 
-  canvasContainer.innerHTML = '';
-  thumbSidebar.innerHTML = '';
-  pageCanvases = [];
-  thumbCanvases = [];
+  loadingText.textContent = 'جاري قياس الصفحات…';
+  const containerW = Math.min(scrollContainer.clientWidth - 16, MAX_CSS_W);
 
-  // Restore progress
-  let startPage = 1;
-  try {
-    const saved = JSON.parse(localStorage.getItem('readerProgress_' + bookName));
-    if (saved && saved.page) startPage = saved.page;
-  } catch {}
-
-  // Render all pages
-  loadingText.textContent = 'جاري تقديم الصفحات…';
   for (let i = 1; i <= totalPages; i++) {
-    loadingBar.style.width = (50 + Math.round((i / totalPages) * 50)) + '%';
-    await renderPage(i);
+    loadingBar.style.width = (40 + Math.round((i/totalPages)*45)) + '%';
+    const pg  = await pdfDoc.getPage(i);
+    const vp  = pg.getViewport({ scale: 1 });
+    const scl = containerW / vp.width;
+    const cssW = Math.round(vp.width  * scl);
+    const cssH = Math.round(vp.height * scl);
+    pageSizes.push({ w: cssW, h: cssH, scale: scl });
+
+    const slot = document.createElement('div');
+    slot.className = 'page-slot page-placeholder';
+    slot.dataset.page = i;
+    slot.style.width  = cssW + 'px';
+    slot.style.height = cssH + 'px';
+    scroller.appendChild(slot);
+    pageSlots.push(slot);
+    pageRendered.push(false);
+
+    // Thumb placeholder
+    const tw = document.createElement('div');
+    tw.className = 'thumb-item';
+    tw.dataset.page = i;
+    const tph = document.createElement('div');
+    tph.className = 'thumb-ph'; tph.textContent = i;
+    tw.appendChild(tph);
+    tw.addEventListener('click', () => { scrollToPage(i, true); closeThumbs(); });
+    thumbSidebar.appendChild(tw);
+    thumbItems.push(tw);
   }
 
+  loadingBar.style.width = '95%';
+
+  // Restore
+  let startPage = 1;
+  try {
+    const saved = JSON.parse(localStorage.getItem('readerProgress_'+bookName));
+    if (saved && saved.page) {
+      startPage = Math.min(saved.page, totalPages);
+      if (saved.speed) speedSlider.value = saved.speed;
+    }
+  } catch {}
+
   saveRecent(bookName, startPage);
+  updateSpeedSliderUI();
 
-  // Scroll to saved page
   setTimeout(() => {
-    scrollToPage(startPage, false);
-    scrollAccum = canvasContainer.scrollTop;
-    scrollWhole = Math.floor(scrollAccum);
-
     loadingScreen.classList.remove('show');
     readerScreen.classList.add('show');
-    updateSpeedSlider();
-    updateSeekBar();
-    schedulePageDetect();
-  }, 200);
+    scrollPanel.classList.remove('hidden');
+
+    scrollToPage(startPage, false);
+    scrollAccum = scrollContainer.scrollTop;
+    scrollWhole = Math.floor(scrollAccum);
+
+    lazyRender();
+    scheduleUI();
+
+    if (startPage > 1) showToast('استُؤنفت القراءة من ص ' + startPage);
+  }, 250);
 }
 
-async function renderPage(num) {
-  const page = await pdfDoc.getPage(num);
+// ── LAZY RENDER ──
+let lazyTimer = null;
+function scheduleLazy() { clearTimeout(lazyTimer); lazyTimer = setTimeout(lazyRender, 100); }
 
-  // Main canvas
-  const viewport = page.getViewport({ scale: SCALE });
-  const wrapper = document.createElement('div');
-  wrapper.className = 'page-wrapper';
-  wrapper.dataset.page = num;
+async function lazyRender() {
+  if (!pdfDoc) return;
+  const start = Math.max(1, currentPage - RENDER_WINDOW);
+  const end   = Math.min(totalPages, currentPage + RENDER_WINDOW);
+  for (let i = start; i <= end; i++) {
+    if (!pageRendered[i-1]) await renderPageIntoSlot(i);
+  }
+  // unload far pages
+  for (let i = 1; i <= totalPages; i++) {
+    if (pageRendered[i-1] && Math.abs(i - currentPage) > UNLOAD_WINDOW) unloadPage(i);
+  }
+}
+
+async function renderPageIntoSlot(num) {
+  if (!pdfDoc || pageRendered[num-1]) return;
+  pageRendered[num-1] = true;
+  const slot = pageSlots[num-1];
+  const size = pageSizes[num-1];
+  const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+  const pg   = await pdfDoc.getPage(num);
+  const vp   = pg.getViewport({ scale: size.scale * dpr });
 
   const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-  canvas.style.width  = (viewport.width  / SCALE) + 'px';
-  canvas.style.height = (viewport.height / SCALE) + 'px';
+  canvas.width  = vp.width; canvas.height = vp.height;
+  canvas.style.width  = size.w + 'px';
+  canvas.style.height = size.h + 'px';
 
-  await page.render({ canvasContext: ctx, viewport }).promise;
-  wrapper.appendChild(canvas);
-  canvasContainer.appendChild(wrapper);
-  pageCanvases.push(wrapper);
+  try {
+    await pg.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+  } catch {
+    pageRendered[num-1] = false; return;
+  }
 
-  // Thumbnail
-  const tvp = page.getViewport({ scale: THUMB_SCALE });
-  const tw = document.createElement('div');
-  tw.className = 'thumb-item';
-  tw.dataset.page = num;
-  const tc = document.createElement('canvas');
-  const tctx = tc.getContext('2d');
-  tc.width = tvp.width; tc.height = tvp.height;
-  await page.render({ canvasContext: tctx, viewport: tvp }).promise;
-  const tpg = document.createElement('div');
-  tpg.className = 'thumb-pg';
-  tpg.textContent = num;
-  tw.appendChild(tc); tw.appendChild(tpg);
-  tw.addEventListener('click', () => {
-    scrollToPage(num, true);
-    closeThumbs();
-  });
-  thumbSidebar.appendChild(tw);
-  thumbCanvases.push(tw);
+  slot.classList.remove('page-placeholder');
+  slot.innerHTML = ''; slot.appendChild(canvas);
+
+  // Thumb
+  const tw = thumbItems[num-1];
+  if (tw && tw.querySelector('.thumb-ph')) {
+    const tvp = pg.getViewport({ scale: THUMB_SCALE });
+    const tc  = document.createElement('canvas');
+    tc.width = tvp.width; tc.height = tvp.height;
+    try {
+      await pg.render({ canvasContext: tc.getContext('2d'), viewport: tvp }).promise;
+      const tpg = document.createElement('div');
+      tpg.className = 'thumb-pg'; tpg.textContent = num;
+      tw.innerHTML = ''; tw.appendChild(tc); tw.appendChild(tpg);
+    } catch {}
+  }
+}
+
+function unloadPage(num) {
+  if (!pageRendered[num-1]) return;
+  const slot = pageSlots[num-1], size = pageSizes[num-1];
+  slot.innerHTML = '';
+  slot.classList.add('page-placeholder');
+  slot.style.width = size.w+'px'; slot.style.height = size.h+'px';
+  pageRendered[num-1] = false;
 }
 
 function scrollToPage(num, animated) {
-  const wrapper = pageCanvases[num - 1];
-  if (!wrapper) return;
-  const top = wrapper.offsetTop - canvasContainer.offsetTop - 20;
-  if (animated) canvasContainer.scrollTo({ top, behavior: 'smooth' });
-  else canvasContainer.scrollTop = top;
-  scrollAccum = canvasContainer.scrollTop;
+  const slot = pageSlots[num-1];
+  if (!slot) return;
+  const top = slot.offsetTop - 16;
+  if (animated) scrollContainer.scrollTo({ top, behavior: 'smooth' });
+  else scrollContainer.scrollTop = top;
+  scrollAccum = scrollContainer.scrollTop;
+  scrollWhole = Math.floor(scrollAccum);
 }
 
-// ── PAGE DETECTION ──
-let detectRAF = null;
-function schedulePageDetect() {
-  if (detectRAF) cancelAnimationFrame(detectRAF);
-  detectRAF = requestAnimationFrame(detectCurrentPage);
-}
-function detectCurrentPage() {
-  detectRAF = null;
-  const mid = canvasContainer.scrollTop + canvasContainer.clientHeight / 2;
+// ── MAX SCROLL ──
+function getMaxScroll() { return Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight); }
+
+// ── UI FLUSH (dirty-flag RAF pattern like quran site) ──
+function scheduleUI() { if (!uiDirty) { uiDirty = true; uiRafId = requestAnimationFrame(flushUI); } }
+
+function flushUI() {
+  uiRafId = null; uiDirty = false;
+  const scrollY = scrollContainer.scrollTop;
+  const maxS    = getMaxScroll();
+  const pct     = maxS > 0 ? scrollY / maxS : 0;
+  const pctNum  = Math.round(pct * 100);
+
+  // Page detection
+  const mid = scrollY + scrollContainer.clientHeight * 0.4;
   let best = 1, bestDist = Infinity;
-  pageCanvases.forEach((w, i) => {
-    const wTop = w.offsetTop - canvasContainer.offsetTop;
-    const wMid = wTop + w.offsetHeight / 2;
-    const d = Math.abs(wMid - mid);
-    if (d < bestDist) { bestDist = d; best = i + 1; }
+  pageSlots.forEach((s, i) => {
+    const d = Math.abs((s.offsetTop + s.offsetHeight * 0.5) - mid);
+    if (d < bestDist) { bestDist = d; best = i+1; }
   });
   if (best !== currentPage) {
     currentPage = best;
-    pageInfo.textContent = `${currentPage} / ${totalPages}`;
-    thumbCanvases.forEach((t, i) => t.classList.toggle('active', i + 1 === currentPage));
+    thumbItems.forEach((t,i) => t.classList.toggle('active', i+1 === currentPage));
     updateRecentPage(bookName, currentPage);
-    saveProgressLocal();
+    saveProgress();
+    scheduleLazy();
   }
-  updateSeekBar();
+
+  pageIndicator.textContent = `ص ${currentPage} / ${totalPages}`;
+  pctIndicator.textContent  = pctNum + '%';
+  progressPct.textContent   = pctNum + '%';
+
+  if (!isSeeking) {
+    seekBar.value = Math.round(pct * 1000);
+    seekBar.style.background = `linear-gradient(to left, var(--gold2) ${pctNum}%, var(--track) ${pctNum}%)`;
+  }
+
+  // Time remaining
+  const remaining = maxS - scrollY;
+  if (remaining <= 2) { timeRemaining.textContent = 'تمت القراءة ✓'; return; }
+  const speed = parseFloat(speedSlider.value);
+  const secs  = remaining / (speed * BASE_SPEED);
+  const m = Math.floor(secs / 60), s = Math.floor(secs % 60);
+  timeRemaining.textContent = `متبقي ${m}:${s<10?'0'+s:s} د`;
+
+  updateSpeedBtnStates();
 }
 
-function saveProgressLocal() {
-  try {
-    localStorage.setItem('readerProgress_' + bookName, JSON.stringify({ page: currentPage }));
-  } catch {}
-}
+// ── SCROLL ENGINE — sub-pixel with translateY (same as quran site) ──
+function tick(timestamp) {
+  if (!isScrolling) return;
+  if (lastTime === null) { lastTime = timestamp; rafId = requestAnimationFrame(tick); return; }
 
-// ── SEEK BAR ──
-function updateSeekBar() {
-  const maxS = canvasContainer.scrollHeight - canvasContainer.clientHeight;
-  if (!maxS) return;
-  seekBar.value = Math.round((canvasContainer.scrollTop / maxS) * 1000);
-}
-let isSeeking = false;
-seekBar.addEventListener('mousedown', () => isSeeking = true);
-seekBar.addEventListener('touchstart', () => isSeeking = true, { passive: true });
-seekBar.addEventListener('input', () => {
-  const maxS = canvasContainer.scrollHeight - canvasContainer.clientHeight;
-  const y = (parseInt(seekBar.value) / 1000) * maxS;
-  canvasContainer.scrollTop = y;
-  scrollAccum = y;
-  schedulePageDetect();
-});
-seekBar.addEventListener('mouseup', () => { isSeeking = false; });
-seekBar.addEventListener('touchend', () => { isSeeking = false; }, { passive: true });
+  const delta = Math.min(timestamp - lastTime, 50);
+  lastTime = timestamp;
 
-// ── AUTO-SCROLL ENGINE ──
-function getSpeed() { return parseFloat(speedSlider.value) * 30; } // px/s
+  const speed = parseFloat(speedSlider.value);
+  const dy    = (speed * BASE_SPEED * delta) / 1000;
+  const maxS  = getMaxScroll();
 
-function tick(ts) {
-  if (!lastTime) { lastTime = ts; rafId = requestAnimationFrame(tick); return; }
-  const dt = (ts - lastTime) / 1000;
-  lastTime = ts;
+  scrollAccum = Math.min(scrollAccum + dy, maxS);
 
-  const delta = getSpeed() * dt;
-  scrollAccum += delta;
   const newWhole = Math.floor(scrollAccum);
-  const diff = newWhole - scrollWhole;
-  if (diff > 0) {
-    canvasContainer.scrollTop += diff;
+  const frac     = scrollAccum - newWhole;
+
+  if (newWhole !== scrollWhole) {
     scrollWhole = newWhole;
+    scrollContainer.scrollTop = scrollWhole;
   }
 
-  const maxS = canvasContainer.scrollHeight - canvasContainer.clientHeight;
-  if (canvasContainer.scrollTop >= maxS) {
+  // Sub-pixel fractional offset → no jitter
+  scroller.style.transform = frac > 0.001
+    ? `translateY(-${frac.toFixed(3)}px) translateZ(0)`
+    : 'translateZ(0)';
+
+  scheduleUI();
+
+  if (scrollAccum >= maxS) {
+    scroller.style.transform = 'translateZ(0)';
     stopScroll();
-    showToast('انتهى الكتاب');
+    showToast('انتهى الكتاب 📖');
     return;
   }
-
-  if (!isSeeking) schedulePageDetect();
   rafId = requestAnimationFrame(tick);
 }
 
 function startScroll() {
-  isScrolling = true; isPaused = false;
-  scrollToggle.textContent = '⏸';
-  scrollToggle.classList.add('active');
-  scrollAccum = canvasContainer.scrollTop;
-  scrollWhole = Math.floor(scrollAccum);
-  lastTime = null;
+  if (isScrolling) return;
+  isScrolling = true; isPausedForManual = false; lastTime = null;
+  scrollAccum = scrollContainer.scrollTop; scrollWhole = Math.floor(scrollAccum);
+  scrollBtn.classList.add('active');
+  pageHeader.classList.add('hidden-header');
   rafId = requestAnimationFrame(tick);
   showToast('السكرول شغّال');
 }
+
 function stopScroll() {
-  isScrolling = false; isPaused = false;
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  scrollToggle.textContent = '▶';
-  scrollToggle.classList.remove('active');
-}
-function pauseScroll() {
-  if (!isScrolling || isPaused) return;
-  isPaused = true;
+  isScrolling = false; isPausedForManual = false; isTouching = false;
+  clearTimeout(resumeTimer);
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   lastTime = null;
-  scheduleResume();
+  scrollContainer.scrollTop = scrollWhole;
+  scroller.style.transform = 'translateZ(0)';
+  scrollBtn.classList.remove('active');
+  pageHeader.classList.remove('hidden-header');
+  scheduleUI(); saveProgress();
 }
-function scheduleResume() {
+
+function pauseAndResume() {
+  if (!isScrolling || isPausedForManual) return;
+  isPausedForManual = true;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  lastTime = null;
+  scheduleResumeIfNotTouching();
+}
+
+function scheduleResumeIfNotTouching() {
   clearTimeout(resumeTimer);
   if (isTouching) return;
   resumeTimer = setTimeout(() => {
-    if (!isPaused) return;
-    isPaused = false;
-    scrollAccum = canvasContainer.scrollTop;
+    if (!isPausedForManual) return;
+    isPausedForManual = false;
+    scrollAccum = scrollContainer.scrollTop;
     scrollWhole = Math.floor(scrollAccum);
     lastTime = null;
     rafId = requestAnimationFrame(tick);
   }, 1000);
 }
 
-scrollToggle.addEventListener('click', e => {
-  e.stopPropagation();
-  isScrolling ? stopScroll() : startScroll();
+scrollBtn.addEventListener('click', e => { e.stopPropagation(); isScrolling ? stopScroll() : startScroll(); });
+
+// ── TOUCH / WHEEL ──
+let touchStartY = 0;
+scrollContainer.addEventListener('wheel', () => { if (isScrolling) pauseAndResume(); }, { passive: true });
+scrollContainer.addEventListener('touchstart', e => {
+  touchStartY = e.touches[0].clientY;
+  if (isScrolling && isPausedForManual) { isTouching = true; clearTimeout(resumeTimer); }
+}, { passive: true });
+scrollContainer.addEventListener('touchmove', e => {
+  if (Math.abs(e.touches[0].clientY - touchStartY) > 8 && isScrolling) {
+    isTouching = true; clearTimeout(resumeTimer); pauseAndResume();
+  }
+}, { passive: true });
+scrollContainer.addEventListener('touchend', () => {
+  if (isTouching) { isTouching = false; if (isPausedForManual) scheduleResumeIfNotTouching(); }
+}, { passive: true });
+scrollContainer.addEventListener('touchcancel', () => {
+  if (isTouching) { isTouching = false; if (isPausedForManual) scheduleResumeIfNotTouching(); }
+}, { passive: true });
+scrollContainer.addEventListener('scroll', () => {
+  if (!isScrolling) scheduleUI();
+  scheduleLazy();
+}, { passive: true });
+
+// ── SEEK BAR ──
+seekBar.addEventListener('mousedown',  () => isSeeking = true);
+seekBar.addEventListener('touchstart', () => isSeeking = true, { passive: true });
+seekBar.addEventListener('input', () => {
+  const maxS = getMaxScroll();
+  const y = (parseInt(seekBar.value)/1000) * maxS;
+  scrollContainer.scrollTop = y; scrollAccum = y; scrollWhole = Math.floor(y);
+  scheduleUI();
 });
+seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); saveProgress(); });
+seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); saveProgress(); }, { passive: true });
+seekBar.addEventListener('click', e => e.stopPropagation());
 
 // ── SPEED ──
-function updateSpeedSlider() {
-  const v = parseFloat(speedSlider.value);
+function updateSpeedSliderUI() {
+  const v   = parseFloat(speedSlider.value);
   const pct = ((v - +speedSlider.min) / (+speedSlider.max - +speedSlider.min)) * 100;
-  speedSlider.style.background =
-    `linear-gradient(to left, rgba(176,125,74,0.85) ${pct}%, var(--track, #2a2a2a) ${pct}%)`;
+  speedSlider.style.background = `linear-gradient(to left, var(--gold) ${pct}%, var(--track) ${pct}%)`;
   speedBadge.textContent = `×${v.toFixed(1)}`;
 }
-speedSlider.addEventListener('input', updateSpeedSlider);
+function updateSpeedBtnStates() {
+  const v = parseFloat(speedSlider.value);
+  minusBtn.disabled = v <= parseFloat(speedSlider.min) + 0.001;
+  plusBtn.disabled  = v >= parseFloat(speedSlider.max) - 0.001;
+}
+speedSlider.addEventListener('input', () => { updateSpeedSliderUI(); scheduleUI(); });
+speedSlider.addEventListener('click', e => e.stopPropagation());
 plusBtn.addEventListener('click', e => {
   e.stopPropagation();
-  speedSlider.value = Math.min(parseFloat(speedSlider.value) + 0.1, +speedSlider.max).toFixed(1);
-  updateSpeedSlider();
+  speedSlider.value = Math.min(parseFloat(speedSlider.value)+0.1, +speedSlider.max).toFixed(1);
+  updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(1));
 });
 minusBtn.addEventListener('click', e => {
   e.stopPropagation();
-  speedSlider.value = Math.max(parseFloat(speedSlider.value) - 0.1, +speedSlider.min).toFixed(1);
-  updateSpeedSlider();
+  speedSlider.value = Math.max(parseFloat(speedSlider.value)-0.1, +speedSlider.min).toFixed(1);
+  updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(1));
 });
 
-// ── TOUCH / WHEEL PAUSE ──
-let touchStartY = 0;
-canvasContainer.addEventListener('wheel', () => { if (isScrolling) pauseScroll(); }, { passive: true });
-canvasContainer.addEventListener('touchstart', e => {
-  touchStartY = e.touches[0].clientY;
-  if (isScrolling && isPaused) { isTouching = true; clearTimeout(resumeTimer); }
-}, { passive: true });
-canvasContainer.addEventListener('touchmove', e => {
-  if (Math.abs(e.touches[0].clientY - touchStartY) > 8 && isScrolling) {
-    isTouching = true; clearTimeout(resumeTimer); pauseScroll();
-  }
-}, { passive: true });
-canvasContainer.addEventListener('touchend', () => {
-  if (isTouching) { isTouching = false; if (isPaused) scheduleResume(); }
-}, { passive: true });
-canvasContainer.addEventListener('scroll', () => {
-  if (!isScrolling) schedulePageDetect();
-  if (!isSeeking) updateSeekBar();
-}, { passive: true });
+// ── JUMP ──
+jumpTopBtn.addEventListener('click', e => {
+  e.stopPropagation(); stopScroll();
+  scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+});
+jumpBottomBtn.addEventListener('click', e => {
+  e.stopPropagation(); stopScroll();
+  scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+});
 
-// ── HEADER HIDE ON SCROLL ──
-let lastScrollY = 0;
-canvasContainer.addEventListener('scroll', () => {
-  const y = canvasContainer.scrollTop;
-  header.classList.toggle('hide', y > lastScrollY + 10 && y > 80);
-  if (y < lastScrollY) header.classList.remove('hide');
-  lastScrollY = y;
-}, { passive: true });
-
-// ── CONTROLS TOGGLE ──
+// ── PANEL TOGGLE ──
 document.body.addEventListener('click', e => {
-  if (controls.contains(e.target) || thumbSidebar.contains(e.target) ||
-      header.contains(e.target)) return;
-  controls.classList.toggle('hidden');
+  if (scrollPanel.contains(e.target) || thumbSidebar.contains(e.target) || pageHeader.contains(e.target)) return;
+  scrollPanel.classList.toggle('hidden');
 });
 
 // ── THUMBNAILS ──
 function openThumbs() {
-  thumbSidebar.classList.add('open');
-  thumbOverlay.classList.add('show');
-  // scroll thumbnail to current
-  const active = thumbSidebar.querySelector('.thumb-item.active');
-  if (active) active.scrollIntoView({ block: 'center' });
+  thumbSidebar.classList.add('open'); thumbOverlay.classList.add('show');
+  const a = thumbSidebar.querySelector('.thumb-item.active');
+  if (a) a.scrollIntoView({ block: 'center' });
 }
-function closeThumbs() {
-  thumbSidebar.classList.remove('open');
-  thumbOverlay.classList.remove('show');
-}
-thumbBtn.addEventListener('click', () => thumbSidebar.classList.contains('open') ? closeThumbs() : openThumbs());
+function closeThumbs() { thumbSidebar.classList.remove('open'); thumbOverlay.classList.remove('show'); }
+thumbBtn.addEventListener('click', e => { e.stopPropagation(); thumbSidebar.classList.contains('open') ? closeThumbs() : openThumbs(); });
 thumbOverlay.addEventListener('click', closeThumbs);
 
 // ── CLOSE ──
@@ -881,11 +1005,16 @@ closeBtn.addEventListener('click', () => {
   readerScreen.classList.remove('show');
   uploadScreen.classList.remove('hidden');
   renderRecentList();
-  canvasContainer.innerHTML = '';
-  thumbSidebar.innerHTML = '';
-  pageCanvases = []; thumbCanvases = [];
-  pdfDoc = null;
+  scroller.innerHTML = ''; thumbSidebar.innerHTML = '';
+  pageSlots = []; pageSizes = []; pageRendered = []; thumbItems = [];
+  pdfDoc = null; scrollPanel.classList.add('hidden');
 });
+
+// ── SAVE PROGRESS ──
+function saveProgress() {
+  if (!bookName) return;
+  try { localStorage.setItem('readerProgress_'+bookName, JSON.stringify({ page: currentPage, speed: speedSlider.value })); } catch {}
+}
 
 // ── KEYBOARD ──
 document.addEventListener('keydown', e => {
@@ -894,22 +1023,22 @@ document.addEventListener('keydown', e => {
     case 'Space': e.preventDefault(); isScrolling ? stopScroll() : startScroll(); break;
     case 'ArrowUp': case 'ArrowLeft':
       e.preventDefault();
-      speedSlider.value = Math.max(parseFloat(speedSlider.value) - 0.1, +speedSlider.min).toFixed(1);
-      updateSpeedSlider();
-      showToast('السرعة: ×' + parseFloat(speedSlider.value).toFixed(1));
-      break;
+      speedSlider.value = Math.max(parseFloat(speedSlider.value)-0.1, +speedSlider.min).toFixed(1);
+      updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(1)); break;
     case 'ArrowDown': case 'ArrowRight':
       e.preventDefault();
-      speedSlider.value = Math.min(parseFloat(speedSlider.value) + 0.1, +speedSlider.max).toFixed(1);
-      updateSpeedSlider();
-      showToast('السرعة: ×' + parseFloat(speedSlider.value).toFixed(1));
-      break;
+      speedSlider.value = Math.min(parseFloat(speedSlider.value)+0.1, +speedSlider.max).toFixed(1);
+      updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(1)); break;
     case 'Escape': closeThumbs(); break;
   }
 });
 
-window.addEventListener('beforeunload', saveProgressLocal);
-</script>
+// ── OFFLINE ──
+window.addEventListener('online',  () => offlineBadge.classList.remove('show'));
+window.addEventListener('offline', () => offlineBadge.classList.add('show'));
+if (!navigator.onLine) offlineBadge.classList.add('show');
 
+window.addEventListener('beforeunload', saveProgress);
+</script>
 </body>
 </html>
