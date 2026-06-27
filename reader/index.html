@@ -3,7 +3,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>قارئ الكتب</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -927,7 +927,7 @@ function renderRecentList() {
   list.forEach(r => {
     const el = document.createElement('div');
     el.className = 'recent-item';
-    el.innerHTML = `<div class="recent-item-icon">📄</div><span class="recent-item-name">${r.name}</span><span class="recent-item-pg">▶ ص ${r.page}</span>`;
+    el.innerHTML = `<div class="recent-item-icon">📄</div><span class="recent-item-name">${r.name}</span><span class="recent-item-pg"> ص ${r.page}</span>`;
     el.title = `استمر من صفحة ${r.page}`;
     el.addEventListener('click', () => {
       showToast(`اختر الملف للاستمرار من ص ${r.page}`);
@@ -1003,13 +1003,14 @@ async function loadPDF(file) {
 
   loadingBar.style.width = '95%';
 
-  // Restore
-  let startPage = 1;
+  // Restore saved progress
+  let startPage = 1, savedScrollTop = null;
   try {
     const saved = JSON.parse(localStorage.getItem('readerProgress_'+bookName));
     if (saved && saved.page) {
       startPage = Math.min(saved.page, totalPages);
       if (saved.speed) speedSlider.value = saved.speed;
+      if (saved.scrollTop != null) savedScrollTop = saved.scrollTop;
     }
   } catch {}
 
@@ -1021,9 +1022,18 @@ async function loadPDF(file) {
     readerScreen.classList.add('show');
     scrollPanel.classList.remove('hidden');
 
-    scrollToPage(startPage, false);
-    scrollAccum = scrollContainer.scrollTop;
-    scrollWhole = Math.floor(scrollAccum);
+    // Apply saved zoom to freshly-built slots
+    applyZoom(false);
+
+    if (savedScrollTop != null) {
+      scrollContainer.scrollTop = savedScrollTop;
+      scrollAccum = savedScrollTop;
+      scrollWhole = Math.floor(savedScrollTop);
+    } else {
+      scrollToPage(startPage, false);
+      scrollAccum = scrollContainer.scrollTop;
+      scrollWhole = Math.floor(scrollAccum);
+    }
 
     lazyRender();
     scheduleUI();
@@ -1071,6 +1081,16 @@ async function renderPageIntoSlot(num) {
 
   slot.classList.remove('page-placeholder');
   slot.innerHTML = ''; slot.appendChild(canvas);
+
+  // Apply current zoom to this newly rendered slot
+  if (zoomLevel !== 1) {
+    const w = Math.round(pageSizes[num-1].w * zoomLevel);
+    const h = Math.round(pageSizes[num-1].h * zoomLevel);
+    slot.style.width  = w + 'px';
+    slot.style.height = h + 'px';
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+  }
 
   // Thumb
   const tw = thumbItems[num-1];
@@ -1142,7 +1162,7 @@ function flushUI() {
 
   if (!isSeeking) {
     seekBar.value = Math.round(pct * 1000);
-    seekBar.style.background = `linear-gradient(to left, rgba(61,40,0,0.35) ${pctNum}%, rgba(0,0,0,0.18) ${pctNum}%)`;
+    seekBar.style.background = `linear-gradient(to left, var(--gold2) ${pctNum}%, var(--track) ${pctNum}%)`;
   }
 
   // Time remaining
@@ -1340,7 +1360,13 @@ closeBtn.addEventListener('click', () => {
 // ── SAVE PROGRESS ──
 function saveProgress() {
   if (!bookName) return;
-  try { localStorage.setItem('readerProgress_'+bookName, JSON.stringify({ page: currentPage, speed: speedSlider.value })); } catch {}
+  try {
+    localStorage.setItem('readerProgress_'+bookName, JSON.stringify({
+      page:      currentPage,
+      scrollTop: scrollContainer.scrollTop,
+      speed:     speedSlider.value
+    }));
+  } catch {}
 }
 
 // ── KEYBOARD ──
@@ -1366,31 +1392,39 @@ window.addEventListener('offline', () => offlineBadge.classList.add('show'));
 if (!navigator.onLine) offlineBadge.classList.add('show');
 
 // ── ZOOM ──
-const ZOOM_STEP = 0.1, ZOOM_MIN = 0.5, ZOOM_MAX = 2.0;
-function applyZoom() {
-  scroller.style.transformOrigin = 'top center';
-  scroller.style.transform = zoomLevel !== 1 ? `scale(${zoomLevel}) translateZ(0)` : 'translateZ(0)';
-  // adjust scroller wrapper height so scroll works
-  scroller.style.marginBottom = zoomLevel > 1 ? `${(zoomLevel - 1) * scroller.scrollHeight * 0.5}px` : '';
+const ZOOM_STEP = 0.1, ZOOM_MIN = 0.5, ZOOM_MAX = 2.5;
+
+function applyZoom(save = true) {
   zoomBadge.textContent = Math.round(zoomLevel * 100) + '%';
-  try { localStorage.setItem('readerZoom', zoomLevel); } catch {}
+  // Resize all page slots — scroll engine is unaffected (it uses scrollTop only)
+  pageSlots.forEach((slot, i) => {
+    const base = pageSizes[i];
+    if (!base) return;
+    const w = Math.round(base.w * zoomLevel);
+    const h = Math.round(base.h * zoomLevel);
+    slot.style.width  = w + 'px';
+    slot.style.height = h + 'px';
+    const canvas = slot.querySelector('canvas');
+    if (canvas) { canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; }
+  });
+  if (save) try { localStorage.setItem('readerZoom', zoomLevel); } catch {}
 }
-zoomInBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  zoomLevel = Math.min(+(zoomLevel + ZOOM_STEP).toFixed(1), ZOOM_MAX);
-  applyZoom(); showToast('الحجم: ' + Math.round(zoomLevel*100) + '%');
-});
-zoomOutBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  zoomLevel = Math.max(+(zoomLevel - ZOOM_STEP).toFixed(1), ZOOM_MIN);
-  applyZoom(); showToast('الحجم: ' + Math.round(zoomLevel*100) + '%');
-});
-zoomResetBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  zoomLevel = 1.0; applyZoom(); showToast('الحجم: 100%');
-});
-// restore zoom
-try { const z = parseFloat(localStorage.getItem('readerZoom')); if (z >= ZOOM_MIN && z <= ZOOM_MAX) { zoomLevel = z; zoomBadge.textContent = Math.round(z*100)+'%'; } } catch {}
+
+function setZoom(z, toast_msg) {
+  zoomLevel = Math.min(Math.max(+z.toFixed(1), ZOOM_MIN), ZOOM_MAX);
+  applyZoom();
+  if (toast_msg) showToast(toast_msg);
+}
+
+zoomInBtn.addEventListener('click',    e => { e.stopPropagation(); setZoom(zoomLevel + ZOOM_STEP, 'الحجم: ' + Math.round(zoomLevel*100) + '%'); });
+zoomOutBtn.addEventListener('click',   e => { e.stopPropagation(); setZoom(zoomLevel - ZOOM_STEP, 'الحجم: ' + Math.round(zoomLevel*100) + '%'); });
+zoomResetBtn.addEventListener('click', e => { e.stopPropagation(); setZoom(1.0, 'الحجم: 100%'); });
+
+// Restore saved zoom
+try {
+  const z = parseFloat(localStorage.getItem('readerZoom'));
+  if (z >= ZOOM_MIN && z <= ZOOM_MAX) { zoomLevel = z; zoomBadge.textContent = Math.round(z*100)+'%'; }
+} catch {}
 
 // ── PAGE NIGHT MODE ──
 function applyPageNight(on) {
