@@ -927,7 +927,7 @@ function renderRecentList() {
   list.forEach(r => {
     const el = document.createElement('div');
     el.className = 'recent-item';
-    el.innerHTML = `<div class="recent-item-icon">📄</div><span class="recent-item-name">${r.name}</span><span class="recent-item-pg"> ص ${r.page}</span>`;
+    el.innerHTML = `<div class="recent-item-icon">📄</div><span class="recent-item-name">${r.name}</span><span class="recent-item-pg">▶ ص ${r.page}</span>`;
     el.title = `استمر من صفحة ${r.page}`;
     el.addEventListener('click', () => {
       showToast(`اختر الملف للاستمرار من ص ${r.page}`);
