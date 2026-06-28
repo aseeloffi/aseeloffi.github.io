@@ -3,7 +3,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>قارئ الكتب</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -951,6 +951,9 @@ fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadPDF(fil
 
 // ── LOAD PDF ──
 async function loadPDF(file) {
+  // احفظ تقدم الكتاب الحالي قبل التبديل لكتاب جديد
+  saveProgress();
+
   bookName = file.name.replace(/\.pdf$/i, '');
   bookTitle.textContent = bookName;
 
@@ -1011,6 +1014,11 @@ async function loadPDF(file) {
       startPage = Math.min(saved.page, totalPages);
       if (saved.speed) speedSlider.value = saved.speed;
       if (saved.scrollTop != null) savedScrollTop = saved.scrollTop;
+      // استعادة الزوم المحفوظ للكتاب إن وجد
+      if (saved.zoom && saved.zoom >= ZOOM_MIN && saved.zoom <= ZOOM_MAX) {
+        zoomLevel = saved.zoom;
+        zoomBadge.textContent = Math.round(zoomLevel * 100) + '%';
+      }
     }
   } catch {}
 
@@ -1025,10 +1033,19 @@ async function loadPDF(file) {
     // Apply saved zoom to freshly-built slots
     applyZoom(false);
 
-    if (savedScrollTop != null) {
-      scrollContainer.scrollTop = savedScrollTop;
-      scrollAccum = savedScrollTop;
-      scrollWhole = Math.floor(savedScrollTop);
+    if (savedScrollTop != null && savedScrollTop > 0) {
+      // تحقق أن الـ scrollTop المحفوظ منطقي (لم تتغير أبعاد الصفحة كثيراً)
+      const maxPossible = scrollContainer.scrollHeight;
+      if (savedScrollTop <= maxPossible) {
+        scrollContainer.scrollTop = savedScrollTop;
+        scrollAccum = savedScrollTop;
+        scrollWhole = Math.floor(savedScrollTop);
+      } else {
+        // fallback: انتقل إلى رقم الصفحة مباشرةً
+        scrollToPage(startPage, false);
+        scrollAccum = scrollContainer.scrollTop;
+        scrollWhole = Math.floor(scrollAccum);
+      }
     } else {
       scrollToPage(startPage, false);
       scrollAccum = scrollContainer.scrollTop;
@@ -1112,7 +1129,10 @@ function unloadPage(num) {
   const slot = pageSlots[num-1], size = pageSizes[num-1];
   slot.innerHTML = '';
   slot.classList.add('page-placeholder');
-  slot.style.width = size.w+'px'; slot.style.height = size.h+'px';
+  // احتفظ بالحجم مع الزوم الحالي لضمان عدم تغيير الـ scrollTop
+  const w = Math.round(size.w * zoomLevel);
+  const h = Math.round(size.h * zoomLevel);
+  slot.style.width = w+'px'; slot.style.height = h+'px';
   pageRendered[num-1] = false;
 }
 
@@ -1149,7 +1169,6 @@ function flushUI() {
   if (best !== currentPage) {
     currentPage = best;
     thumbItems.forEach((t,i) => t.classList.toggle('active', i+1 === currentPage));
-    updateRecentPage(bookName, currentPage);
     saveProgress();
     scheduleLazy();
   }
@@ -1349,12 +1368,13 @@ thumbOverlay.addEventListener('click', closeThumbs);
 // ── CLOSE ──
 closeBtn.addEventListener('click', () => {
   stopScroll();
+  saveProgress(); // احفظ قبل الإغلاق
   readerScreen.classList.remove('show');
   uploadScreen.classList.remove('hidden');
   renderRecentList();
   scroller.innerHTML = ''; thumbSidebar.innerHTML = '';
   pageSlots = []; pageSizes = []; pageRendered = []; thumbItems = [];
-  pdfDoc = null; scrollPanel.classList.add('hidden');
+  pdfDoc = null; bookName = ''; scrollPanel.classList.add('hidden');
 });
 
 // ── SAVE PROGRESS ──
@@ -1364,8 +1384,10 @@ function saveProgress() {
     localStorage.setItem('readerProgress_'+bookName, JSON.stringify({
       page:      currentPage,
       scrollTop: scrollContainer.scrollTop,
-      speed:     speedSlider.value
+      speed:     speedSlider.value,
+      zoom:      zoomLevel
     }));
+    updateRecentPage(bookName, currentPage);
   } catch {}
 }
 
@@ -1390,6 +1412,47 @@ document.addEventListener('keydown', e => {
 window.addEventListener('online',  () => offlineBadge.classList.remove('show'));
 window.addEventListener('offline', () => offlineBadge.classList.add('show'));
 if (!navigator.onLine) offlineBadge.classList.add('show');
+
+// ── PINCH TO ZOOM (على منطقة الصفحات فقط) ──
+let pinchStartDist = 0, pinchStartZoom = 1;
+
+function getPinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+scrollContainer.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    pinchStartDist = getPinchDist(e.touches);
+    pinchStartZoom = zoomLevel;
+    if (isScrolling) pauseAndResume();
+  }
+}, { passive: false });
+
+scrollContainer.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = getPinchDist(e.touches);
+    const ratio = dist / pinchStartDist;
+    const newZoom = Math.min(Math.max(pinchStartZoom * ratio, ZOOM_MIN), ZOOM_MAX);
+    zoomLevel = parseFloat(newZoom.toFixed(2));
+    applyZoom(false); // لا نحفظ أثناء السحب
+  }
+}, { passive: false });
+
+scrollContainer.addEventListener('touchend', e => {
+  if (e.touches.length < 2 && pinchStartDist > 0) {
+    pinchStartDist = 0;
+    applyZoom(true); // احفظ الزوم النهائي
+    showToast('الحجم: ' + Math.round(zoomLevel * 100) + '%');
+  }
+}, { passive: true });
+
+// منع زوم المتصفح الافتراضي على كامل الصفحة
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
 // ── ZOOM ──
 const ZOOM_STEP = 0.1, ZOOM_MIN = 0.5, ZOOM_MAX = 2.5;
