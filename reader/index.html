@@ -278,7 +278,7 @@
 
     #scrollContainer {
       position: absolute; inset: 0;
-      overflow-y: scroll; overflow-x: hidden;
+      overflow-y: scroll; overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scroll-behavior: auto;
       overscroll-behavior: contain;
@@ -1435,10 +1435,12 @@ scrollContainer.addEventListener('touchmove', e => {
   if (e.touches.length === 2) {
     e.preventDefault();
     const dist = getPinchDist(e.touches);
-    const ratio = dist / pinchStartDist;
-    const newZoom = Math.min(Math.max(pinchStartZoom * ratio, ZOOM_MIN), ZOOM_MAX);
+    const rawRatio = dist / pinchStartDist;
+    // تخفيف الحساسية: نقلل الأثر لـ 40% من النسبة الأصلية
+    const dampedRatio = 1 + (rawRatio - 1) * 0.4;
+    const newZoom = Math.min(Math.max(pinchStartZoom * dampedRatio, ZOOM_MIN), ZOOM_MAX);
     zoomLevel = parseFloat(newZoom.toFixed(2));
-    applyZoom(false); // لا نحفظ أثناء السحب
+    applyZoom(false);
   }
 }, { passive: false });
 
@@ -1455,11 +1457,23 @@ document.addEventListener('gesturestart', e => e.preventDefault(), { passive: fa
 document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
 // ── ZOOM ──
-const ZOOM_STEP = 0.1, ZOOM_MIN = 0.5, ZOOM_MAX = 2.5;
+const ZOOM_STEP = 0.05, ZOOM_MIN = 0.5, ZOOM_MAX = 1.8;
 
 function applyZoom(save = true) {
   zoomBadge.textContent = Math.round(zoomLevel * 100) + '%';
-  // Resize all page slots — scroll engine is unaffected (it uses scrollTop only)
+
+  // احفظ الصفحة الحالية قبل تغيير الأحجام
+  const anchorPage = currentPage;
+  const anchorSlot = pageSlots[anchorPage - 1];
+  // احسب الإزاحة داخل الصفحة قبل الزوم (0 = أعلى الصفحة، 1 = أسفلها)
+  let offsetRatio = 0;
+  if (anchorSlot) {
+    const slotTop = anchorSlot.offsetTop;
+    const slotH   = anchorSlot.offsetHeight || 1;
+    offsetRatio = (scrollContainer.scrollTop - slotTop) / slotH;
+    offsetRatio = Math.max(0, Math.min(1, offsetRatio));
+  }
+
   pageSlots.forEach((slot, i) => {
     const base = pageSizes[i];
     if (!base) return;
@@ -1470,6 +1484,30 @@ function applyZoom(save = true) {
     const canvas = slot.querySelector('canvas');
     if (canvas) { canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; }
   });
+
+  // أعد ضبط الـ scrollTop ليبقى على نفس الصفحة والموقع
+  if (anchorSlot) {
+    const newSlotTop = anchorSlot.offsetTop;
+    const newSlotH   = anchorSlot.offsetHeight || 1;
+    const newScrollTop = newSlotTop + offsetRatio * newSlotH;
+    scrollContainer.scrollTop = newScrollTop;
+    scrollAccum = newScrollTop;
+    scrollWhole = Math.floor(newScrollTop);
+  }
+
+  // عند التكبير أكثر من عرض الشاشة: اتركها تتمدد
+  const anyBase = pageSizes[0];
+  if (anyBase) {
+    const zoomed = Math.round(anyBase.w * zoomLevel);
+    if (zoomed > scrollContainer.clientWidth) {
+      scroller.style.alignItems = 'flex-start';
+      scroller.style.minWidth = zoomed + 16 + 'px';
+    } else {
+      scroller.style.alignItems = 'center';
+      scroller.style.minWidth = '';
+    }
+  }
+
   if (save) try { localStorage.setItem('readerZoom', zoomLevel); } catch {}
 }
 
