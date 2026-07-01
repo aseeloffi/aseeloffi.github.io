@@ -1030,8 +1030,6 @@ scrollContainer.addEventListener('scroll', () => {
   if (!headerRafId) {
     headerRafId = requestAnimationFrame(() => {
       headerRafId = null;
-      // أثناء تحميل/استعادة سورة، القفزة البرمجية للسكرول لا يجب أن تخفي الهيدر؛
-      // نزامن lastScrollY بدل تشغيل منطق الإخفاء الطبيعي.
       if (isLoadingSurah) {
         lastScrollY = sy;
       } else if (!isScrolling) {
@@ -1040,9 +1038,9 @@ scrollContainer.addEventListener('scroll', () => {
       scheduleUI();
     });
   }
-  // حفظ فوري (مقيّد بثانية واحدة) أثناء السكرول نفسه — نفس طريقة حفظ الإشارات المرجعية
-  // الموثوقة، بدل الاعتماد فقط على أحداث الخروج غير المضمونة داخل تطبيقات PWA على الجوال.
-  if (isLoadingSurah) return; // لا تحفظ أثناء إعادة ضبط السكرول عند فتح سورة (يمنع الكتابة فوق القيمة المحفوظة)
+
+
+  if (isLoadingSurah) return;
   const now = Date.now();
   if (now - lastScrollSaveTs > 1000) {
     lastScrollSaveTs = now;
@@ -1122,7 +1120,7 @@ surahSearch.addEventListener('input', () => buildSurahList(surahSearch.value.tri
 
 // ====== HELPER ======
 function toArabicNum(n) {
-  return String(n); // أرقام إنجليزية (تم تعطيل تحويلها إلى أرقام عربية)
+  return String(n);
 }
 
 // ====== AYAH TRACKING ======
@@ -1337,8 +1335,8 @@ function stopScroll() {
   headerVisible = true;
   pageHeader.classList.remove('hidden-header');
   scheduleUI();
-  // لا تحفظ أثناء تحميل سورة (يمنع الكتابة فوق التقدم المحفوظ بصفر، لأن scrollWhole
-  // تكون صفرًا افتراضيًا عند فتح صفحة جديدة وما زالت لم تُحدَّث بعد من السكرول اليدوي).
+
+
   if (!isLoadingSurah) saveProgress();
 }
 
@@ -1725,7 +1723,6 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
       reg.addEventListener('updatefound', () => showToast('🔄 تحديث متاح، أعد تحميل الصفحة'));
-      // يتأكد بشكل دوري إذا فيه نسخة جديدة من sw.js على السيرفر ويحدّثها فورًا
       reg.update();
     }).catch(() => {});
   });
