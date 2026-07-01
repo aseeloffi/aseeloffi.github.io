@@ -1024,6 +1024,7 @@ function updateHeader(scrollY) {
 }
 
 let lastScrollSaveTs = 0;
+let isLoadingSurah = false; // يمنع الحفظ التلقائي أثناء التحميل من الكتابة فوق التقدم المحفوظ
 scrollContainer.addEventListener('scroll', () => {
   const sy = scrollContainer.scrollTop;
   if (!headerRafId) {
@@ -1035,6 +1036,7 @@ scrollContainer.addEventListener('scroll', () => {
   }
   // حفظ فوري (مقيّد بثانية واحدة) أثناء السكرول نفسه — نفس طريقة حفظ الإشارات المرجعية
   // الموثوقة، بدل الاعتماد فقط على أحداث الخروج غير المضمونة داخل تطبيقات PWA على الجوال.
+  if (isLoadingSurah) return; // لا تحفظ أثناء إعادة ضبط السكرول عند فتح سورة (يمنع الكتابة فوق القيمة المحفوظة)
   const now = Date.now();
   if (now - lastScrollSaveTs > 1000) {
     lastScrollSaveTs = now;
@@ -1432,6 +1434,7 @@ nextSurahBtn.addEventListener('click', () => {
 
 // ====== LOAD SURAH ======
 async function loadSurah(surahNum, isInitialLoad = false) {
+  isLoadingSurah = true;
   stopScroll();
   currentSurah = surahNum;
   scrollContainer.scrollTop = 0;
@@ -1484,14 +1487,6 @@ async function loadSurah(surahNum, isInitialLoad = false) {
         buildAyahPositions();
         const doRestore = () => {
           const saved = restoreProgress(surahNum);
-          const dbg2 = document.querySelector('[data-debug-restore]') || (() => {
-            const el = document.createElement('div');
-            el.setAttribute('data-debug-restore', '1');
-            el.style.cssText = 'position:fixed;top:60px;left:0;right:0;z-index:99999;background:#000;color:#ff0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;text-align:left;white-space:pre-wrap;';
-            document.body.appendChild(el);
-            return el;
-          })();
-          dbg2.textContent = 'doRestore() called\nsurahNum=' + surahNum + '\nsaved=' + JSON.stringify(saved) + '\ngetMaxScroll=' + getMaxScroll();
           if (saved && saved.posY > 0) {
             const targetY = Math.min(saved.posY, getMaxScroll());
             scrollContainer.scrollTop = targetY;
@@ -1499,9 +1494,6 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
             showToast('استُؤنفت القراءة من حيث توقفت');
-            dbg2.textContent += '\n>>> RESTORED to ' + targetY;
-          } else {
-            dbg2.textContent += '\n>>> NOT restored (condition failed)';
           }
           scheduleUI();
           updateBookmarkDot();
@@ -1513,6 +1505,9 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             loadingScreen.classList.add('hidden');
             scrollPanel.classList.remove('hidden'); // show controls after successful load
           }, 420);
+          // نعطّل علم التحميل بعد إطار إضافي حتى يكتمل تنفيذ حدث scroll الناتج
+          // عن ضبط scrollTop برمجيًا، فلا يُكتب posY:0 فوق القيمة المستعادة.
+          requestAnimationFrame(() => { isLoadingSurah = false; });
         };
         // On initial load, wait longer for fonts/layout to fully settle
         if (isInitialLoad) {
@@ -1724,22 +1719,14 @@ if ('serviceWorker' in navigator) {
 
 // ====== INIT ======
 window.addEventListener('load', () => {
-  // === تشخيص مؤقت: صندوق ثابت بأعلى الشاشة ===
-  const dbg = document.createElement('div');
-  dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;text-align:left;white-space:pre-wrap;';
-  document.body.appendChild(dbg);
-  let raw = null;
-  try { raw = localStorage.getItem('quranProgress'); } catch(e) { raw = 'ERROR: ' + e.message; }
-  dbg.textContent = 'LOAD EVENT FIRED\nraw quranProgress = ' + raw + '\ncurrentSurah before = ' + currentSurah;
-
   try {
-    if (raw && raw !== null) {
+    const raw = localStorage.getItem('quranProgress');
+    if (raw) {
       const data = JSON.parse(raw);
       if (data.speed) speedSlider.value = data.speed;
       if (data.surah) currentSurah = data.surah;
     }
   } catch {}
-  dbg.textContent += '\ncurrentSurah after = ' + currentSurah;
   updateSliderUI();
   loadSurah(currentSurah, true);
 });
