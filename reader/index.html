@@ -4,1300 +4,1230 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>القرآن الكريم</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a1a1a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- PWA Icons -->
-
-  <link rel="icon" type="image/svg+xml" href="icon.svg">
-  <link rel="apple-touch-icon" href="icon.svg">
-  <meta name="apple-mobile-web-app-title" content="القرآن الكريم">
-
-  <!-- OG / Link Preview -->
-
-  <meta property="og:title" content="القرآن الكريم">
-  <meta property="og:description" content="القرآن الكريم مع سكرول تلقائي وحساب مدة القراءة">
-
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="القرآن الكريم">
-  <meta name="twitter:description" content="القرآن الكريم مع سكرول تلقائي وحساب مدة القراءة">
-
-  <meta name="twitter:image" content="https://aseel.space/quran/og-image.jpg">
-  <meta property="og:url" content="https://aseel.space/quran/">
-  <meta property="og:image" content="https://aseel.space/quran/og-image.jpg">
-
-  <link rel="preload" href="https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2" as="font" type="font/woff2" crossorigin>
+  <title>قارئ الكتب</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
-    @font-face {
-      font-family: 'Conv_original-hafs';
-      src: url('https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.woff2') format('woff2'),
-           url('https://cdn.jsdelivr.net/gh/thetruetruth/quran-data-kfgqpc@main/hafs/font/hafs.18.ttf') format('truetype');
-      font-weight: normal;
-      font-style: normal;
-      font-display: swap;
-    }
-
     :root {
-      --bg: #1a1a1a;
-      --bg2: #111;
-      --text: #e8e8e8;
-      --gold: #c8a96e;
-      --gold2: rgba(200,169,110,0.6);
-      --green: #4caf7d;
-      --muted: #888;
-      --border: #333;
-      --panel-bg: rgba(255,255,255,0.04);
-      --panel-border: rgba(255,255,255,0.09);
-      --track: rgba(255,255,255,0.07);
-      --highlight-bg: rgba(200,169,110,0.12);
-      --highlight-border: rgba(200,169,110,0.4);
-      --sidebar-bg: #0e0e0e;
-      --sidebar-item-hover: rgba(255,255,255,0.05);
-      --sidebar-item-active: rgba(200,169,110,0.12);
-      --header-h: 70px;
+      --bg:          #141414;
+      --bg2:         #0d0d0d;
+      --surface:     #1c1c1c;
+      --surface2:    #252525;
+      --text:        #ddd8ce;
+      --muted:       #666;
+      --gold:        #c8a96e;
+      --gold2:       rgba(200,169,110,0.55);
+      --border:      #2c2c2c;
+      --track:       rgba(255,255,255,0.07);
+      --panel-bg:    rgba(255,255,255,0.045);
+      --panel-border:rgba(255,255,255,0.09);
+      --sidebar-bg:  #0e0e0e;
+      --sidebar-hover: rgba(255,255,255,0.05);
+      --sidebar-active: rgba(200,169,110,0.12);
+      --page-shadow: 0 4px 40px rgba(0,0,0,0.7);
     }
-
     body.light {
-      --bg: #f5f0e8;
-      --bg2: #ede7d9;
-      --text: #1a1a1a;
-      --gold: #8a6a2e;
-      --gold2: rgba(138,106,46,0.5);
-      --green: #2d7a52;
-      --muted: #666;
-      --border: #d0c8b8;
-      --panel-bg: rgba(0,0,0,0.04);
-      --panel-border: rgba(0,0,0,0.1);
-      --track: rgba(0,0,0,0.08);
-      --highlight-bg: rgba(138,106,46,0.1);
-      --highlight-border: rgba(138,106,46,0.35);
-      --sidebar-bg: #ede7d9;
-      --sidebar-item-hover: rgba(0,0,0,0.04);
-      --sidebar-item-active: rgba(138,106,46,0.1);
+      --bg:          #f0ebe3;
+      --bg2:         #e8e2d9;
+      --surface:     #faf7f2;
+      --surface2:    #ede8df;
+      --text:        #1a1710;
+      --muted:       #8a8070;
+      --gold:        #8a5c28;
+      --gold2:       rgba(138,92,40,0.45);
+      --border:      #d5cfc5;
+      --track:       rgba(0,0,0,0.08);
+      --panel-bg:    rgba(0,0,0,0.04);
+      --panel-border:rgba(0,0,0,0.1);
+      --sidebar-bg:  #ede8df;
+      --sidebar-hover: rgba(0,0,0,0.04);
+      --sidebar-active: rgba(138,92,40,0.1);
+      --page-shadow: 0 4px 24px rgba(0,0,0,0.15);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-      background-color: var(--bg);
+      height: 100%; width: 100%;
+      background: var(--bg);
       color: var(--text);
-      direction: rtl;
-      transition: background-color 0.3s, color 0.3s;
+      font-family: 'Tajawal', sans-serif;
+      overflow: hidden;
+      transition: background 0.3s, color 0.3s;
       touch-action: manipulation;
     }
 
-    /* ====== SIDEBAR ====== */
-    #sidebar {
-      position: fixed;
-      top: 0; right: 0;
-      width: 280px;
-      height: 100%;
-      background: var(--sidebar-bg);
-      border-left: 1px solid var(--border);
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      transform: translateX(100%);
-      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-      will-change: transform;
+    /* ── UPLOAD ── */
+    #uploadScreen {
+      position: fixed; inset: 0;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      grid-template-columns: 1fr;
+      z-index: 500;
+      background: var(--bg);
+      transition: opacity 0.4s;
+      overflow: hidden;
     }
-    #sidebar.open { transform: translateX(0); }
+    #uploadScreen.hidden { opacity: 0; pointer-events: none; }
 
-    .sidebar-header {
-      padding: 18px 16px 14px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .sidebar-header h2 {
-      font-family: 'Tajawal', sans-serif;
-      font-size: 1.1em;
-      color: var(--gold);
-      font-weight: 700;
-    }
-    .sidebar-close {
-      background: none; border: none;
-      color: var(--muted); font-size: 1.3em;
-      cursor: pointer; padding: 4px 8px;
-      border-radius: 8px;
-      transition: background 0.2s, color 0.2s;
-    }
-    .sidebar-close:hover { background: var(--sidebar-item-hover); color: var(--text); }
-
-    .sidebar-search {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .sidebar-search input {
-      width: 100%;
-      background: var(--track);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 7px 10px;
-      border-radius: 10px;
-      font-family: system-ui, sans-serif;
-      font-size: 0.82em;
-      outline: none;
-      direction: rtl;
-      transition: border-color 0.2s;
-    }
-    .sidebar-search input:focus { border-color: var(--gold); }
-    .sidebar-search input::placeholder { color: var(--muted); }
-
-    #surahList {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-    #surahList::-webkit-scrollbar { width: 4px; }
-    #surahList::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .surah-item {
-      display: flex;
-      align-items: center;
-      padding: 11px 14px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-      transition: background 0.15s;
-      gap: 10px;
-    }
-    body.light .surah-item { border-bottom: 1px solid rgba(0,0,0,0.04); }
-    .surah-item:hover { background: var(--sidebar-item-hover); }
-    .surah-item.active { background: var(--sidebar-item-active); }
-    .surah-num {
-      font-size: 0.7em;
-      color: var(--muted);
-      min-width: 24px;
-      font-family: system-ui, sans-serif;
-      font-variant-numeric: tabular-nums;
-    }
-    .surah-name {
-      font-family: 'Tajawal', sans-serif;
-      font-size: 1em;
-      font-weight: 500;
-      color: var(--text);
-      flex: 1;
-    }
-    .surah-count {
-      font-size: 0.65em;
-      color: var(--muted);
-      font-family: system-ui, sans-serif;
-    }
-
-    #sidebarOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 1999;
-      opacity: 0;
+    /* decorative background glow */
+    #uploadScreen::before {
+      content: '';
+      position: absolute;
+      top: -20%; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(200,169,110,0.07) 0%, transparent 70%);
       pointer-events: none;
-      transition: opacity 0.35s;
     }
-    #sidebarOverlay.visible { opacity: 1; pointer-events: all; }
+    body.light #uploadScreen::before {
+      background: radial-gradient(ellipse, rgba(138,92,40,0.06) 0%, transparent 70%);
+    }
 
-    /* ====== HEADER — hides/shows on scroll ====== */
-    .page-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background-color: var(--bg2);
-      padding: 14px 20px;
-      text-align: center;
+    /* top section: logo + title */
+    .upload-top {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 32px; gap: 14px;
+    }
+
+    .upload-logo-wrap {
+      width: 80px; height: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+      font-size: 2.4rem;
+    }
+    body.light .upload-logo-wrap {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .upload-title {
+      font-size: 1.9rem; font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+    }
+    .upload-sub {
+      font-size: 0.88rem; color: var(--muted);
+      text-align: center; max-width: 260px;
+      line-height: 1.7;
+    }
+
+    /* middle section: drop zone */
+    .upload-mid {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      padding: 0 20px;
+    }
+
+    .drop-zone {
+      width: 100%; max-width: 420px;
+      border: 1.5px dashed var(--border);
+      border-radius: 20px;
+      padding: 40px 28px;
+      text-align: center; cursor: pointer;
+      transition: border-color 0.25s, background 0.25s, transform 0.2s;
+      position: relative;
+      background: var(--surface);
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--gold);
+      background: rgba(200,169,110,0.05);
+      transform: translateY(-2px);
+    }
+    body.light .drop-zone:hover, body.light .drop-zone.dragover {
+      background: rgba(138,92,40,0.04);
+    }
+    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    .drop-icon-wrap {
+      width: 56px; height: 56px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin: 0 auto 16px;
+    }
+
+    .drop-text { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+    .drop-text span { color: var(--gold); font-weight: 600; }
+    .drop-formats {
+      margin-top: 10px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 0.72rem; color: var(--muted);
+    }
+
+    /* bottom section: recent books */
+    .upload-bottom {
+      padding-top: 28px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+      overflow: hidden;
+    }
+
+    .recent-label {
+      font-size: 0.7rem; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    #recentList {
+      display: flex; flex-direction: column; gap: 8px;
+      width: 100%; max-width: 420px;
+      padding: 0 20px;
+      max-height: calc(100% - 60px); overflow-y: auto;
+    }
+
+    .recent-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      font-size: 0.84rem; color: var(--text);
+    }
+    .recent-item:hover {
+      background: var(--surface2);
+      border-color: var(--gold);
+      transform: translateX(-2px);
+    }
+    .recent-item-icon {
+      width: 32px; height: 32px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .recent-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .recent-item-pg {
+      font-size: 0.7rem; color: var(--muted); flex-shrink: 0;
+      background: var(--surface2); padding: 2px 8px;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+
+    /* ── LOADING ── */
+    #loadingScreen {
+      position: fixed; inset: 0; z-index: 400;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #loadingScreen.show { opacity: 1; pointer-events: all; }
+    .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loadingText { font-size: 0.86rem; color: var(--muted); }
+    #loadingProgress { width: 200px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    #loadingBar { height: 100%; width: 0%; background: var(--gold); border-radius: 2px; transition: width 0.12s; }
+
+    /* ── READER ── */
+    #readerScreen {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    #readerScreen.show { opacity: 1; pointer-events: all; }
+
+    /* Header */
+    #pageHeader {
+      position: relative; z-index: 100;
+      background: var(--bg2);
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      transition: background-color 0.3s, transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      padding: 11px 14px;
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
       will-change: transform;
     }
-    .page-header.hidden-header {
-      transform: translateY(-100%);
-    }
-    .header-center { flex: 1; }
-    .page-header h1 {
-      font-family: 'Tajawal', sans-serif;
-      font-size: 1.2em;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing: 0.01em;
-    }
-    .header-meta {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 4px;
-    }
-    .header-meta span {
-      color: var(--muted);
-      font-size: 0.72em;
-      font-family: 'Tajawal', sans-serif;
-    }
-    .ayah-indicator {
-      color: var(--gold) !important;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-    }
+    #pageHeader.hidden-header { transform: translateY(-100%); }
 
-    .header-btns {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
     .hbtn {
       background: var(--track);
       border: 1px solid var(--border);
       color: var(--muted);
-      width: 34px; height: 34px;
-      border-radius: 50%;
+      width: 34px; height: 34px; border-radius: 50%;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.9em;
+      font-size: 0.88rem;
       transition: background 0.2s, color 0.2s;
       flex-shrink: 0;
     }
-    .hbtn:hover { background: var(--sidebar-item-hover); color: var(--text); }
-    .hbtn.active { background: var(--sidebar-item-active); color: var(--gold); border-color: var(--gold2); }
+    .hbtn:hover { background: var(--sidebar-hover); color: var(--text); }
+    .hbtn.active { background: var(--sidebar-active); color: var(--gold); border-color: var(--gold2); }
 
-    .font-controls {
-      display: flex;
-      gap: 4px;
+    #headerCenter { flex: 1; text-align: center; min-width: 0; }
+    #bookTitle {
+      font-size: 0.92rem; font-weight: 600; color: var(--gold);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .font-btn {
-      background: var(--track);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 4px 9px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.8em;
-      font-family: system-ui, sans-serif;
-      transition: background 0.2s, color 0.2s;
-    }
-    .font-btn:hover { background: var(--sidebar-item-hover); color: var(--text); }
-    .font-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #headerMeta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2px; }
+    #headerMeta span { font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #pageIndicator { color: var(--gold) !important; font-weight: 600; }
 
-    .basmalah {
-      text-align: center;
-      padding: 28px 20px 8px;
-      font-family: Conv_original-hafs, serif;
-      font-size: 2.2em;
-      color: var(--text);
-      line-height: 1.8em;
-    }
+    /* Viewport */
+    #viewport { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
 
-    .quran-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 10px 25px 40px;
-    }
-
-    #quranText {
-      font-size: 1.7em;
-      text-align: justify;
-      font-family: Conv_original-hafs, serif;
-      color: var(--text);
-      font-weight: 400;
-      line-height: 1.85em;
-    }
-
-    b { font-weight: 400; color: var(--gold); }
-
-    /* ── Ayah number — clickable, no transition color change ── */
-    label {
-      font-family: Conv_original-hafs, serif;
-      color: var(--green);
-      font-size: 0.75em;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      border-radius: 50%;
-      padding: 0 2px;
-      transition: background 0.15s;
-    }
-    label:hover {
-      background: var(--highlight-bg);
-    }
-    label:active {
-      background: rgba(200,169,110,0.25);
-    }
-    /* Bookmarked ayah number highlight */
-    label.bm-active {
-      background: rgba(200,169,110,0.28);
-      color: var(--gold);
-      box-shadow: 0 0 0 2px var(--gold2);
-      border-radius: 50%;
-      font-weight: 700;
-    }
-
-    .p5 {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.5em;
-      margin-top: 30px;
-      font-family: sans-serif;
-    }
-
-    /* ====== SURAH NAV (bottom) ====== */
-    .surah-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 25px;
-      gap: 12px;
-      max-width: 900px;
-      margin: 0 auto;
-      margin-bottom: 200px;
-    }
-    .surah-nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--panel-bg);
-      border: 1px solid var(--panel-border);
-      color: var(--text);
-      padding: 10px 18px;
-      border-radius: 50px;
-      cursor: pointer;
-      font-family: Conv_original-hafs, serif;
-      font-size: 0.85em;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-    .surah-nav-btn:hover {
-      background: var(--sidebar-item-active);
-      border-color: var(--gold2);
-      color: var(--gold);
-    }
-    .surah-nav-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-    .surah-nav-btn .nav-arrow {
-      font-size: 1em;
-      color: var(--gold);
-    }
-
-    /* ====== MAIN VIEWPORT ====== */
-    #viewport {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      overflow: hidden;
-    }
-
-    /* ✅ Native-feeling scroll container */
     #scrollContainer {
-      position: absolute;
-      inset: 0;
-      overflow-y: scroll;
-      overflow-x: hidden;
+      position: absolute; inset: 0;
+      overflow-y: scroll; overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scroll-behavior: auto;
       overscroll-behavior: contain;
       will-change: scroll-position;
     }
-    /* hide scrollbar but keep functional */
     #scrollContainer::-webkit-scrollbar { width: 0; }
 
+    /* The inner scroller — translateY sub-pixel trick lives here */
     #scroller {
       contain: layout style;
       min-height: 100%;
       transform: translateZ(0);
       will-change: transform;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 16px 8px 240px;
+      gap: 14px;
     }
 
-    /* ====== SCROLL PANEL ====== */
-    .scroll-panel {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
+    .page-slot {
+      flex-shrink: 0; position: relative;
+      background: var(--surface); border-radius: 3px;
+      overflow: hidden; box-shadow: var(--page-shadow);
+    }
+    .page-slot canvas { display: block; }
+    .page-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--border); font-size: 0.72rem;
+    }
+
+    /* ── SCROLL PANEL ── */
+    #scrollPanel {
+      position: fixed; bottom: 16px; left: 50%;
       transform: translateX(-50%);
-      background: var(--panel-bg);
-      backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
-      -webkit-backdrop-filter: blur(20px) saturate(1.8) brightness(1.1);
-      border: 1px solid var(--panel-border);
+      background: var(--surface);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid var(--border);
       border-radius: 22px;
-      padding: 13px 18px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
+      padding: 12px 16px 11px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 9px;
       z-index: 1000;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
-      font-family: system-ui, -apple-system, sans-serif;
-      width: 88%;
-      max-width: 340px;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.15);
+      width: 92%; max-width: 360px;
+      transition: opacity 0.3s, transform 0.3s;
       contain: layout style;
     }
-
-    .scroll-panel.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateX(-50%) translateY(10px);
+    body.light #scrollPanel {
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+    }
+    #scrollPanel.hidden {
+      opacity: 0; pointer-events: none;
+      transform: translateX(-50%) translateY(16px);
     }
 
-    .progress-section { width: 100%; display: flex; flex-direction: column; gap: 5px; }
-    .progress-labels { display: flex; justify-content: space-between; align-items: center; }
-    .progress-label { font-size: 0.65em; color: rgba(200,169,110,0.6); letter-spacing: 0.03em; }
-    .progress-pct { font-size: 0.65em; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
+    /* ── PROGRESS SECTION ── */
+    .progress-section { width: 100%; display: flex; flex-direction: column; gap: 6px; }
 
+    .progress-labels {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .progress-label {
+      font-size: 0.7rem; color: var(--muted);
+      letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .progress-label svg { opacity: 0.7; }
+    .progress-pct {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--gold); font-variant-numeric: tabular-nums;
+    }
+    .time-remaining {
+      font-size: 0.7rem; color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* page counter chip */
+    .panel-page-info {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 3px 9px;
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      align-self: center;
+    }
+    .panel-page-info svg { opacity: 0.6; }
+
+    /* seek bar */
     .seek-bar {
-      -webkit-appearance: none;
-      width: 100%; height: 5px; border-radius: 4px;
-      outline: none; cursor: pointer;
+      -webkit-appearance: none; width: 100%; height: 5px;
+      border-radius: 6px; outline: none; cursor: pointer;
       background: var(--track);
     }
     .seek-bar::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 15px; height: 15px; border-radius: 50%;
-      background: #fff;
-      border: 2px solid rgba(200,169,110,0.9);
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold);
+      border: none;
       cursor: pointer;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.5);
-      transition: transform 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .seek-bar:active::-webkit-slider-thumb { transform: scale(1.25); }
+    .seek-bar:active::-webkit-slider-thumb {
+      transform: scale(1.2);
+      box-shadow: 0 3px 16px rgba(0,0,0,0.4);
+    }
 
-    .divider { width: 100%; height: 1px; background: rgba(128,128,128,0.1); }
+    /* ── DIVIDER ── */
+    .panel-divider {
+      width: calc(100% + 32px); margin: 0 -16px;
+      height: 1px; background: var(--border);
+    }
 
+    /* Panel-scoped variables — kept for buttons */
+    #scrollPanel {
+      --p-btn-bg:     var(--surface2);
+      --p-btn-border: var(--border);
+      --p-btn-color:  var(--text);
+      --p-divider:    var(--border);
+    }
+
+    /* ── MAIN CONTROLS ── */
     .main-controls {
       display: flex; align-items: center;
-      justify-content: center; gap: 10px; width: 100%;
+      justify-content: space-between;
+      gap: 8px; width: 100%;
     }
 
-    .step-btn {
-      background: var(--track);
-      border: 1px solid var(--panel-border);
-      color: rgba(128,128,128,0.6);
-      width: 32px; height: 32px; border-radius: 50%;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.05em;
-      transition: background 0.2s, color 0.2s, opacity 0.2s;
-      flex-shrink: 0;
-    }
-    .step-btn:hover:not(:disabled) { background: rgba(200,169,110,0.14); color: var(--gold); }
-    .step-btn:disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
-
-    /* Jump buttons */
+    /* jump buttons — bigger, pill shaped */
     .jump-btn {
-      background: var(--track);
-      border: 1px solid var(--panel-border);
-      color: rgba(128,128,128,0.7);
-      height: 28px;
-      padding: 0 10px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex; align-items: center; gap: 4px;
-      font-size: 0.65em;
-      font-family: system-ui, sans-serif;
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      height: 34px; padding: 0 12px;
+      border-radius: 17px; cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.75rem; font-family: 'Tajawal', sans-serif;
       white-space: nowrap;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
       flex-shrink: 0;
     }
-    .jump-btn:hover { background: rgba(200,169,110,0.14); color: var(--gold); }
-    .jump-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .jump-btn:hover {
+      background: var(--sidebar-active);
+      color: var(--gold); border-color: var(--gold2);
+    }
+    .jump-btn:active { transform: scale(0.95); }
 
-    .scroll-btn {
-      background: rgba(200,169,110,0.9);
-      color: #111;
-      border: none;
-      width: 46px; height: 46px; border-radius: 50%;
+    /* speed step buttons */
+    .step-btn {
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      width: 34px; height: 34px; border-radius: 50%;
       cursor: pointer;
-      font-size: 1.1em;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 3px 14px rgba(200,169,110,0.3), inset 0 1px 0 rgba(255,255,255,0.25);
-      transition: transform 0.15s, background 0.2s;
+      font-size: 1.2rem; font-family: system-ui, sans-serif; font-weight: 300;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
       flex-shrink: 0;
     }
-    .scroll-btn:active { transform: scale(0.92); }
-    .scroll-btn.active { background: rgba(255,255,255,0.88); }
+    .step-btn:hover {
+      background: var(--sidebar-active);
+      color: var(--gold); border-color: var(--gold2);
+    }
+    .step-btn:active { transform: scale(0.9); }
+    .step-btn:disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+
+    /* play/pause — main CTA button */
+    .scroll-btn {
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      width: 52px; height: 52px; border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .scroll-btn::after {
+      content: '';
+      position: absolute; inset: -4px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, inset 0.3s;
+    }
+    .scroll-btn.active::after {
+      border-color: var(--gold2);
+      inset: -6px;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { inset: -4px; border-color: var(--gold2); }
+      100% { inset: -14px; border-color: transparent; }
+    }
+    .scroll-btn:active { transform: scale(0.9); }
+    .scroll-btn.active { background: var(--surface2); color: var(--gold); }
 
     .play-icon, .pause-icon {
-      width: 20px; height: 20px;
-      display: flex; align-items: center; justify-content: center;
       pointer-events: none;
-    }
-    .play-icon svg, .pause-icon svg {
-      width: 20px; height: 20px;
-      display: block;
+      display: flex; align-items: center; justify-content: center;
     }
     .pause-icon { display: none; }
     .scroll-btn.active .play-icon  { display: none; }
     .scroll-btn.active .pause-icon { display: flex; }
 
-    .speed-section { width: 100%; display: flex; align-items: center; gap: 8px; }
-    .speed-label { font-size: 0.62em; color: rgba(200,169,110,0.6); flex-shrink: 0; letter-spacing: 0.02em; }
+    /* ── SPEED SECTION ── */
+    .speed-section {
+      width: 100%;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 12px;
+    }
+    .speed-label {
+      font-size: 0.7rem; color: var(--muted);
+      flex-shrink: 0; letter-spacing: 0.03em;
+      display: flex; align-items: center; gap: 5px;
+    }
 
     .speed-slider {
-      -webkit-appearance: none;
-      flex: 1; height: 3px; border-radius: 2px;
-      outline: none; cursor: pointer;
+      -webkit-appearance: none; flex: 1; height: 4px;
+      border-radius: 4px; outline: none; cursor: pointer;
       background: var(--track);
     }
     .speed-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 11px; height: 11px; border-radius: 50%;
-      background: rgba(200,169,110,0.9);
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--gold);
+      border: none;
       cursor: pointer;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.3);
       transition: transform 0.15s;
     }
-    .speed-slider:active::-webkit-slider-thumb { transform: scale(1.4); }
+    .speed-slider:active::-webkit-slider-thumb { transform: scale(1.3); }
 
     .speed-badge {
-      font-size: 0.62em; font-weight: 700;
-      color: rgba(200,169,110,0.8);
-      font-variant-numeric: tabular-nums;
-      min-width: 30px; text-align: left; flex-shrink: 0;
-    }
-
-    .time-remaining { font-size: 0.62em; color: rgba(200,169,110,0.8); font-variant-numeric: tabular-nums; }
-
-    /* ====== BOOKMARK BUTTON ====== */
-    #bookmarkBtn { position: relative; }
-    #bookmarkBtn svg { width: 16px; height: 16px; }
-    #bookmarkBtn .bm-dot {
-      position: absolute;
-      top: 4px; left: 4px;
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--gold);
-      display: none;
-    }
-    #bookmarkBtn.has-bookmark .bm-dot { display: block; }
-    #bookmarkBtn.has-bookmark svg { fill: var(--gold); color: var(--gold); }
-
-    /* ====== THEME BUTTON ====== */
-    #themeBtn svg { width: 16px; height: 16px; }
-
-    /* ====== BOOKMARK PANEL ====== */
-    #bookmarkPanel {
-      position: fixed;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-8px);
-      background: var(--sidebar-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px 16px;
-      z-index: 1500;
-      width: 88%;
-      max-width: 300px;
-      font-family: 'Tajawal', sans-serif;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s, transform 0.25s;
-    }
-    #bookmarkPanel.show {
-      opacity: 1;
-      pointer-events: all;
-      transform: translateX(-50%) translateY(0);
-    }
-    .bm-panel-title {
+      font-size: 0.8rem; font-weight: 700;
       color: var(--gold);
-      margin-bottom: 8px;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 0.9em;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-variant-numeric: tabular-nums;
+      min-width: 36px; text-align: center;
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 2px 6px;
     }
-    .bm-panel-title svg { width: 14px; height: 14px; }
-    .bm-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 200px;
-      overflow-y: auto;
+
+    /* ── ZOOM ROW ── */
+    .zoom-row {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      justify-content: center;
     }
-    .bm-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 8px 10px;
-      background: var(--track);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .bm-item:hover { background: var(--sidebar-item-hover); }
-    .bm-item-text {
-      font-size: 0.82em;
-      color: var(--text);
-      font-family: 'Tajawal', sans-serif;
-      font-weight: 500;
-    }
-    .bm-item-del {
-      background: none; border: none;
-      color: var(--muted); cursor: pointer;
-      font-size: 0.8em;
-      padding: 2px 5px;
-      border-radius: 6px;
-      transition: color 0.15s;
+    .zoom-btn {
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      width: 30px; height: 30px; border-radius: 8px;
+      cursor: pointer; font-size: 1rem; font-family: system-ui;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
       flex-shrink: 0;
     }
-    .bm-item-del:hover { color: #e55; }
-    .bm-add-btn {
-      width: 100%;
-      margin-top: 8px;
-      background: var(--sidebar-item-active);
-      border: 1px solid var(--gold2);
-      color: var(--gold);
-      padding: 7px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-family: 'Tajawal', sans-serif;
-      font-size: 0.9em;
-      font-weight: 500;
-      transition: background 0.2s;
+    .zoom-btn:hover { background: var(--sidebar-active); color: var(--gold); border-color: var(--gold2); }
+    .zoom-btn:active { transform: scale(0.9); }
+    .zoom-label {
+      font-size: 0.72rem; color: var(--muted);
+      display: flex; align-items: center; gap: 5px; flex-shrink: 0;
     }
-    .bm-add-btn:hover { background: rgba(200,169,110,0.18); }
-    .bm-empty {
-      font-size: 0.8em;
-      color: var(--muted);
-      text-align: center;
-      padding: 8px 0;
-      font-family: 'Tajawal', sans-serif;
+    .zoom-badge {
+      font-size: 0.75rem; font-weight: 700; color: var(--gold);
+      min-width: 38px; text-align: center;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 2px 5px;
+      font-variant-numeric: tabular-nums;
+    }
+    /* page night mode filter */
+    #scroller.page-night .page-slot canvas {
+      filter: invert(1) hue-rotate(180deg) sepia(0.25) brightness(0.9);
     }
 
-    /* ====== OFFLINE BADGE ====== */
-    #offlineBadge {
-      position: fixed;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(200,169,110,0.85);
-      color: #111;
-      font-size: 0.7em;
-      padding: 4px 12px;
-      border-radius: 20px;
+    /* ── THUMBNAILS SIDEBAR ── */
+    #thumbSidebar {
+      position: fixed; top: 0; right: 0;
+      width: 120px; height: 100%;
+      background: var(--sidebar-bg); border-left: 1px solid var(--border);
+      z-index: 300; transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      overflow-y: auto; padding: 8px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #thumbSidebar.open { transform: translateX(0); }
+    #thumbSidebar::-webkit-scrollbar { width: 3px; }
+    #thumbSidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .thumb-item {
+      cursor: pointer; border: 2px solid transparent;
+      border-radius: 5px; overflow: hidden;
+      transition: border-color 0.15s; position: relative; flex-shrink: 0;
+    }
+    .thumb-item:hover { border-color: var(--gold); }
+    .thumb-item.active { border-color: var(--gold); }
+    .thumb-item canvas { width: 100% !important; height: auto !important; display: block; }
+    .thumb-pg {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.6); color: #fff;
+      font-size: 0.62rem; text-align: center; padding: 2px;
       font-family: system-ui, sans-serif;
-      z-index: 5000;
-      opacity: 0;
-      transition: opacity 0.4s;
-      pointer-events: none;
     }
-    #offlineBadge.show { opacity: 1; }
+    .thumb-ph { width: 100%; aspect-ratio: 0.707; background: var(--surface); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.65rem; font-family: system-ui, sans-serif; }
 
-    /* ====== TOAST ====== */
+    #thumbOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 299; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    #thumbOverlay.show { opacity: 1; pointer-events: all; }
+
+    /* ── TOAST ── */
     #toast {
-      position: fixed;
-      bottom: 110px;
-      left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      background: rgba(30,30,30,0.92);
-      color: #e8e8e8;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.78em;
-      font-family: system-ui, sans-serif;
-      z-index: 3000;
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      pointer-events: none;
-      white-space: nowrap;
+      position: fixed; bottom: 100px; left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 7px 18px;
+      border-radius: 20px; font-size: 0.8rem;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none; white-space: nowrap; z-index: 999;
     }
-    body.light #toast { background: rgba(240,235,225,0.95); color: #1a1a1a; border: 1px solid var(--border); }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ====== LOADING ====== */
-    #loadingScreen {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      transition: opacity 0.4s;
+    /* ── OFFLINE ── */
+    #offlineBadge {
+      position: fixed; top: 60px; left: 50%;
+      transform: translateX(-50%);
+      background: #c0392b; color: #fff;
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 0.75rem; z-index: 900;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
-    #loadingScreen.hidden { opacity: 0; pointer-events: none; display: none; }
-    .loader-text { font-family: 'Tajawal', sans-serif; font-size: 1.8em; color: var(--gold); }
-    .loader-sub { font-family: system-ui, sans-serif; font-size: 0.75em; color: var(--muted); }
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--track);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ====== RESPONSIVE ====== */
-    @media (max-width: 600px) {
-      #quranText { font-size: 1.6em; }
-      .quran-container { padding: 10px 15px 30px; }
-      .basmalah { font-size: 1.6em; }
-      #sidebar { width: 260px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      * { transition: none !important; animation: none !important; }
-    }
+    #offlineBadge.show { opacity: 1; }
   </style>
 
 </head>
 <body>
 
-<div id="offlineBadge">وضع عدم الاتصال</div>
+<!-- UPLOAD -->
+
+<div id="uploadScreen">
+
+  <!-- Top: logo + title -->
+
+  <div class="upload-top">
+    <div class="upload-logo-wrap">📖</div>
+    <div class="upload-title">قارئ الكتب</div>
+    <div class="upload-sub">افتح أي كتاب PDF واقرأه بتمرير تلقائي سلس</div>
+  </div>
+
+  <!-- Middle: drop zone -->
+
+  <div class="upload-mid">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" accept=".pdf" id="fileInput">
+      <div class="drop-icon-wrap">📂</div>
+      <div class="drop-text">
+        اسحب ملف PDF هنا<br>أو <span>اضغط للاختيار من جهازك</span>
+      </div>
+      <div class="drop-formats">
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        PDF فقط
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: recent books -->
+
+  <div class="upload-bottom" id="recentSection" style="display:none;">
+    <div class="recent-label">آخر الكتب</div>
+    <div id="recentList"></div>
+  </div>
+
+</div>
+
+<!-- LOADING -->
 
 <div id="loadingScreen">
-  <div class="loader-text">القرآن الكريم</div>
   <div class="spinner"></div>
-  <div class="loader-sub">جاري التحميل ...</div>
+  <div id="loadingText">جاري تحميل الكتاب…</div>
+  <div id="loadingProgress"><div id="loadingBar"></div></div>
 </div>
 
-<div id="sidebarOverlay"></div>
+<!-- READER -->
 
-<div id="sidebar">
-  <div class="sidebar-header">
-    <h2>فهرس السور</h2>
-    <button class="sidebar-close" id="sidebarClose" title="إغلاق">✕</button>
-  </div>
-  <div class="sidebar-search">
-    <input type="text" id="surahSearch" placeholder="ابحث عن سورة...">
-  </div>
-  <div id="surahList"></div>
-</div>
+<div id="readerScreen">
 
-<div id="bookmarkPanel">
-  <div class="bm-panel-title">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17l-6-4-6 4V4z"/></svg>
-    العلامات المرجعية
-  </div>
-  <div class="bm-list" id="bmList"></div>
-  <button class="bm-add-btn" id="bmAddBtn">+ إضافة علامة هنا</button>
-</div>
+  <!-- Header -->
 
-<!-- Main Viewport — native scroll -->
-
-<div id="viewport">
-  <div id="scrollContainer">
-    <div id="scroller">
-
-  <div class="page-header" id="pageHeader">
-    <div class="header-btns">
-      <button class="hbtn" id="menuBtn" title="قائمة السور">☰</button>
-    </div>
-    <div class="header-center">
-      <h1 id="surahTitle">سورة البقرة</h1>
-      <div class="header-meta">
-        <span id="surahInfo">286 آية</span>
+  <div id="pageHeader">
+    <button class="hbtn" id="closeBtn" title="إغلاق">✕</button>
+    <div id="headerCenter">
+      <div id="bookTitle">—</div>
+      <div id="headerMeta">
+        <span id="pageIndicator">ص 1</span>
         <span>·</span>
-        <span class="ayah-indicator" id="ayahIndicator">الآية 1</span>
+        <span id="pctIndicator">0%</span>
       </div>
     </div>
-    <div class="header-btns">
-      <button class="hbtn" id="bookmarkBtn" title="العلامات المرجعية">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17l-6-4-6 4V4z"/></svg>
-        <span class="bm-dot"></span>
-      </button>
-      <div class="font-controls">
-        <button class="font-btn" id="fontMinus" title="تصغير الخط">A−</button>
-        <button class="font-btn" id="fontPlus" title="تكبير الخط">A+</button>
-      </div>
-      <button class="hbtn" id="themeBtn" title="تبديل المظهر"></button>
+    <button class="hbtn" id="themeBtn" title="الوضع">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <button class="hbtn" id="pageNightBtn" title="وضع ليلي للصفحات">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    <button class="hbtn" id="thumbBtn" title="الصفحات">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Scroll area -->
+
+  <div id="viewport">
+    <div id="scrollContainer">
+      <div id="scroller"></div>
     </div>
   </div>
 
-  <div class="basmalah" id="basmalah">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>
-  <div class="quran-container">
-    <div id="quranText"></div>
+  <!-- Control panel -->
+
+  <div id="scrollPanel" class="hidden">
+
+<!-- Page info + Progress row -->
+
+<div class="progress-section">
+  <div class="progress-labels">
+    <span class="progress-label">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      التقدم
+    </span>
+    <span class="panel-page-info" id="panelPageInfo">
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+      ص 1 / —
+    </span>
+    <span class="progress-pct" id="progressPct">0%</span>
   </div>
+  <input type="range" class="seek-bar" id="seekBar" min="0" max="1000" value="0">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <span class="progress-label">بداية</span>
+    <span class="time-remaining" id="timeRemaining">
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      —
+    </span>
+    <span class="progress-label">نهاية</span>
+  </div>
+</div>
 
-  <!-- Bottom surah navigation -->
+<div class="panel-divider"></div>
 
-  <div class="surah-nav" id="surahNav">
-    <button class="surah-nav-btn" id="prevSurahBtn">
-      <span class="nav-arrow">›</span>
-      <span id="prevSurahName">السورة السابقة</span>
-    </button>
-    <button class="surah-nav-btn" id="nextSurahBtn">
-      <span id="nextSurahName">السورة التالية</span>
-      <span class="nav-arrow">‹</span>
-    </button>
+<!-- Main controls -->
+
+<div class="main-controls">
+
+  <button class="jump-btn" id="jumpTopBtn">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+    الأعلى
+  </button>
+
+  <button class="step-btn" id="minusBtn" title="أبطأ">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="4" y="11" width="16" height="2" rx="1"/></svg>
+  </button>
+
+  <button class="scroll-btn" id="scrollBtn">
+    <span class="play-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+    </span>
+    <span class="pause-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg>
+    </span>
+  </button>
+
+  <button class="step-btn" id="plusBtn" title="أسرع">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 4a1 1 0 011 1v6h6a1 1 0 010 2h-6v6a1 1 0 01-2 0v-6H5a1 1 0 010-2h6V5a1 1 0 011-1z"/></svg>
+  </button>
+
+  <button class="jump-btn" id="jumpBottomBtn">
+    النهاية
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+
+</div>
+
+<div class="panel-divider"></div>
+
+<!-- Speed row -->
+
+<div class="speed-section">
+  <span class="speed-label">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    السرعة
+  </span>
+  <input type="range" class="speed-slider" id="speedSlider" min="0.05" max="3" step="0.05" value="0.3">
+  <span class="speed-badge" id="speedBadge">×0.3</span>
+</div>
+
+<div class="panel-divider"></div>
+
+<!-- Zoom row -->
+
+<div class="zoom-row">
+  <span class="zoom-label">
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    الحجم
+  </span>
+  <button class="zoom-btn" id="zoomOutBtn">−</button>
+  <span class="zoom-badge" id="zoomBadge">100%</span>
+  <button class="zoom-btn" id="zoomInBtn">+</button>
+  <button class="zoom-btn" id="zoomResetBtn" title="إعادة تعيين" style="font-size:0.65rem;width:auto;padding:0 7px;">تعيين</button>
+</div>
+
   </div>
 
 </div>
 
-  </div>
-</div>
+<!-- THUMBNAILS -->
 
-<!-- Scroll Panel -->
+<div id="thumbOverlay"></div>
+<div id="thumbSidebar"></div>
 
-<div class="scroll-panel" id="scrollPanel">
-  <div class="progress-section">
-    <div class="progress-labels">
-      <span class="progress-label">التقدم</span>
-      <span class="progress-pct" id="progressPct">0%</span>
-    </div>
-    <input type="range" id="seekBar" class="seek-bar" min="0" max="1000" step="1" value="0">
-  </div>
-  <div class="divider"></div>
-  <div class="main-controls">
-    <button class="jump-btn" id="jumpTopBtn" title="الأعلى">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-      الأعلى
-    </button>
-    <button class="step-btn" id="minusBtn" title="تبطيء">−</button>
-    <button class="scroll-btn" id="scrollBtn">
-      <span class="play-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.52.85l11-7.5a1 1 0 0 0 0-1.7l-11-7.5A1 1 0 0 0 7 4.5z"/></svg>
-      </span>
-      <span class="pause-icon">
-        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4.5" height="16" rx="1"/><rect x="13.5" y="4" width="4.5" height="16" rx="1"/></svg>
-      </span>
-    </button>
-    <button class="step-btn" id="plusBtn" title="تسريع">+</button>
-    <button class="jump-btn" id="jumpBottomBtn" title="الأسفل">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      الأسفل
-    </button>
-  </div>
-  <div class="speed-section">
-    <span class="speed-label">السرعة</span>
-    <input type="range" id="speedSlider" class="speed-slider" min="0.1" max="3.0" step="0.1" value="0.6">
-    <span class="speed-badge" id="speedBadge">×0.6</span>
-  </div>
-  <div class="time-remaining" id="timeRemaining">متبقي: --:--</div>
-</div>
+<!-- TOAST + OFFLINE -->
 
 <div id="toast"></div>
+<div id="offlineBadge">لا يوجد اتصال بالإنترنت</div>
 
 <script>
-// ====== SURAH DATA ======
-const SURAHS = [
-  {n:1,name:"الفاتحة",ayat:7},{n:2,name:"البقرة",ayat:286},{n:3,name:"آل عمران",ayat:200},
-  {n:4,name:"النساء",ayat:176},{n:5,name:"المائدة",ayat:120},{n:6,name:"الأنعام",ayat:165},
-  {n:7,name:"الأعراف",ayat:206},{n:8,name:"الأنفال",ayat:75},{n:9,name:"التوبة",ayat:129},
-  {n:10,name:"يونس",ayat:109},{n:11,name:"هود",ayat:123},{n:12,name:"يوسف",ayat:111},
-  {n:13,name:"الرعد",ayat:43},{n:14,name:"إبراهيم",ayat:52},{n:15,name:"الحجر",ayat:99},
-  {n:16,name:"النحل",ayat:128},{n:17,name:"الإسراء",ayat:111},{n:18,name:"الكهف",ayat:110},
-  {n:19,name:"مريم",ayat:98},{n:20,name:"طه",ayat:135},{n:21,name:"الأنبياء",ayat:112},
-  {n:22,name:"الحج",ayat:78},{n:23,name:"المؤمنون",ayat:118},{n:24,name:"النور",ayat:64},
-  {n:25,name:"الفرقان",ayat:77},{n:26,name:"الشعراء",ayat:227},{n:27,name:"النمل",ayat:93},
-  {n:28,name:"القصص",ayat:88},{n:29,name:"العنكبوت",ayat:69},{n:30,name:"الروم",ayat:60},
-  {n:31,name:"لقمان",ayat:34},{n:32,name:"السجدة",ayat:30},{n:33,name:"الأحزاب",ayat:73},
-  {n:34,name:"سبأ",ayat:54},{n:35,name:"فاطر",ayat:45},{n:36,name:"يس",ayat:83},
-  {n:37,name:"الصافات",ayat:182},{n:38,name:"ص",ayat:88},{n:39,name:"الزمر",ayat:75},
-  {n:40,name:"غافر",ayat:85},{n:41,name:"فصلت",ayat:54},{n:42,name:"الشورى",ayat:53},
-  {n:43,name:"الزخرف",ayat:89},{n:44,name:"الدخان",ayat:59},{n:45,name:"الجاثية",ayat:37},
-  {n:46,name:"الأحقاف",ayat:35},{n:47,name:"محمد",ayat:38},{n:48,name:"الفتح",ayat:29},
-  {n:49,name:"الحجرات",ayat:18},{n:50,name:"ق",ayat:45},{n:51,name:"الذاريات",ayat:60},
-  {n:52,name:"الطور",ayat:49},{n:53,name:"النجم",ayat:62},{n:54,name:"القمر",ayat:55},
-  {n:55,name:"الرحمن",ayat:78},{n:56,name:"الواقعة",ayat:96},{n:57,name:"الحديد",ayat:29},
-  {n:58,name:"المجادلة",ayat:22},{n:59,name:"الحشر",ayat:24},{n:60,name:"الممتحنة",ayat:13},
-  {n:61,name:"الصف",ayat:14},{n:62,name:"الجمعة",ayat:11},{n:63,name:"المنافقون",ayat:11},
-  {n:64,name:"التغابن",ayat:18},{n:65,name:"الطلاق",ayat:12},{n:66,name:"التحريم",ayat:12},
-  {n:67,name:"الملك",ayat:30},{n:68,name:"القلم",ayat:52},{n:69,name:"الحاقة",ayat:52},
-  {n:70,name:"المعارج",ayat:44},{n:71,name:"نوح",ayat:28},{n:72,name:"الجن",ayat:28},
-  {n:73,name:"المزمل",ayat:20},{n:74,name:"المدثر",ayat:56},{n:75,name:"القيامة",ayat:40},
-  {n:76,name:"الإنسان",ayat:31},{n:77,name:"المرسلات",ayat:50},{n:78,name:"النبأ",ayat:40},
-  {n:79,name:"النازعات",ayat:46},{n:80,name:"عبس",ayat:42},{n:81,name:"التكوير",ayat:29},
-  {n:82,name:"الانفطار",ayat:19},{n:83,name:"المطففين",ayat:36},{n:84,name:"الانشقاق",ayat:25},
-  {n:85,name:"البروج",ayat:22},{n:86,name:"الطارق",ayat:17},{n:87,name:"الأعلى",ayat:19},
-  {n:88,name:"الغاشية",ayat:26},{n:89,name:"الفجر",ayat:30},{n:90,name:"البلد",ayat:20},
-  {n:91,name:"الشمس",ayat:15},{n:92,name:"الليل",ayat:21},{n:93,name:"الضحى",ayat:11},
-  {n:94,name:"الشرح",ayat:8},{n:95,name:"التين",ayat:8},{n:96,name:"العلق",ayat:19},
-  {n:97,name:"القدر",ayat:5},{n:98,name:"البينة",ayat:8},{n:99,name:"الزلزلة",ayat:8},
-  {n:100,name:"العاديات",ayat:11},{n:101,name:"القارعة",ayat:11},{n:102,name:"التكاثر",ayat:8},
-  {n:103,name:"العصر",ayat:3},{n:104,name:"الهمزة",ayat:9},{n:105,name:"الفيل",ayat:5},
-  {n:106,name:"قريش",ayat:4},{n:107,name:"الماعون",ayat:7},{n:108,name:"الكوثر",ayat:3},
-  {n:109,name:"الكافرون",ayat:6},{n:110,name:"النصر",ayat:3},{n:111,name:"المسد",ayat:5},
-  {n:112,name:"الإخلاص",ayat:4},{n:113,name:"الفلق",ayat:5},{n:114,name:"الناس",ayat:6}
-];
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// ====== ICON TEMPLATES ======
-const ICON_MOON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.7A8.5 8.5 0 0 1 9.3 3.5a.6.6 0 0 0-.77-.78A10 10 0 1 0 21.27 15.5a.6.6 0 0 0-.77-.8z"/></svg>';
-const ICON_SUN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.3M19.2 12h2.3M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>';
+// ── CONFIG ──
+const RENDER_WINDOW = 2;
+const UNLOAD_WINDOW = 7;
+const THUMB_SCALE   = 0.18;
+const BASE_SPEED    = 30;   // px/s at ×1.0
+const MAX_CSS_W     = 860;
 
-// ====== DOM REFS ======
+// ── STATE ──
+let pdfDoc = null, totalPages = 0, bookName = '';
+let pageSlots = [], pageSizes = [], pageRendered = [], thumbItems = [];
+let currentPage = 1;
+let zoomLevel = 1.0;
+let pageNightMode = false;
+
+// scroll engine
+let isScrolling = false, rafId = null, lastTime = null;
+let scrollAccum = 0, scrollWhole = 0;
+let isPausedForManual = false, isTouching = false, resumeTimer = null;
+let isSeeking = false;
+
+// UI dirty flag (like quran site)
+let uiDirty = false, uiRafId = null;
+
+// ── ELEMENTS ──
+const uploadScreen    = document.getElementById('uploadScreen');
+const loadingScreen   = document.getElementById('loadingScreen');
+const readerScreen    = document.getElementById('readerScreen');
+const loadingBar      = document.getElementById('loadingBar');
+const loadingText     = document.getElementById('loadingText');
+const pageHeader      = document.getElementById('pageHeader');
+const bookTitle       = document.getElementById('bookTitle');
+const pageIndicator   = document.getElementById('pageIndicator');
+const pctIndicator    = document.getElementById('pctIndicator');
+const viewport        = document.getElementById('viewport');
+const scrollContainer = document.getElementById('scrollContainer');
+const scroller        = document.getElementById('scroller');
 const scrollPanel     = document.getElementById('scrollPanel');
 const scrollBtn       = document.getElementById('scrollBtn');
-const plusBtn         = document.getElementById('plusBtn');
-const minusBtn        = document.getElementById('minusBtn');
-const jumpTopBtn      = document.getElementById('jumpTopBtn');
-const jumpBottomBtn   = document.getElementById('jumpBottomBtn');
 const speedSlider     = document.getElementById('speedSlider');
 const speedBadge      = document.getElementById('speedBadge');
-const timeRemainingEl = document.getElementById('timeRemaining');
-const progressPct     = document.getElementById('progressPct');
 const seekBar         = document.getElementById('seekBar');
-const quranText       = document.getElementById('quranText');
-const scroller        = document.getElementById('scroller');
-const scrollContainer = document.getElementById('scrollContainer');
-const viewport        = document.getElementById('viewport');
-const pageHeader      = document.getElementById('pageHeader');
+const minusBtn        = document.getElementById('minusBtn');
+const plusBtn         = document.getElementById('plusBtn');
+const jumpTopBtn      = document.getElementById('jumpTopBtn');
+const jumpBottomBtn   = document.getElementById('jumpBottomBtn');
+const progressPct     = document.getElementById('progressPct');
+const timeRemaining   = document.getElementById('timeRemaining');
+const closeBtn        = document.getElementById('closeBtn');
 const themeBtn        = document.getElementById('themeBtn');
-const fontPlus        = document.getElementById('fontPlus');
-const fontMinus       = document.getElementById('fontMinus');
-const menuBtn         = document.getElementById('menuBtn');
-const sidebar         = document.getElementById('sidebar');
-const sidebarOverlay  = document.getElementById('sidebarOverlay');
-const sidebarClose    = document.getElementById('sidebarClose');
-const surahList       = document.getElementById('surahList');
-const surahSearch     = document.getElementById('surahSearch');
-const surahTitle      = document.getElementById('surahTitle');
-const surahInfo       = document.getElementById('surahInfo');
-const ayahIndicator   = document.getElementById('ayahIndicator');
-const toastEl         = document.getElementById('toast');
-const loadingScreen   = document.getElementById('loadingScreen');
-const bookmarkBtn     = document.getElementById('bookmarkBtn');
-const bookmarkPanel   = document.getElementById('bookmarkPanel');
-const bmList          = document.getElementById('bmList');
-const bmAddBtn        = document.getElementById('bmAddBtn');
+const thumbBtn        = document.getElementById('thumbBtn');
+const thumbSidebar    = document.getElementById('thumbSidebar');
+const thumbOverlay    = document.getElementById('thumbOverlay');
+const dropZone        = document.getElementById('dropZone');
+const fileInput       = document.getElementById('fileInput');
+const toast           = document.getElementById('toast');
 const offlineBadge    = document.getElementById('offlineBadge');
-const prevSurahBtn    = document.getElementById('prevSurahBtn');
-const nextSurahBtn    = document.getElementById('nextSurahBtn');
-const prevSurahName   = document.getElementById('prevSurahName');
-const nextSurahName   = document.getElementById('nextSurahName');
-const basmalahEl      = document.getElementById('basmalah');
+const zoomInBtn       = document.getElementById('zoomInBtn');
+const zoomOutBtn      = document.getElementById('zoomOutBtn');
+const zoomResetBtn    = document.getElementById('zoomResetBtn');
+const zoomBadge       = document.getElementById('zoomBadge');
+const pageNightBtn    = document.getElementById('pageNightBtn');
 
-// ====== STATE ======
-const BASE_SPEED = 40;
-let isScrolling = false;
-let rafId = null;
-let lastTime = null;
-let scrollAccum = 0; // floating-point scroll position accumulator (fixes sub-pixel stall at low speeds)
-let scrollWhole = 0; // last integer px written to scrollTop (avoids redundant DOM writes)
-let isSeeking = false;
-let uiRafId = null;
-let uiDirty = false;
-let currentSurah = 2;
-let fontSize = parseFloat(localStorage.getItem('fontSize') || '1.7');
-const FONT_MIN = 1.2, FONT_MAX = 3.5;
-let ayahPositions = [];
-let currentAyah = 1;
-let ayahUpdateScheduled = false;
-let pendingAyah = null;
-
-// Pause-and-resume state (for manual scroll during auto-scroll)
-let isPausedForManual = false;
-let resumeTimer = null;
-
-// ====== HEADER HIDE/SHOW on scroll ======
-let lastScrollY = 0;
-let headerVisible = true;
-let headerRafId = null;
-
-function updateHeader(scrollY) {
-  const delta = scrollY - lastScrollY;
-  lastScrollY = scrollY;
-  if (scrollY < 60) {
-    // Always show near top
-    if (!headerVisible) {
-      headerVisible = true;
-      pageHeader.classList.remove('hidden-header');
-    }
-    return;
-  }
-  if (delta > 4 && headerVisible) {
-    headerVisible = false;
-    pageHeader.classList.add('hidden-header');
-  } else if (delta < -4 && !headerVisible) {
-    headerVisible = true;
-    pageHeader.classList.remove('hidden-header');
-  }
-}
-
-let lastScrollSaveTs = 0;
-let isLoadingSurah = false; // يمنع الحفظ التلقائي أثناء التحميل من الكتابة فوق التقدم المحفوظ
-scrollContainer.addEventListener('scroll', () => {
-  const sy = scrollContainer.scrollTop;
-  if (!headerRafId) {
-    headerRafId = requestAnimationFrame(() => {
-      headerRafId = null;
-      if (!isScrolling) updateHeader(sy);
-      scheduleUI();
-    });
-  }
-  // حفظ فوري (مقيّد بثانية واحدة) أثناء السكرول نفسه — نفس طريقة حفظ الإشارات المرجعية
-  // الموثوقة، بدل الاعتماد فقط على أحداث الخروج غير المضمونة داخل تطبيقات PWA على الجوال.
-  if (isLoadingSurah) return; // لا تحفظ أثناء إعادة ضبط السكرول عند فتح سورة (يمنع الكتابة فوق القيمة المحفوظة)
-  const now = Date.now();
-  if (now - lastScrollSaveTs > 1000) {
-    lastScrollSaveTs = now;
-    saveProgress();
-  }
-}, { passive: true });
-
-// ====== TOAST ======
-let toastTimer = null;
-function showToast(msg, duration = 2000) {
-  toastEl.textContent = msg;
-  toastEl.classList.add('show');
+// ── TOAST ──
+let toastTimer;
+function showToast(msg, dur=1800) {
+  toast.textContent = msg;
+  toast.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toastEl.classList.remove('show'), duration);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), dur);
 }
 
-// ====== THEME ======
+// ── THEME ──
 function applyTheme(light) {
   document.body.classList.toggle('light', light);
-  themeBtn.innerHTML = light ? ICON_SUN : ICON_MOON;
-  localStorage.setItem('theme', light ? 'light' : 'dark');
+  localStorage.setItem('readerTheme', light ? 'light' : 'dark');
 }
-const savedTheme = localStorage.getItem('theme');
-applyTheme(savedTheme === 'light');
-themeBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  applyTheme(!document.body.classList.contains('light'));
+themeBtn.addEventListener('click', e => { e.stopPropagation(); applyTheme(!document.body.classList.contains('light')); });
+if (localStorage.getItem('readerTheme') === 'light') applyTheme(true);
+
+// ── RECENT ──
+function getRecent() { try { return JSON.parse(localStorage.getItem('readerRecent') || '[]'); } catch { return []; } }
+function saveRecent(name, page) {
+  let list = getRecent().filter(r => r.name !== name);
+  list.unshift({ name, page }); list = list.slice(0, 5);
+  localStorage.setItem('readerRecent', JSON.stringify(list));
+}
+function updateRecentPage(name, page) {
+  let list = getRecent(); const i = list.findIndex(r => r.name === name);
+  if (i >= 0) { list[i].page = page; localStorage.setItem('readerRecent', JSON.stringify(list)); }
+}
+function renderRecentList() {
+  const list = getRecent();
+  const sec = document.getElementById('recentSection');
+  const ul  = document.getElementById('recentList');
+  ul.innerHTML = '';
+  if (!list.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'flex';
+  list.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'recent-item';
+    el.innerHTML = `<div class="recent-item-icon">📄</div><span class="recent-item-name">${r.name}</span><span class="recent-item-pg">▶ ص ${r.page}</span>`;
+    el.title = `استمر من صفحة ${r.page}`;
+    el.addEventListener('click', () => {
+      showToast(`اختر الملف للاستمرار من ص ${r.page}`);
+      fileInput.click();
+    });
+    ul.appendChild(el);
+  });
+}
+renderRecentList();
+
+// ── FILE INPUT ──
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') loadPDF(file);
+  else showToast('يرجى اختيار ملف PDF فقط');
 });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadPDF(fileInput.files[0]); });
 
-// ====== FONT SIZE ======
-function applyFontSize(size) {
-  fontSize = Math.max(FONT_MIN, Math.min(FONT_MAX, size));
-  quranText.style.fontSize = fontSize + 'em';
-  localStorage.setItem('fontSize', fontSize);
-  fontMinus.disabled = fontSize <= FONT_MIN;
-  fontPlus.disabled  = fontSize >= FONT_MAX;
-  scheduleUI();
-}
-applyFontSize(fontSize);
-fontPlus.addEventListener('click',  (e) => { e.stopPropagation(); applyFontSize(fontSize + 0.15); });
-fontMinus.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(fontSize - 0.15); });
+// ── LOAD PDF ──
+async function loadPDF(file) {
+  // احفظ تقدم الكتاب الحالي قبل التبديل لكتاب جديد
+  saveProgress();
 
-// ====== SPEED BUTTONS ======
-function updateSpeedBtnStates() {
-  const val = parseFloat(speedSlider.value);
-  minusBtn.disabled = val <= parseFloat(speedSlider.min) + 0.001;
-  plusBtn.disabled  = val >= parseFloat(speedSlider.max) - 0.001;
-}
+  bookName = file.name.replace(/\.pdf$/i, '');
+  bookTitle.textContent = bookName;
 
-// ====== SIDEBAR ======
-function buildSurahList(filter = '') {
-  surahList.innerHTML = '';
-  const filtered = SURAHS.filter(s => s.name.includes(filter) || String(s.n).includes(filter));
-  filtered.forEach(s => {
-    const div = document.createElement('div');
-    div.className = 'surah-item' + (s.n === currentSurah ? ' active' : '');
-    div.innerHTML = `<span class="surah-num">${s.n}</span><span class="surah-name">سورة ${s.name}</span><span class="surah-count">${s.ayat} آية</span>`;
-    div.addEventListener('click', () => { loadSurah(s.n); closeSidebar(); });
-    surahList.appendChild(div);
-  });
-}
-function openSidebar() {
-  sidebar.classList.add('open');
-  sidebarOverlay.classList.add('visible');
-  buildSurahList();
-  const active = surahList.querySelector('.active');
-  if (active) active.scrollIntoView({ block: 'center' });
-}
-function closeSidebar() {
-  sidebar.classList.remove('open');
-  sidebarOverlay.classList.remove('visible');
-}
-menuBtn.addEventListener('click', (e) => { e.stopPropagation(); openSidebar(); });
-sidebarClose.addEventListener('click', closeSidebar);
-sidebarOverlay.addEventListener('click', closeSidebar);
-surahSearch.addEventListener('input', () => buildSurahList(surahSearch.value.trim()));
+  uploadScreen.classList.add('hidden');
+  loadingScreen.classList.add('show');
+  loadingBar.style.width = '0%';
+  loadingText.textContent = 'جاري تحميل الكتاب…';
 
-// ====== HELPER ======
-function toArabicNum(n) {
-  return String(n); // أرقام إنجليزية (تم تعطيل تحويلها إلى أرقام عربية)
-}
+  const buf = await file.arrayBuffer();
+  const task = pdfjsLib.getDocument({ data: buf });
+  task.onProgress = p => { if (p.total) loadingBar.style.width = Math.round((p.loaded/p.total)*40)+'%'; };
 
-// ====== AYAH TRACKING ======
-function buildAyahPositions() {
-  ayahPositions = [];
-  const labels = quranText.querySelectorAll('label');
-  labels.forEach(label => {
-    const match = label.textContent.trim().match(/\d+/);
-    if (match) {
-      ayahPositions.push({ el: label.closest('span[data-ayah]') || label, num: parseInt(match[0]) });
-    }
-  });
-}
+  pdfDoc = await task.promise;
+  totalPages = pdfDoc.numPages;
+  pageSlots = []; pageSizes = []; pageRendered = []; thumbItems = [];
+  scroller.innerHTML = ''; thumbSidebar.innerHTML = '';
 
-// ① Ayah number tap → save bookmark (no transition color change)
-function attachAyahTapHandlers() {
-  quranText.querySelectorAll('label').forEach(label => {
-    label.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const match = label.textContent.trim().match(/\d+/);
-      if (!match) return;
-      const ayahNum = parseInt(match[0]);
-      addBookmarkForAyah(ayahNum);
-    });
-  });
-}
+  loadingText.textContent = 'جاري قياس الصفحات…';
+  const containerW = Math.min(scrollContainer.clientWidth - 16, MAX_CSS_W);
 
-function addBookmarkForAyah(ayahNum) {
-  let bms = loadBookmarks();
-  
-  const existingIndex = bms.findIndex(b => b.surah === currentSurah && b.ayah === ayahNum);
-  
-  if (existingIndex !== -1) {
-    bms.splice(existingIndex, 1);
-    saveBookmarks(bms);
-    updateBookmarkDot();
-    
-    quranText.querySelectorAll('label').forEach(label => {
-      const match = label.textContent.trim().match(/\d+/);
-      if (match && parseInt(match[0]) === ayahNum) {
-        label.classList.remove('bm-active');
+  for (let i = 1; i <= totalPages; i++) {
+    loadingBar.style.width = (40 + Math.round((i/totalPages)*45)) + '%';
+    const pg  = await pdfDoc.getPage(i);
+    const vp  = pg.getViewport({ scale: 1 });
+    const scl = containerW / vp.width;
+    const cssW = Math.round(vp.width  * scl);
+    const cssH = Math.round(vp.height * scl);
+    pageSizes.push({ w: cssW, h: cssH, scale: scl });
+
+    const slot = document.createElement('div');
+    slot.className = 'page-slot page-placeholder';
+    slot.dataset.page = i;
+    slot.style.width  = cssW + 'px';
+    slot.style.height = cssH + 'px';
+    scroller.appendChild(slot);
+    pageSlots.push(slot);
+    pageRendered.push(false);
+
+    // Thumb placeholder
+    const tw = document.createElement('div');
+    tw.className = 'thumb-item';
+    tw.dataset.page = i;
+    const tph = document.createElement('div');
+    tph.className = 'thumb-ph'; tph.textContent = i;
+    tw.appendChild(tph);
+    tw.addEventListener('click', () => { scrollToPage(i, true); closeThumbs(); });
+    thumbSidebar.appendChild(tw);
+    thumbItems.push(tw);
+  }
+
+  loadingBar.style.width = '95%';
+
+  // Restore saved progress
+  let startPage = 1, savedScrollTop = null;
+  try {
+    const saved = JSON.parse(localStorage.getItem('readerProgress_'+bookName));
+    if (saved && saved.page) {
+      startPage = Math.min(saved.page, totalPages);
+      if (saved.speed) speedSlider.value = saved.speed;
+      if (saved.scrollTop != null) savedScrollTop = saved.scrollTop;
+      // استعادة الزوم المحفوظ للكتاب إن وجد
+      if (saved.zoom && saved.zoom >= ZOOM_MIN && saved.zoom <= ZOOM_MAX) {
+        zoomLevel = saved.zoom;
+        zoomBadge.textContent = Math.round(zoomLevel * 100) + '%';
       }
-    });
-    if (bookmarkPanelOpen) renderBookmarkPanel();
-
-  } else {
-    bms = bms.filter(b => b.surah !== currentSurah); 
-    
-    const scrollY = scrollContainer.scrollTop;
-    bms.push({ id: Date.now(), surah: currentSurah, ayah: ayahNum, posY: Math.round(scrollY) });
-    saveBookmarks(bms);
-    updateBookmarkDot();
-    highlightBookmarkedAyah(ayahNum);
-    if (bookmarkPanelOpen) renderBookmarkPanel();
-    //refreshBookmarkHighlight();
-    
-  }
-}
-
-function highlightBookmarkedAyah(ayahNum) {
-  // Refresh all highlights based on current bookmarks
-  refreshBookmarkHighlight();
-}
-
-function refreshBookmarkHighlight() {
-  quranText.querySelectorAll('label.bm-active').forEach(l => l.classList.remove('bm-active'));
-  const bms = loadBookmarks();
-  const forThis = bms.filter(b => b.surah === currentSurah);
-  if (!forThis.length) return;
-  const bookmarkedAyahs = new Set(forThis.map(b => b.ayah));
-  quranText.querySelectorAll('label').forEach(label => {
-    const match = label.textContent.trim().match(/\d+/);
-    if (match && bookmarkedAyahs.has(parseInt(match[0]))) {
-      label.classList.add('bm-active');
     }
-  });
-}
+  } catch {}
 
-function updateAyahIndicator() {
-  if (!ayahPositions.length) return;
-  const scrollY = scrollContainer.scrollTop;
-  
-  let found = ayahPositions[0];
-
-  if (scrollY < 200) {
-    found = ayahPositions[0];
-  } else {
-
-    const viewH = scrollContainer.clientHeight;
-    for (const a of ayahPositions) {
-      const top = a.el ? a.el.offsetTop : 0;
-      if (top <= scrollY + viewH * 0.35) found = a;
-      else break;
-    }
-  }
-
-  if (found.num === currentAyah) return;
-
-  pendingAyah = found;
-  if (ayahUpdateScheduled) return;
-  ayahUpdateScheduled = true;
+  saveRecent(bookName, startPage);
+  updateSpeedSliderUI();
 
   setTimeout(() => {
-    ayahUpdateScheduled = false;
-    if (!pendingAyah) return;
-    const newAyah = pendingAyah;
-    pendingAyah = null;
-    if (newAyah.num === currentAyah) return;
-    currentAyah = newAyah.num;
-    ayahIndicator.textContent = 'الآية ' + toArabicNum(currentAyah);
-  }, 80);
+    loadingScreen.classList.remove('show');
+    readerScreen.classList.add('show');
+    scrollPanel.classList.remove('hidden');
+
+    // Apply saved zoom to freshly-built slots
+    applyZoom(false);
+
+    if (savedScrollTop != null && savedScrollTop > 0) {
+      // تحقق أن الـ scrollTop المحفوظ منطقي (لم تتغير أبعاد الصفحة كثيراً)
+      const maxPossible = scrollContainer.scrollHeight;
+      if (savedScrollTop <= maxPossible) {
+        scrollContainer.scrollTop = savedScrollTop;
+        scrollAccum = savedScrollTop;
+        scrollWhole = Math.floor(savedScrollTop);
+      } else {
+        // fallback: انتقل إلى رقم الصفحة مباشرةً
+        scrollToPage(startPage, false);
+        scrollAccum = scrollContainer.scrollTop;
+        scrollWhole = Math.floor(scrollAccum);
+      }
+    } else {
+      scrollToPage(startPage, false);
+      scrollAccum = scrollContainer.scrollTop;
+      scrollWhole = Math.floor(scrollAccum);
+    }
+
+    lazyRender();
+    scheduleUI();
+
+    if (startPage > 1) showToast('استُؤنفت القراءة من ص ' + startPage);
+  }, 250);
 }
 
-// ====== PROGRESS UI ======
-function scheduleUI() {
-  if (uiDirty || uiRafId) return;
-  uiDirty = true;
-  uiRafId = requestAnimationFrame(flushUI);
+// ── LAZY RENDER ──
+let lazyTimer = null;
+function scheduleLazy() { clearTimeout(lazyTimer); lazyTimer = setTimeout(lazyRender, 100); }
+
+async function lazyRender() {
+  if (!pdfDoc) return;
+  const start = Math.max(1, currentPage - RENDER_WINDOW);
+  const end   = Math.min(totalPages, currentPage + RENDER_WINDOW);
+  for (let i = start; i <= end; i++) {
+    if (!pageRendered[i-1]) await renderPageIntoSlot(i);
+  }
+  // unload far pages
+  for (let i = 1; i <= totalPages; i++) {
+    if (pageRendered[i-1] && Math.abs(i - currentPage) > UNLOAD_WINDOW) unloadPage(i);
+  }
 }
 
-function getMaxScroll() {
-  return Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+async function renderPageIntoSlot(num) {
+  if (!pdfDoc || pageRendered[num-1]) return;
+  pageRendered[num-1] = true;
+  const slot = pageSlots[num-1];
+  const size = pageSizes[num-1];
+  const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+  const pg   = await pdfDoc.getPage(num);
+  const vp   = pg.getViewport({ scale: size.scale * dpr });
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = vp.width; canvas.height = vp.height;
+  canvas.style.width  = size.w + 'px';
+  canvas.style.height = size.h + 'px';
+
+  try {
+    await pg.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+  } catch {
+    pageRendered[num-1] = false; return;
+  }
+
+  slot.classList.remove('page-placeholder');
+  slot.innerHTML = ''; slot.appendChild(canvas);
+
+  // Apply current zoom to this newly rendered slot
+  if (zoomLevel !== 1) {
+    const w = Math.round(pageSizes[num-1].w * zoomLevel);
+    const h = Math.round(pageSizes[num-1].h * zoomLevel);
+    slot.style.width  = w + 'px';
+    slot.style.height = h + 'px';
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+  }
+
+  // Thumb
+  const tw = thumbItems[num-1];
+  if (tw && tw.querySelector('.thumb-ph')) {
+    const tvp = pg.getViewport({ scale: THUMB_SCALE });
+    const tc  = document.createElement('canvas');
+    tc.width = tvp.width; tc.height = tvp.height;
+    try {
+      await pg.render({ canvasContext: tc.getContext('2d'), viewport: tvp }).promise;
+      const tpg = document.createElement('div');
+      tpg.className = 'thumb-pg'; tpg.textContent = num;
+      tw.innerHTML = ''; tw.appendChild(tc); tw.appendChild(tpg);
+    } catch {}
+  }
 }
+
+function unloadPage(num) {
+  if (!pageRendered[num-1]) return;
+  const slot = pageSlots[num-1], size = pageSizes[num-1];
+  slot.innerHTML = '';
+  slot.classList.add('page-placeholder');
+  // احتفظ بالحجم مع الزوم الحالي لضمان عدم تغيير الـ scrollTop
+  const w = Math.round(size.w * zoomLevel);
+  const h = Math.round(size.h * zoomLevel);
+  slot.style.width = w+'px'; slot.style.height = h+'px';
+  pageRendered[num-1] = false;
+}
+
+function scrollToPage(num, animated) {
+  const slot = pageSlots[num-1];
+  if (!slot) return;
+  const top = slot.offsetTop - 16;
+  if (animated) scrollContainer.scrollTo({ top, behavior: 'smooth' });
+  else scrollContainer.scrollTop = top;
+  scrollAccum = scrollContainer.scrollTop;
+  scrollWhole = Math.floor(scrollAccum);
+}
+
+// ── MAX SCROLL ──
+function getMaxScroll() { return Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight); }
+
+// ── UI FLUSH (dirty-flag RAF pattern like quran site) ──
+function scheduleUI() { if (!uiDirty) { uiDirty = true; uiRafId = requestAnimationFrame(flushUI); } }
 
 function flushUI() {
-  uiRafId = null;
-  uiDirty = false;
+  uiRafId = null; uiDirty = false;
   const scrollY = scrollContainer.scrollTop;
-  const maxS = getMaxScroll();
-  const pct = maxS > 0 ? scrollY / maxS : 0;
-  const pctNum = Math.round(pct * 100);
-  if (!isSeeking) seekBar.value = Math.round(pct * 1000);
-  seekBar.style.background = `linear-gradient(to left, rgba(200,169,110,0.6) ${pctNum}%, var(--track) ${pctNum}%)`;
-  progressPct.textContent = pctNum + '%';
+  const maxS    = getMaxScroll();
+  const pct     = maxS > 0 ? scrollY / maxS : 0;
+  const pctNum  = Math.round(pct * 100);
+
+  // Page detection
+  const mid = scrollY + scrollContainer.clientHeight * 0.4;
+  let best = 1, bestDist = Infinity;
+  pageSlots.forEach((s, i) => {
+    const d = Math.abs((s.offsetTop + s.offsetHeight * 0.5) - mid);
+    if (d < bestDist) { bestDist = d; best = i+1; }
+  });
+  if (best !== currentPage) {
+    currentPage = best;
+    thumbItems.forEach((t,i) => t.classList.toggle('active', i+1 === currentPage));
+    saveProgress();
+    scheduleLazy();
+  }
+
+  pageIndicator.textContent = `ص ${currentPage} / ${totalPages}`;
+  pctIndicator.textContent  = pctNum + '%';
+  progressPct.textContent   = pctNum + '%';
+  const panelPageInfo = document.getElementById('panelPageInfo');
+  if (panelPageInfo) panelPageInfo.innerHTML = `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg> ص ${currentPage} / ${totalPages}`;
+
+  if (!isSeeking) {
+    seekBar.value = Math.round(pct * 1000);
+    seekBar.style.background = `linear-gradient(to left, var(--gold2) ${pctNum}%, var(--track) ${pctNum}%)`;
+  }
+
+  // Time remaining
   const remaining = maxS - scrollY;
-  if (remaining <= 2) { timeRemainingEl.textContent = 'تمت القراءة ✓'; return; }
+  if (remaining <= 2) { timeRemaining.textContent = 'تمت القراءة ✓'; return; }
   const speed = parseFloat(speedSlider.value);
-  const secs = remaining / (speed * BASE_SPEED);
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  timeRemainingEl.textContent = `متبقي: ${m}:${s < 10 ? '0'+s : s} د`;
-  updateAyahIndicator();
+  const secs  = remaining / (speed * BASE_SPEED);
+  const m = Math.floor(secs / 60), s = Math.floor(secs % 60);
+  timeRemaining.textContent = `متبقي ${m}:${s<10?'0'+s:s} د`;
+
+  updateSpeedBtnStates();
 }
 
-// ====== AUTO-SCROLL ENGINE — true sub-pixel smooth ======
-// We keep scrollAccum as the floating-point logical position.
-// scrollWhole = the last integer written to scrollTop.
-// subPixelOffset = the fractional remainder (0..1) applied as a CSS
-//   translateY on #scroller so the eye sees continuous motion even when
-//   the integer part hasn't changed yet.
-
+// ── SCROLL ENGINE — sub-pixel with translateY (same as quran site) ──
 function tick(timestamp) {
   if (!isScrolling) return;
   if (lastTime === null) { lastTime = timestamp; rafId = requestAnimationFrame(tick); return; }
 
-  const delta = Math.min(timestamp - lastTime, 50); // cap at 50 ms (handles tab switch / slow frames)
+  const delta = Math.min(timestamp - lastTime, 50);
   lastTime = timestamp;
 
   const speed = parseFloat(speedSlider.value);
-  const dy = (speed * BASE_SPEED * delta) / 1000;
-  const maxS = getMaxScroll();
+  const dy    = (speed * BASE_SPEED * delta) / 1000;
+  const maxS  = getMaxScroll();
 
   scrollAccum = Math.min(scrollAccum + dy, maxS);
 
   const newWhole = Math.floor(scrollAccum);
-  const frac = scrollAccum - newWhole; // 0.0 – 0.999...
+  const frac     = scrollAccum - newWhole;
 
-  // Commit integer part to scrollTop only when it changes
   if (newWhole !== scrollWhole) {
     scrollWhole = newWhole;
     scrollContainer.scrollTop = scrollWhole;
   }
 
-  // Apply fractional offset via transform so motion is visually continuous
-  scroller.style.transform = frac > 0 ? `translateY(-${frac.toFixed(3)}px) translateZ(0)` : 'translateZ(0)';
+  // Sub-pixel fractional offset → no jitter
+  scroller.style.transform = frac > 0.001
+    ? `translateY(-${frac.toFixed(3)}px) translateZ(0)`
+    : 'translateZ(0)';
 
   scheduleUI();
 
   if (scrollAccum >= maxS) {
     scroller.style.transform = 'translateZ(0)';
     stopScroll();
+    showToast('انتهى الكتاب 📖');
     return;
   }
   rafId = requestAnimationFrame(tick);
@@ -1305,441 +1235,313 @@ function tick(timestamp) {
 
 function startScroll() {
   if (isScrolling) return;
-  isScrolling = true;
-  lastTime = null;
-  scrollAccum = scrollContainer.scrollTop;
-  scrollWhole = Math.floor(scrollAccum);
+  isScrolling = true; isPausedForManual = false; lastTime = null;
+  scrollAccum = scrollContainer.scrollTop; scrollWhole = Math.floor(scrollAccum);
   scrollBtn.classList.add('active');
-  // Hide header when auto-scroll starts
-  headerVisible = false;
   pageHeader.classList.add('hidden-header');
   rafId = requestAnimationFrame(tick);
+  showToast('السكرول شغّال');
 }
 
 function stopScroll() {
-  isScrolling = false;
-  isPausedForManual = false;
-  isTouching = false;
+  isScrolling = false; isPausedForManual = false; isTouching = false;
   clearTimeout(resumeTimer);
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   lastTime = null;
-  // Snap scroll to the committed integer position and clear fractional offset
   scrollContainer.scrollTop = scrollWhole;
   scroller.style.transform = 'translateZ(0)';
   scrollBtn.classList.remove('active');
-  // Show header when auto-scroll stops
-  headerVisible = true;
   pageHeader.classList.remove('hidden-header');
-  scheduleUI();
-  saveProgress();
+  scheduleUI(); saveProgress();
 }
-
-// ====== JUMP BUTTONS ======
-jumpTopBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  stopScroll();
-  scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-
-});
-jumpBottomBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  stopScroll();
-  scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
-
-});
-
-// ====== SAVE / RESTORE ======
-function saveProgress() {
-  const data = { surah: currentSurah, posY: Math.round(scrollContainer.scrollTop), speed: speedSlider.value };
-  localStorage.setItem('quranProgress', JSON.stringify(data));
-}
-function restoreProgress(surah) {
-  try {
-    const raw = localStorage.getItem('quranProgress');
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (data.surah === surah) return data;
-  } catch {}
-  return null;
-}
-
-// ====== BOOKMARKS ======
-function loadBookmarks() {
-  try { return JSON.parse(localStorage.getItem('quranBookmarks') || '[]'); }
-  catch { return []; }
-}
-function saveBookmarks(bms) { localStorage.setItem('quranBookmarks', JSON.stringify(bms)); }
-
-function renderBookmarkPanel() {
-  const bms = loadBookmarks();
-  bookmarkBtn.classList.toggle('has-bookmark', bms.some(b => b.surah === currentSurah));
-  bmList.innerHTML = '';
-  const forThis = bms.filter(b => b.surah === currentSurah);
-  if (forThis.length === 0) {
-    bmList.innerHTML = '<div class="bm-empty">لا توجد علامات في هذه السورة<br><small style="color:var(--muted);font-size:0.85em">اضغط على رقم الآية لحفظها</small></div>';
-  } else {
-    forThis.forEach((bm) => {
-      const meta = SURAHS.find(s => s.n === bm.surah);
-      const div = document.createElement('div');
-      div.className = 'bm-item';
-      div.innerHTML = `
-        <span class="bm-item-text">سورة ${meta ? meta.name : ''} · الآية ${toArabicNum(bm.ayah)}</span>
-        <button class="bm-item-del" data-id="${bm.id}" title="حذف">✕</button>
-      `;
-      div.addEventListener('click', (e) => {
-        if (e.target.classList.contains('bm-item-del')) return;
-        scrollContainer.scrollTo({ top: Math.min(bm.posY, getMaxScroll()), behavior: 'smooth' });
-        closeBookmarkPanel();
-
-      });
-      div.querySelector('.bm-item-del').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const all = loadBookmarks().filter(b => b.id !== bm.id);
-        saveBookmarks(all);
-        renderBookmarkPanel();
-
-      });
-      bmList.appendChild(div);
-    });
-  }
-}
-
-function addBookmark() {
-  addBookmarkForAyah(currentAyah);
-}
-
-let bookmarkPanelOpen = false;
-function openBookmarkPanel() { renderBookmarkPanel(); bookmarkPanel.classList.add('show'); bookmarkPanelOpen = true; }
-function closeBookmarkPanel() { bookmarkPanel.classList.remove('show'); bookmarkPanelOpen = false; }
-bookmarkBtn.addEventListener('click', (e) => { e.stopPropagation(); bookmarkPanelOpen ? closeBookmarkPanel() : openBookmarkPanel(); });
-bmAddBtn.addEventListener('click', (e) => { e.stopPropagation(); addBookmark(); });
-bookmarkPanel.addEventListener('click', (e) => e.stopPropagation());
-
-// ====== SURAH NAV (bottom) ======
-function updateSurahNavButtons() {
-  const prev = SURAHS.find(s => s.n === currentSurah - 1);
-  const next = SURAHS.find(s => s.n === currentSurah + 1);
-  prevSurahBtn.disabled = !prev;
-  nextSurahBtn.disabled = !next;
-  prevSurahName.textContent = prev ? 'سورة ' + prev.name : 'السورة السابقة';
-  nextSurahName.textContent = next ? 'سورة ' + next.name : 'السورة التالية';
-}
-
-prevSurahBtn.addEventListener('click', () => {
-  if (currentSurah > 1) loadSurah(currentSurah - 1);
-});
-nextSurahBtn.addEventListener('click', () => {
-  if (currentSurah < 114) loadSurah(currentSurah + 1);
-});
-
-// ====== LOAD SURAH ======
-async function loadSurah(surahNum, isInitialLoad = false) {
-  isLoadingSurah = true;
-  stopScroll();
-  currentSurah = surahNum;
-  scrollContainer.scrollTop = 0;
-  scrollAccum = 0;
-  lastScrollY = 0;
-  headerVisible = true;
-  pageHeader.classList.remove('hidden-header');
-  ayahPositions = [];
-  currentAyah = 1;
-
-  const meta = SURAHS.find(s => s.n === surahNum);
-  surahTitle.textContent = 'سورة ' + (meta ? meta.name : '');
-  surahInfo.textContent = meta ? toArabicNum(meta.ayat) + ' آية' : '';
-  ayahIndicator.textContent = 'الآية 1';
-
-  quranText.textContent = '';
-  loadingScreen.classList.remove('hidden');
-  loadingScreen.style.opacity = '1';
-  loadingScreen.style.pointerEvents = 'all';
-  scrollPanel.classList.add('hidden'); // hide controls while loading
-
-  basmalahEl.style.display = (surahNum === 9) ? 'none' : '';
-  updateSurahNavButtons();
-
-  try {
-    const res = await fetch(`surah/${surahNum}.json`);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-
-    quranText.innerHTML = data.content +
-      '<br><p class="p5">لا تنسنا من دعوة صالحة بظهر الغيب</p><br>';
-
-    // Wrap each ayah label in a span for tracking
-    quranText.querySelectorAll('label').forEach(label => {
-      const match = label.textContent.trim().match(/\d+/);
-      if (match) {
-        const span = document.createElement('span');
-        span.setAttribute('data-ayah', match[0]);
-        const parent = label.parentNode;
-        parent.insertBefore(span, label);
-        span.appendChild(label);
-      }
-    });
-
-    // Attach tap-to-bookmark on ayah numbers
-    attachAyahTapHandlers();
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        buildAyahPositions();
-        const doRestore = () => {
-          const saved = restoreProgress(surahNum);
-          if (saved && saved.posY > 0) {
-            const maxScroll = getMaxScroll();
-            // إذا كان الحد الأقصى الحالي أصغر بكثير من الموضع المحفوظ فهذا يعني
-            // أن المحتوى/الخط لم يكتمل تحميله بعد فعليًا رغم انتظار fonts.ready؛
-            // في هذه الحالة الأفضل الانتظار قليلاً وإعادة المحاولة بدل الرجوع للصفر.
-            if (maxScroll > 0 && maxScroll < saved.posY * 0.5) {
-              setTimeout(doRestore, 150);
-              return;
-            }
-            const targetY = Math.min(saved.posY, maxScroll);
-            scrollContainer.scrollTop = targetY;
-            scrollAccum = targetY;
-            speedSlider.value = saved.speed || 0.8;
-            updateSliderUI();
-            showToast('استُؤنفت القراءة من حيث توقفت');
-          }
-          scheduleUI();
-          updateBookmarkDot();
-          refreshBookmarkHighlight();
-          // Hide loading screen
-          loadingScreen.style.opacity = '0';
-          loadingScreen.style.pointerEvents = 'none';
-          setTimeout(() => {
-            loadingScreen.classList.add('hidden');
-            scrollPanel.classList.remove('hidden'); // show controls after successful load
-          }, 420);
-          // نعطّل علم التحميل بعد إطار إضافي حتى يكتمل تنفيذ حدث scroll الناتج
-          // عن ضبط scrollTop برمجيًا، فلا يُكتب posY:0 فوق القيمة المستعادة.
-          requestAnimationFrame(() => { isLoadingSurah = false; });
-        };
-        // ننتظر اكتمال تحميل الخط فعليًا (لا نفترض مدة ثابتة) حتى يكون ارتفاع
-        // النص (scrollHeight) صحيحًا وقت حساب الحد الأقصى للسكرول عند الاستعادة.
-        const fontsPromise = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-        if (isInitialLoad) {
-          fontsPromise.then(() => requestAnimationFrame(() => requestAnimationFrame(doRestore)));
-        } else {
-          doRestore();
-        }
-      });
-    });
-
-  } catch (err) {
-    quranText.innerHTML = `
-      <div style="text-align:center; padding:40px; font-family:system-ui; color:var(--muted);">
-        <div style="font-size:2em; margin-bottom:12px;">⚠️</div>
-        <div style="margin-bottom:16px; font-size:0.9em;">تعذر تحميل السورة</div>
-        <button onclick="loadSurah(${surahNum})" style="
-          background: var(--gold); color: #111; border: none;
-          padding: 8px 20px; border-radius: 20px; cursor: pointer;
-          font-family: system-ui; font-size: 0.85em;
-        ">إعادة المحاولة</button>
-      </div>`;
-    loadingScreen.classList.add('hidden');
-    loadingScreen.style.pointerEvents = 'none';
-    scrollPanel.classList.add('hidden'); // keep panel hidden on error
-  }
-}
-
-function updateBookmarkDot() {
-  const bms = loadBookmarks();
-  bookmarkBtn.classList.toggle('has-bookmark', bms.some(b => b.surah === currentSurah));
-}
-
-// ====== SEEK BAR ======
-seekBar.addEventListener('mousedown',  () => { isSeeking = true; });
-seekBar.addEventListener('touchstart', () => { isSeeking = true; }, { passive: true });
-seekBar.addEventListener('input', () => {
-  const maxS = getMaxScroll();
-  const newY = (parseInt(seekBar.value) / 1000) * maxS;
-  scrollContainer.scrollTop = newY;
-  scrollAccum = newY;
-  scheduleUI();
-});
-seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); saveProgress(); });
-seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); saveProgress(); }, { passive: true });
-
-// ====== WHEEL / TOUCH — pause auto-scroll for 1s then resume ======
-let isTouching = false;
 
 function pauseAndResume() {
   if (!isScrolling || isPausedForManual) return;
-  // Pause: freeze the engine but keep isScrolling=true and icon unchanged
   isPausedForManual = true;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   lastTime = null;
-  // DO NOT change scrollBtn icon — scroll is still "active"
   scheduleResumeIfNotTouching();
 }
 
 function scheduleResumeIfNotTouching() {
   clearTimeout(resumeTimer);
-  if (isTouching) return; // wait until finger lifts
+  if (isTouching) return;
   resumeTimer = setTimeout(() => {
     if (!isPausedForManual) return;
     isPausedForManual = false;
     scrollAccum = scrollContainer.scrollTop;
     scrollWhole = Math.floor(scrollAccum);
-    scroller.style.transform = 'translateZ(0)';
     lastTime = null;
     rafId = requestAnimationFrame(tick);
   }, 1000);
 }
 
+scrollBtn.addEventListener('click', e => { e.stopPropagation(); isScrolling ? stopScroll() : startScroll(); });
+
+// ── TOUCH / WHEEL ──
 let touchStartY = 0;
-scrollContainer.addEventListener('wheel', () => {
-  if (isScrolling) pauseAndResume();
-}, { passive: true });
-
-scrollContainer.addEventListener('touchstart', (e) => {
+scrollContainer.addEventListener('wheel', () => { if (isScrolling) pauseAndResume(); }, { passive: true });
+scrollContainer.addEventListener('touchstart', e => {
   touchStartY = e.touches[0].clientY;
-  if (isScrolling && isPausedForManual) {
-    // Finger down again — keep holding, cancel resume timer
-    isTouching = true;
-    clearTimeout(resumeTimer);
+  if (isScrolling && isPausedForManual) { isTouching = true; clearTimeout(resumeTimer); }
+}, { passive: true });
+scrollContainer.addEventListener('touchmove', e => {
+  if (Math.abs(e.touches[0].clientY - touchStartY) > 8 && isScrolling) {
+    isTouching = true; clearTimeout(resumeTimer); pauseAndResume();
   }
 }, { passive: true });
-
-scrollContainer.addEventListener('touchmove', (e) => {
-  const dy = Math.abs(e.touches[0].clientY - touchStartY);
-  if (dy > 8 && isScrolling) {
-    isTouching = true;
-    clearTimeout(resumeTimer);
-    pauseAndResume();
-  }
-}, { passive: true });
-
 scrollContainer.addEventListener('touchend', () => {
-  if (isTouching) {
-    isTouching = false;
-    if (isPausedForManual) scheduleResumeIfNotTouching();
-  }
+  if (isTouching) { isTouching = false; if (isPausedForManual) scheduleResumeIfNotTouching(); }
 }, { passive: true });
-
 scrollContainer.addEventListener('touchcancel', () => {
-  if (isTouching) {
-    isTouching = false;
-    if (isPausedForManual) scheduleResumeIfNotTouching();
-  }
+  if (isTouching) { isTouching = false; if (isPausedForManual) scheduleResumeIfNotTouching(); }
+}, { passive: true });
+scrollContainer.addEventListener('scroll', () => {
+  if (!isScrolling) scheduleUI();
+  scheduleLazy();
 }, { passive: true });
 
-// ====== KEYBOARD SHORTCUTS ======
-document.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT') return;
-  switch(e.code) {
-    case 'Space':
-      e.preventDefault();
-      isScrolling ? stopScroll() : startScroll();
-      break;
-    case 'ArrowUp':
-    case 'ArrowLeft':
-      e.preventDefault();
-      speedSlider.value = Math.max(parseFloat(speedSlider.value) - 0.1, +speedSlider.min).toFixed(2);
-      updateSliderUI();
-      showToast('السرعة: ×' + parseFloat(speedSlider.value).toFixed(1));
-      break;
-    case 'ArrowDown':
-    case 'ArrowRight':
-      e.preventDefault();
-      speedSlider.value = Math.min(parseFloat(speedSlider.value) + 0.1, +speedSlider.max).toFixed(2);
-      updateSliderUI();
-      showToast('السرعة: ×' + parseFloat(speedSlider.value).toFixed(1));
-      break;
-    case 'KeyM': openSidebar(); break;
-    case 'Escape': closeSidebar(); closeBookmarkPanel(); break;
-    case 'KeyB': e.preventDefault(); addBookmark(); break;
-  }
+// ── SEEK BAR ──
+seekBar.addEventListener('mousedown',  () => isSeeking = true);
+seekBar.addEventListener('touchstart', () => isSeeking = true, { passive: true });
+seekBar.addEventListener('input', () => {
+  const maxS = getMaxScroll();
+  const y = (parseInt(seekBar.value)/1000) * maxS;
+  scrollContainer.scrollTop = y; scrollAccum = y; scrollWhole = Math.floor(y);
+  scheduleUI();
+});
+seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); saveProgress(); });
+seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); saveProgress(); }, { passive: true });
+seekBar.addEventListener('click', e => e.stopPropagation());
+
+// ── SPEED ──
+function updateSpeedSliderUI() {
+  const v   = parseFloat(speedSlider.value);
+  const pct = ((v - +speedSlider.min) / (+speedSlider.max - +speedSlider.min)) * 100;
+  speedSlider.style.background = `linear-gradient(to left, rgba(61,40,0,0.5) ${pct}%, rgba(0,0,0,0.2) ${pct}%)`;
+  speedBadge.textContent = `×${v.toFixed(2)}`;
+}
+function updateSpeedBtnStates() {
+  const v = parseFloat(speedSlider.value);
+  minusBtn.disabled = v <= parseFloat(speedSlider.min) + 0.001;
+  plusBtn.disabled  = v >= parseFloat(speedSlider.max) - 0.001;
+}
+speedSlider.addEventListener('input', () => { updateSpeedSliderUI(); scheduleUI(); });
+speedSlider.addEventListener('click', e => e.stopPropagation());
+plusBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  speedSlider.value = Math.min(parseFloat(speedSlider.value)+0.05, +speedSlider.max).toFixed(2);
+  updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2));
+});
+minusBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  speedSlider.value = Math.max(parseFloat(speedSlider.value)-0.05, +speedSlider.min).toFixed(2);
+  updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2));
 });
 
-// ====== CONTROLS ======
-function updateSliderUI() {
-  const val = parseFloat(speedSlider.value);
-  const pct = ((val - +speedSlider.min) / (+speedSlider.max - +speedSlider.min)) * 100;
-  speedSlider.style.background = `linear-gradient(to left, rgba(200,169,110,0.8) ${pct}%, var(--track) ${pct}%)`;
-  speedBadge.textContent = `×${val.toFixed(1)}`;
-  updateSpeedBtnStates();
-  scheduleUI();
+// ── JUMP ──
+jumpTopBtn.addEventListener('click', e => {
+  e.stopPropagation(); stopScroll();
+  scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+});
+jumpBottomBtn.addEventListener('click', e => {
+  e.stopPropagation(); stopScroll();
+  scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+});
+
+// ── PANEL TOGGLE ──
+document.body.addEventListener('click', e => {
+  if (scrollPanel.contains(e.target) || thumbSidebar.contains(e.target) || pageHeader.contains(e.target)) return;
+  scrollPanel.classList.toggle('hidden');
+});
+
+// ── THUMBNAILS ──
+function openThumbs() {
+  thumbSidebar.classList.add('open'); thumbOverlay.classList.add('show');
+  const a = thumbSidebar.querySelector('.thumb-item.active');
+  if (a) a.scrollIntoView({ block: 'center' });
+}
+function closeThumbs() { thumbSidebar.classList.remove('open'); thumbOverlay.classList.remove('show'); }
+thumbBtn.addEventListener('click', e => { e.stopPropagation(); thumbSidebar.classList.contains('open') ? closeThumbs() : openThumbs(); });
+thumbOverlay.addEventListener('click', closeThumbs);
+
+// ── CLOSE ──
+closeBtn.addEventListener('click', () => {
+  stopScroll();
+  saveProgress(); // احفظ قبل الإغلاق
+  readerScreen.classList.remove('show');
+  uploadScreen.classList.remove('hidden');
+  renderRecentList();
+  scroller.innerHTML = ''; thumbSidebar.innerHTML = '';
+  pageSlots = []; pageSizes = []; pageRendered = []; thumbItems = [];
+  pdfDoc = null; bookName = ''; scrollPanel.classList.add('hidden');
+});
+
+// ── SAVE PROGRESS ──
+function saveProgress() {
+  if (!bookName) return;
+  try {
+    localStorage.setItem('readerProgress_'+bookName, JSON.stringify({
+      page:      currentPage,
+      scrollTop: scrollContainer.scrollTop,
+      speed:     speedSlider.value,
+      zoom:      zoomLevel
+    }));
+    updateRecentPage(bookName, currentPage);
+  } catch {}
 }
 
-scrollBtn.addEventListener('click', (e) => { e.stopPropagation(); isScrolling ? stopScroll() : startScroll(); });
-plusBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  speedSlider.value = Math.min(parseFloat(speedSlider.value) + 0.1, +speedSlider.max).toFixed(2);
-  updateSliderUI();
-});
-minusBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  speedSlider.value = Math.max(parseFloat(speedSlider.value) - 0.1, +speedSlider.min).toFixed(2);
-  updateSliderUI();
-});
-speedSlider.addEventListener('click', (e) => e.stopPropagation());
-speedSlider.addEventListener('input', updateSliderUI);
-seekBar.addEventListener('click', (e) => e.stopPropagation());
-
-// Close bookmark panel when user scrolls
-let isScrollingTouch = false;
-scrollContainer.addEventListener('touchstart', () => { isScrollingTouch = false; }, { passive: true });
-scrollContainer.addEventListener('touchmove', () => {
-  if (!isScrollingTouch) {
-    isScrollingTouch = true;
-    if (bookmarkPanelOpen) closeBookmarkPanel();
-  }
-}, { passive: true });
-
-document.body.addEventListener('click', (e) => {
-  if (isScrollingTouch) { isScrollingTouch = false; return; }
-  if (bookmarkPanelOpen && !bookmarkPanel.contains(e.target) && e.target !== bookmarkBtn) {
-    closeBookmarkPanel();
-    return;
-  }
-  if (!scrollPanel.contains(e.target) && !sidebar.contains(e.target) && !bookmarkPanel.contains(e.target)) {
-    scrollPanel.classList.toggle('hidden');
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  switch (e.code) {
+    case 'Space': e.preventDefault(); isScrolling ? stopScroll() : startScroll(); break;
+    case 'ArrowUp': case 'ArrowLeft':
+      e.preventDefault();
+      speedSlider.value = Math.max(parseFloat(speedSlider.value)-0.05, +speedSlider.min).toFixed(2);
+      updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2)); break;
+    case 'ArrowDown': case 'ArrowRight':
+      e.preventDefault();
+      speedSlider.value = Math.min(parseFloat(speedSlider.value)+0.05, +speedSlider.max).toFixed(2);
+      updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2)); break;
+    case 'Escape': closeThumbs(); break;
   }
 });
 
-window.addEventListener('resize', scheduleUI);
-window.addEventListener('beforeunload', saveProgress);
-// الموبايل غالبًا لا يطلق beforeunload عند تصغير التطبيق أو تبديل التطبيقات أو قفل الشاشة،
-// لذلك نضيف مستمعين أكثر موثوقية على الجوال + حفظ دوري أثناء القراءة كطبقة أمان إضافية.
-window.addEventListener('pagehide', saveProgress);
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') saveProgress();
-});
-setInterval(saveProgress, 5000);
-
-// ====== OFFLINE ======
-window.addEventListener('online', () => offlineBadge.classList.remove('show'));
+// ── OFFLINE ──
+window.addEventListener('online',  () => offlineBadge.classList.remove('show'));
 window.addEventListener('offline', () => offlineBadge.classList.add('show'));
 if (!navigator.onLine) offlineBadge.classList.add('show');
 
-// ====== SERVICE WORKER ======
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.addEventListener('updatefound', () => showToast('🔄 تحديث متاح، أعد تحميل الصفحة'));
-      // يتأكد بشكل دوري إذا فيه نسخة جديدة من sw.js على السيرفر ويحدّثها فورًا
-      reg.update();
-    }).catch(() => {});
-  });
+// ── PINCH TO ZOOM (على منطقة الصفحات فقط) ──
+let pinchStartDist = 0, pinchStartZoom = 1;
+
+function getPinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
 }
 
-// ====== INIT ======
-window.addEventListener('load', () => {
-  try {
-    const raw = localStorage.getItem('quranProgress');
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data.speed) speedSlider.value = data.speed;
-      if (data.surah) currentSurah = data.surah;
+scrollContainer.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    pinchStartDist = getPinchDist(e.touches);
+    pinchStartZoom = zoomLevel;
+    if (isScrolling) pauseAndResume();
+  }
+}, { passive: false });
+
+scrollContainer.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = getPinchDist(e.touches);
+    const rawRatio = dist / pinchStartDist;
+    // تخفيف الحساسية: نقلل الأثر لـ 40% من النسبة الأصلية
+    const dampedRatio = 1 + (rawRatio - 1) * 0.4;
+    const newZoom = Math.min(Math.max(pinchStartZoom * dampedRatio, ZOOM_MIN), ZOOM_MAX);
+    zoomLevel = parseFloat(newZoom.toFixed(2));
+    applyZoom(false);
+  }
+}, { passive: false });
+
+scrollContainer.addEventListener('touchend', e => {
+  if (e.touches.length < 2 && pinchStartDist > 0) {
+    pinchStartDist = 0;
+    applyZoom(true); // احفظ الزوم النهائي
+    showToast('الحجم: ' + Math.round(zoomLevel * 100) + '%');
+  }
+}, { passive: true });
+
+// منع زوم المتصفح الافتراضي على كامل الصفحة
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+
+// ── ZOOM ──
+const ZOOM_STEP = 0.05, ZOOM_MIN = 0.5, ZOOM_MAX = 1.8;
+
+function applyZoom(save = true) {
+  zoomBadge.textContent = Math.round(zoomLevel * 100) + '%';
+
+  // احفظ الصفحة الحالية قبل تغيير الأحجام
+  const anchorPage = currentPage;
+  const anchorSlot = pageSlots[anchorPage - 1];
+  // احسب الإزاحة داخل الصفحة قبل الزوم (0 = أعلى الصفحة، 1 = أسفلها)
+  let offsetRatio = 0;
+  if (anchorSlot) {
+    const slotTop = anchorSlot.offsetTop;
+    const slotH   = anchorSlot.offsetHeight || 1;
+    offsetRatio = (scrollContainer.scrollTop - slotTop) / slotH;
+    offsetRatio = Math.max(0, Math.min(1, offsetRatio));
+  }
+
+  pageSlots.forEach((slot, i) => {
+    const base = pageSizes[i];
+    if (!base) return;
+    const w = Math.round(base.w * zoomLevel);
+    const h = Math.round(base.h * zoomLevel);
+    slot.style.width  = w + 'px';
+    slot.style.height = h + 'px';
+    const canvas = slot.querySelector('canvas');
+    if (canvas) { canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; }
+  });
+
+  // أعد ضبط الـ scrollTop ليبقى على نفس الصفحة والموقع
+  if (anchorSlot) {
+    const newSlotTop = anchorSlot.offsetTop;
+    const newSlotH   = anchorSlot.offsetHeight || 1;
+    const newScrollTop = newSlotTop + offsetRatio * newSlotH;
+    scrollContainer.scrollTop = newScrollTop;
+    scrollAccum = newScrollTop;
+    scrollWhole = Math.floor(newScrollTop);
+  }
+
+  // عند التكبير أكثر من عرض الشاشة: اتركها تتمدد
+  const anyBase = pageSizes[0];
+  if (anyBase) {
+    const zoomed = Math.round(anyBase.w * zoomLevel);
+    if (zoomed > scrollContainer.clientWidth) {
+      scroller.style.alignItems = 'flex-start';
+      scroller.style.minWidth = zoomed + 16 + 'px';
+    } else {
+      scroller.style.alignItems = 'center';
+      scroller.style.minWidth = '';
     }
-  } catch {}
-  updateSliderUI();
-  loadSurah(currentSurah, true);
+  }
+
+  if (save) try { localStorage.setItem('readerZoom', zoomLevel); } catch {}
+}
+
+function setZoom(z, toast_msg) {
+  zoomLevel = Math.min(Math.max(+z.toFixed(1), ZOOM_MIN), ZOOM_MAX);
+  applyZoom();
+  if (toast_msg) showToast(toast_msg);
+}
+
+zoomInBtn.addEventListener('click',    e => { e.stopPropagation(); setZoom(zoomLevel + ZOOM_STEP, 'الحجم: ' + Math.round(zoomLevel*100) + '%'); });
+zoomOutBtn.addEventListener('click',   e => { e.stopPropagation(); setZoom(zoomLevel - ZOOM_STEP, 'الحجم: ' + Math.round(zoomLevel*100) + '%'); });
+zoomResetBtn.addEventListener('click', e => { e.stopPropagation(); setZoom(1.0, 'الحجم: 100%'); });
+
+// Restore saved zoom
+try {
+  const z = parseFloat(localStorage.getItem('readerZoom'));
+  if (z >= ZOOM_MIN && z <= ZOOM_MAX) { zoomLevel = z; zoomBadge.textContent = Math.round(z*100)+'%'; }
+} catch {}
+
+// ── PAGE NIGHT MODE ──
+function applyPageNight(on) {
+  pageNightMode = on;
+  scroller.classList.toggle('page-night', on);
+  pageNightBtn.classList.toggle('active', on);
+  try { localStorage.setItem('readerPageNight', on ? '1' : '0'); } catch {}
+}
+pageNightBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  applyPageNight(!pageNightMode);
+  showToast(pageNightMode ? 'وضع ليلي للصفحات ✓' : 'وضع عادي للصفحات');
 });
+if (localStorage.getItem('readerPageNight') === '1') applyPageNight(true);
+
+window.addEventListener('beforeunload', saveProgress);
 </script>
 
 </body>
