@@ -1030,7 +1030,13 @@ scrollContainer.addEventListener('scroll', () => {
   if (!headerRafId) {
     headerRafId = requestAnimationFrame(() => {
       headerRafId = null;
-      if (!isScrolling) updateHeader(sy);
+      // أثناء تحميل/استعادة سورة، القفزة البرمجية للسكرول لا يجب أن تخفي الهيدر؛
+      // نزامن lastScrollY بدل تشغيل منطق الإخفاء الطبيعي.
+      if (isLoadingSurah) {
+        lastScrollY = sy;
+      } else if (!isScrolling) {
+        updateHeader(sy);
+      }
       scheduleUI();
     });
   }
@@ -1501,6 +1507,10 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
             showToast('استُؤنفت القراءة من حيث توقفت');
+            // نتأكد أن الهيدر ظاهر بعد الاستعادة (القفزة البرمجية لا يجب أن تخفيه)
+            lastScrollY = targetY;
+            headerVisible = true;
+            pageHeader.classList.remove('hidden-header');
           }
           scheduleUI();
           updateBookmarkDot();
