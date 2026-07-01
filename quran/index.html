@@ -1487,6 +1487,14 @@ async function loadSurah(surahNum, isInitialLoad = false) {
         buildAyahPositions();
         const doRestore = () => {
           const saved = restoreProgress(surahNum);
+          const dbg = document.createElement('div');
+          dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;text-align:left;white-space:pre-wrap;max-height:40vh;overflow:auto;';
+          document.body.appendChild(dbg);
+          dbg.textContent = 'isInitialLoad=' + isInitialLoad + '\nsurahNum=' + surahNum +
+            '\nsaved=' + JSON.stringify(saved) +
+            '\nscrollHeight=' + scrollContainer.scrollHeight +
+            '\nclientHeight=' + scrollContainer.clientHeight +
+            '\ngetMaxScroll=' + getMaxScroll();
           if (saved && saved.posY > 0) {
             const targetY = Math.min(saved.posY, getMaxScroll());
             scrollContainer.scrollTop = targetY;
@@ -1494,6 +1502,9 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
             showToast('استُؤنفت القراءة من حيث توقفت');
+            dbg.textContent += '\n>>> set scrollTop=' + targetY + ' actual now=' + scrollContainer.scrollTop;
+          } else {
+            dbg.textContent += '\n>>> NOT restored, condition false';
           }
           scheduleUI();
           updateBookmarkDot();
@@ -1508,6 +1519,9 @@ async function loadSurah(surahNum, isInitialLoad = false) {
           // نعطّل علم التحميل بعد إطار إضافي حتى يكتمل تنفيذ حدث scroll الناتج
           // عن ضبط scrollTop برمجيًا، فلا يُكتب posY:0 فوق القيمة المستعادة.
           requestAnimationFrame(() => { isLoadingSurah = false; });
+          setTimeout(() => {
+            dbg.textContent += '\n[+2s check] scrollTop now=' + scrollContainer.scrollTop + ' scrollHeight=' + scrollContainer.scrollHeight;
+          }, 2000);
         };
         // On initial load, wait longer for fonts/layout to fully settle
         if (isInitialLoad) {
