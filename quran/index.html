@@ -1487,24 +1487,21 @@ async function loadSurah(surahNum, isInitialLoad = false) {
         buildAyahPositions();
         const doRestore = () => {
           const saved = restoreProgress(surahNum);
-          const dbg = document.createElement('div');
-          dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;text-align:left;white-space:pre-wrap;max-height:40vh;overflow:auto;';
-          document.body.appendChild(dbg);
-          dbg.textContent = 'isInitialLoad=' + isInitialLoad + '\nsurahNum=' + surahNum +
-            '\nsaved=' + JSON.stringify(saved) +
-            '\nscrollHeight=' + scrollContainer.scrollHeight +
-            '\nclientHeight=' + scrollContainer.clientHeight +
-            '\ngetMaxScroll=' + getMaxScroll();
           if (saved && saved.posY > 0) {
-            const targetY = Math.min(saved.posY, getMaxScroll());
+            const maxScroll = getMaxScroll();
+            // إذا كان الحد الأقصى الحالي أصغر بكثير من الموضع المحفوظ فهذا يعني
+            // أن المحتوى/الخط لم يكتمل تحميله بعد فعليًا رغم انتظار fonts.ready؛
+            // في هذه الحالة الأفضل الانتظار قليلاً وإعادة المحاولة بدل الرجوع للصفر.
+            if (maxScroll > 0 && maxScroll < saved.posY * 0.5) {
+              setTimeout(doRestore, 150);
+              return;
+            }
+            const targetY = Math.min(saved.posY, maxScroll);
             scrollContainer.scrollTop = targetY;
             scrollAccum = targetY;
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
             showToast('استُؤنفت القراءة من حيث توقفت');
-            dbg.textContent += '\n>>> set scrollTop=' + targetY + ' actual now=' + scrollContainer.scrollTop;
-          } else {
-            dbg.textContent += '\n>>> NOT restored, condition false';
           }
           scheduleUI();
           updateBookmarkDot();
@@ -1519,13 +1516,12 @@ async function loadSurah(surahNum, isInitialLoad = false) {
           // نعطّل علم التحميل بعد إطار إضافي حتى يكتمل تنفيذ حدث scroll الناتج
           // عن ضبط scrollTop برمجيًا، فلا يُكتب posY:0 فوق القيمة المستعادة.
           requestAnimationFrame(() => { isLoadingSurah = false; });
-          setTimeout(() => {
-            dbg.textContent += '\n[+2s check] scrollTop now=' + scrollContainer.scrollTop + ' scrollHeight=' + scrollContainer.scrollHeight;
-          }, 2000);
         };
-        // On initial load, wait longer for fonts/layout to fully settle
+        // ننتظر اكتمال تحميل الخط فعليًا (لا نفترض مدة ثابتة) حتى يكون ارتفاع
+        // النص (scrollHeight) صحيحًا وقت حساب الحد الأقصى للسكرول عند الاستعادة.
+        const fontsPromise = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
         if (isInitialLoad) {
-          setTimeout(doRestore, 300);
+          fontsPromise.then(() => requestAnimationFrame(() => requestAnimationFrame(doRestore)));
         } else {
           doRestore();
         }
