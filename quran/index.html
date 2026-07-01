@@ -1341,17 +1341,22 @@ function stopScroll() {
 }
 
 // ====== JUMP BUTTONS ======
+function jumpTo(targetTop) {
+  // Cancel any pending manual-touch state so it can't interrupt this scroll
+  isTouching = false;
+  isPausedForManual = false;
+  clearTimeout(resumeTimer);
+  stopScroll();
+  scrollContainer.scrollTo({ top: targetTop, behavior: 'smooth' });
+}
+
 jumpTopBtn.addEventListener('click', (e) => {
   e.stopPropagation();
-  stopScroll();
-  scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-
+  jumpTo(0);
 });
 jumpBottomBtn.addEventListener('click', (e) => {
   e.stopPropagation();
-  stopScroll();
-  scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
-
+  jumpTo(scrollContainer.scrollHeight);
 });
 
 // ====== SAVE / RESTORE ======
