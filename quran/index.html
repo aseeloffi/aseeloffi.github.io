@@ -1489,9 +1489,6 @@ async function loadSurah(surahNum, isInitialLoad = false) {
           const saved = restoreProgress(surahNum);
           if (saved && saved.posY > 0) {
             const maxScroll = getMaxScroll();
-            // إذا كان الحد الأقصى الحالي أصغر بكثير من الموضع المحفوظ فهذا يعني
-            // أن المحتوى/الخط لم يكتمل تحميله بعد فعليًا رغم انتظار fonts.ready؛
-            // في هذه الحالة الأفضل الانتظار قليلاً وإعادة المحاولة بدل الرجوع للصفر.
             if (maxScroll > 0 && maxScroll < saved.posY * 0.5) {
               setTimeout(doRestore, 150);
               return;
@@ -1502,6 +1499,20 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
             showToast('استُؤنفت القراءة من حيث توقفت');
+            // === تشخيص مؤقت: صندوق ثابت بأعلى الشاشة يظهر بعد 2.5 ثانية ===
+            setTimeout(() => {
+              const dbg = document.createElement('div');
+              dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;white-space:pre-wrap;';
+              dbg.textContent = 'saved.posY=' + saved.posY + '\nmaxScroll(at restore)=' + maxScroll + '\ntargetY set=' + targetY + '\nscrollTop actual now=' + scrollContainer.scrollTop + '\nscrollHeight now=' + scrollContainer.scrollHeight;
+              document.body.appendChild(dbg);
+            }, 2500);
+          } else {
+            setTimeout(() => {
+              const dbg = document.createElement('div');
+              dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#f55;font-family:monospace;font-size:11px;padding:8px;direction:ltr;white-space:pre-wrap;';
+              dbg.textContent = 'RESTORE CONDITION FAILED\nsaved=' + JSON.stringify(saved);
+              document.body.appendChild(dbg);
+            }, 2500);
           }
           scheduleUI();
           updateBookmarkDot();
