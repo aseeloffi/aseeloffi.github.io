@@ -1331,7 +1331,9 @@ function stopScroll() {
   headerVisible = true;
   pageHeader.classList.remove('hidden-header');
   scheduleUI();
-  saveProgress();
+  // لا تحفظ أثناء تحميل سورة (يمنع الكتابة فوق التقدم المحفوظ بصفر، لأن scrollWhole
+  // تكون صفرًا افتراضيًا عند فتح صفحة جديدة وما زالت لم تُحدَّث بعد من السكرول اليدوي).
+  if (!isLoadingSurah) saveProgress();
 }
 
 // ====== JUMP BUTTONS ======
@@ -1499,20 +1501,6 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
             showToast('استُؤنفت القراءة من حيث توقفت');
-            // === تشخيص مؤقت: صندوق ثابت بأعلى الشاشة يظهر بعد 2.5 ثانية ===
-            setTimeout(() => {
-              const dbg = document.createElement('div');
-              dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;white-space:pre-wrap;';
-              dbg.textContent = 'saved.posY=' + saved.posY + '\nmaxScroll(at restore)=' + maxScroll + '\ntargetY set=' + targetY + '\nscrollTop actual now=' + scrollContainer.scrollTop + '\nscrollHeight now=' + scrollContainer.scrollHeight;
-              document.body.appendChild(dbg);
-            }, 2500);
-          } else {
-            setTimeout(() => {
-              const dbg = document.createElement('div');
-              dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#f55;font-family:monospace;font-size:11px;padding:8px;direction:ltr;white-space:pre-wrap;';
-              dbg.textContent = 'RESTORE CONDITION FAILED\nsaved=' + JSON.stringify(saved);
-              document.body.appendChild(dbg);
-            }, 2500);
           }
           scheduleUI();
           updateBookmarkDot();
