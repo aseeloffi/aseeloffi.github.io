@@ -1484,6 +1484,14 @@ async function loadSurah(surahNum, isInitialLoad = false) {
         buildAyahPositions();
         const doRestore = () => {
           const saved = restoreProgress(surahNum);
+          const dbg2 = document.querySelector('[data-debug-restore]') || (() => {
+            const el = document.createElement('div');
+            el.setAttribute('data-debug-restore', '1');
+            el.style.cssText = 'position:fixed;top:60px;left:0;right:0;z-index:99999;background:#000;color:#ff0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;text-align:left;white-space:pre-wrap;';
+            document.body.appendChild(el);
+            return el;
+          })();
+          dbg2.textContent = 'doRestore() called\nsurahNum=' + surahNum + '\nsaved=' + JSON.stringify(saved) + '\ngetMaxScroll=' + getMaxScroll();
           if (saved && saved.posY > 0) {
             const targetY = Math.min(saved.posY, getMaxScroll());
             scrollContainer.scrollTop = targetY;
@@ -1491,6 +1499,9 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
             showToast('استُؤنفت القراءة من حيث توقفت');
+            dbg2.textContent += '\n>>> RESTORED to ' + targetY;
+          } else {
+            dbg2.textContent += '\n>>> NOT restored (condition failed)';
           }
           scheduleUI();
           updateBookmarkDot();
@@ -1713,14 +1724,22 @@ if ('serviceWorker' in navigator) {
 
 // ====== INIT ======
 window.addEventListener('load', () => {
+  // === تشخيص مؤقت: صندوق ثابت بأعلى الشاشة ===
+  const dbg = document.createElement('div');
+  dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:8px;direction:ltr;text-align:left;white-space:pre-wrap;';
+  document.body.appendChild(dbg);
+  let raw = null;
+  try { raw = localStorage.getItem('quranProgress'); } catch(e) { raw = 'ERROR: ' + e.message; }
+  dbg.textContent = 'LOAD EVENT FIRED\nraw quranProgress = ' + raw + '\ncurrentSurah before = ' + currentSurah;
+
   try {
-    const raw = localStorage.getItem('quranProgress');
-    if (raw) {
+    if (raw && raw !== null) {
       const data = JSON.parse(raw);
       if (data.speed) speedSlider.value = data.speed;
       if (data.surah) currentSurah = data.surah;
     }
   } catch {}
+  dbg.textContent += '\ncurrentSurah after = ' + currentSurah;
   updateSliderUI();
   loadSurah(currentSurah, true);
 });
