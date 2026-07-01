@@ -1342,6 +1342,7 @@ jumpBottomBtn.addEventListener('click', (e) => {
 function saveProgress() {
   const data = { surah: currentSurah, posY: Math.round(scrollContainer.scrollTop), speed: speedSlider.value };
   localStorage.setItem('quranProgress', JSON.stringify(data));
+  window._lastSaveDebug = data; // تشخيص مؤقت
 }
 function restoreProgress(surah) {
   try {
@@ -1683,7 +1684,11 @@ window.addEventListener('beforeunload', saveProgress);
 // لذلك نضيف مستمعين أكثر موثوقية على الجوال + حفظ دوري أثناء القراءة كطبقة أمان إضافية.
 window.addEventListener('pagehide', saveProgress);
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') saveProgress();
+  if (document.visibilityState === 'hidden') {
+    saveProgress();
+    // === تشخيص مؤقت: يكتب بعنوان الصفحة نفسه لأنه أوثق طريقة تظهر حتى لو التطبيق يتقفل فورًا ===
+    document.title = 'حُفظ: سورة ' + currentSurah + ' @ ' + Math.round(scrollContainer.scrollTop) + 'px';
+  }
 });
 setInterval(saveProgress, 5000);
 
@@ -1711,8 +1716,14 @@ window.addEventListener('load', () => {
       const data = JSON.parse(raw);
       if (data.speed) speedSlider.value = data.speed;
       if (data.surah) currentSurah = data.surah;
+      // === تشخيص مؤقت ===
+      setTimeout(() => showToast('🔍 وجدت حفظ: سورة ' + data.surah + ' عند ' + data.posY + 'px'), 1500);
+    } else {
+      setTimeout(() => showToast('🔍 لا يوجد أي حفظ محلي (localStorage فاضي)'), 1500);
     }
-  } catch {}
+  } catch (e) {
+    setTimeout(() => showToast('🔍 خطأ بقراءة الحفظ: ' + e.message), 1500);
+  }
   updateSliderUI();
   loadSurah(currentSurah, true);
 });
