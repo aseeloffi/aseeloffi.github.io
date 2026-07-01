@@ -1506,8 +1506,7 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             scrollAccum = targetY;
             speedSlider.value = saved.speed || 0.8;
             updateSliderUI();
-            showToast('استُؤنفت القراءة من حيث توقفت');
-            // نتأكد أن الهيدر ظاهر بعد الاستعادة (القفزة البرمجية لا يجب أن تخفيه)
+            
             lastScrollY = targetY;
             headerVisible = true;
             pageHeader.classList.remove('hidden-header');
@@ -1522,12 +1521,10 @@ async function loadSurah(surahNum, isInitialLoad = false) {
             loadingScreen.classList.add('hidden');
             scrollPanel.classList.remove('hidden'); // show controls after successful load
           }, 420);
-          // نعطّل علم التحميل بعد إطار إضافي حتى يكتمل تنفيذ حدث scroll الناتج
-          // عن ضبط scrollTop برمجيًا، فلا يُكتب posY:0 فوق القيمة المستعادة.
+
           requestAnimationFrame(() => { isLoadingSurah = false; });
         };
-        // ننتظر اكتمال تحميل الخط فعليًا (لا نفترض مدة ثابتة) حتى يكون ارتفاع
-        // النص (scrollHeight) صحيحًا وقت حساب الحد الأقصى للسكرول عند الاستعادة.
+
         const fontsPromise = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
         if (isInitialLoad) {
           fontsPromise.then(() => requestAnimationFrame(() => requestAnimationFrame(doRestore)));
@@ -1712,8 +1709,6 @@ document.body.addEventListener('click', (e) => {
 
 window.addEventListener('resize', scheduleUI);
 window.addEventListener('beforeunload', saveProgress);
-// الموبايل غالبًا لا يطلق beforeunload عند تصغير التطبيق أو تبديل التطبيقات أو قفل الشاشة،
-// لذلك نضيف مستمعين أكثر موثوقية على الجوال + حفظ دوري أثناء القراءة كطبقة أمان إضافية.
 window.addEventListener('pagehide', saveProgress);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') saveProgress();
