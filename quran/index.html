@@ -1697,6 +1697,8 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
       reg.addEventListener('updatefound', () => showToast('🔄 تحديث متاح، أعد تحميل الصفحة'));
+      // يتأكد بشكل دوري إذا فيه نسخة جديدة من sw.js على السيرفر ويحدّثها فورًا
+      reg.update();
     }).catch(() => {});
   });
 }
