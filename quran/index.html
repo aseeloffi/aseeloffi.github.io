@@ -1341,13 +1341,46 @@ function stopScroll() {
 }
 
 // ====== JUMP BUTTONS ======
+// Use our own rAF-driven animation instead of native `scrollTo({behavior:'smooth'})`.
+// iOS Safari can cancel/freeze native smooth scrolls when other scrollTop/transform
+// writes happen during the animation (e.g. from stopScroll(), our scroll listener,
+// or a stray touch on the container) — a self-driven animation isn't affected by that.
+let jumpRafId = null;
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
 function jumpTo(targetTop) {
-  // Cancel any pending manual-touch state so it can't interrupt this scroll
   isTouching = false;
   isPausedForManual = false;
   clearTimeout(resumeTimer);
   stopScroll();
-  scrollContainer.scrollTo({ top: targetTop, behavior: 'smooth' });
+  if (jumpRafId) { cancelAnimationFrame(jumpRafId); jumpRafId = null; }
+
+  const startTop = scrollContainer.scrollTop;
+  const maxS = getMaxScroll();
+  const clampedTarget = Math.max(0, Math.min(targetTop, maxS));
+  const distance = clampedTarget - startTop;
+  if (Math.abs(distance) < 1) return;
+
+  const duration = 450; // ms
+  let startTime = null;
+
+  function step(timestamp) {
+    if (startTime === null) startTime = timestamp;
+    const elapsed = timestamp - startTime;
+    const t = Math.min(elapsed / duration, 1);
+    const eased = easeOutCubic(t);
+    scrollContainer.scrollTop = startTop + distance * eased;
+    if (t < 1) {
+      jumpRafId = requestAnimationFrame(step);
+    } else {
+      jumpRafId = null;
+      scrollAccum = scrollContainer.scrollTop;
+      scrollWhole = Math.floor(scrollAccum);
+      scheduleUI();
+      saveProgress();
+    }
+  }
+  jumpRafId = requestAnimationFrame(step);
 }
 
 jumpTopBtn.addEventListener('click', (e) => {
@@ -1399,8 +1432,8 @@ function renderBookmarkPanel() {
       `;
       div.addEventListener('click', (e) => {
         if (e.target.classList.contains('bm-item-del')) return;
-        scrollContainer.scrollTo({ top: Math.min(bm.posY, getMaxScroll()), behavior: 'smooth' });
         closeBookmarkPanel();
+        jumpTo(bm.posY);
 
       });
       div.querySelector('.bm-item-del').addEventListener('click', (e) => {
