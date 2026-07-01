@@ -20,14 +20,14 @@
 
   <meta property="og:title" content="القرآن الكريم">
   <meta property="og:description" content="القرآن الكريم مع سكرول تلقائي وحساب مدة القراءة">
-  
+
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="القرآن الكريم">
   <meta name="twitter:description" content="القرآن الكريم مع سكرول تلقائي وحساب مدة القراءة">
-  
+
   <meta name="twitter:image" content="https://aseel.space/quran/og-image.jpg">
   <meta property="og:url" content="https://aseel.space/quran/">
   <meta property="og:image" content="https://aseel.space/quran/og-image.jpg">
@@ -805,9 +805,9 @@
     <div class="header-center">
       <h1 id="surahTitle">سورة البقرة</h1>
       <div class="header-meta">
-        <span id="surahInfo">٢٨٦ آية</span>
+        <span id="surahInfo">286 آية</span>
         <span>·</span>
-        <span class="ayah-indicator" id="ayahIndicator">الآية ١</span>
+        <span class="ayah-indicator" id="ayahIndicator">الآية 1</span>
       </div>
     </div>
     <div class="header-btns">
@@ -1106,7 +1106,7 @@ surahSearch.addEventListener('input', () => buildSurahList(surahSearch.value.tri
 
 // ====== HELPER ======
 function toArabicNum(n) {
-  return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+  return String(n); // أرقام إنجليزية (تم تعطيل تحويلها إلى أرقام عربية)
 }
 
 // ====== AYAH TRACKING ======
@@ -1437,7 +1437,7 @@ async function loadSurah(surahNum, isInitialLoad = false) {
   const meta = SURAHS.find(s => s.n === surahNum);
   surahTitle.textContent = 'سورة ' + (meta ? meta.name : '');
   surahInfo.textContent = meta ? toArabicNum(meta.ayat) + ' آية' : '';
-  ayahIndicator.textContent = 'الآية ١';
+  ayahIndicator.textContent = 'الآية 1';
 
   quranText.textContent = '';
   loadingScreen.classList.remove('hidden');
@@ -1679,6 +1679,13 @@ document.body.addEventListener('click', (e) => {
 
 window.addEventListener('resize', scheduleUI);
 window.addEventListener('beforeunload', saveProgress);
+// الموبايل غالبًا لا يطلق beforeunload عند تصغير التطبيق أو تبديل التطبيقات أو قفل الشاشة،
+// لذلك نضيف مستمعين أكثر موثوقية على الجوال + حفظ دوري أثناء القراءة كطبقة أمان إضافية.
+window.addEventListener('pagehide', saveProgress);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') saveProgress();
+});
+setInterval(saveProgress, 5000);
 
 // ====== OFFLINE ======
 window.addEventListener('online', () => offlineBadge.classList.remove('show'));
