@@ -1,7 +1,5 @@
 // ====== القرآن الكريم - Service Worker ======
-// ملاحظة: كل مرة تسوي تعديل على index.html أو أي ملف مهم، لازم تغيّر رقم النسخة هنا
-// (مثلاً من quran-v1 إلى quran-v2) عشان يجبر المتصفح يمسح الكاش القديم ويحمّل النسخة الجديدة.
-const CACHE_NAME = ‘quran-v2’;
+const CACHE_NAME = ‘quran-v3’;
 
 const PRECACHE = [
 ‘/quran/’,
