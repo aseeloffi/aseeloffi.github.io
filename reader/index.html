@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>قارئ الكتب</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    :root {
+      --bg:          #141414;
+      --bg2:         #0d0d0d;
+      --surface:     #1c1c1c;
+      --surface2:    #252525;
+      --text:        #ddd8ce;
+      --muted:       #666;
+      --gold:        #c8a96e;
+      --gold2:       rgba(200,169,110,0.55);
+      --border:      #2c2c2c;
+      --track:       rgba(255,255,255,0.07);
+      --panel-bg:    rgba(255,255,255,0.045);
+      --panel-border:rgba(255,255,255,0.09);
+      --sidebar-bg:  #0e0e0e;
+      --sidebar-hover: rgba(255,255,255,0.05);
+      --sidebar-active: rgba(200,169,110,0.12);
+      --page-shadow: 0 4px 40px rgba(0,0,0,0.7);
+    }
+    body.light {
+      --bg:          #f0ebe3;
+      --bg2:         #e8e2d9;
+      --surface:     #faf7f2;
+      --surface2:    #ede8df;
+      --text:        #1a1710;
+      --muted:       #8a8070;
+      --gold:        #8a5c28;
+      --gold2:       rgba(138,92,40,0.45);
+      --border:      #d5cfc5;
+      --track:       rgba(0,0,0,0.08);
+      --panel-bg:    rgba(0,0,0,0.04);
+      --panel-border:rgba(0,0,0,0.1);
+      --sidebar-bg:  #ede8df;
+      --sidebar-hover: rgba(0,0,0,0.04);
+      --sidebar-active: rgba(138,92,40,0.1);
+      --page-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%; width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      overflow: hidden;
+      transition: background 0.3s, color 0.3s;
+      touch-action: manipulation;
+    }
+
+    /* ── UPLOAD ── */
+    #uploadScreen {
+      position: fixed; inset: 0;
+      display: grid;
+      grid-template-rows: 1fr auto 1fr;
+      grid-template-columns: 1fr;
+      z-index: 500;
+      background: var(--bg);
+      transition: opacity 0.4s;
+      overflow: hidden;
+    }
+    #uploadScreen.hidden { opacity: 0; pointer-events: none; }
+
+    /* decorative background glow */
+    #uploadScreen::before {
+      content: '';
+      position: absolute;
+      top: -20%; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(200,169,110,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body.light #uploadScreen::before {
+      background: radial-gradient(ellipse, rgba(138,92,40,0.06) 0%, transparent 70%);
+    }
+
+    /* top section: logo + title */
+    .upload-top {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 32px; gap: 14px;
+    }
+
+    .upload-logo-wrap {
+      width: 80px; height: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+      font-size: 2.4rem;
+    }
+    body.light .upload-logo-wrap {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .upload-title {
+      font-size: 1.9rem; font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+    }
+    .upload-sub {
+      font-size: 0.88rem; color: var(--muted);
+      text-align: center; max-width: 260px;
+      line-height: 1.7;
+    }
+
+    /* middle section: drop zone */
+    .upload-mid {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      padding: 0 20px;
+    }
+
+    .drop-zone {
+      width: 100%; max-width: 420px;
+      border: 1.5px dashed var(--border);
+      border-radius: 20px;
+      padding: 40px 28px;
+      text-align: center; cursor: pointer;
+      transition: border-color 0.25s, background 0.25s, transform 0.2s;
+      position: relative;
+      background: var(--surface);
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--gold);
+      background: rgba(200,169,110,0.05);
+      transform: translateY(-2px);
+    }
+    body.light .drop-zone:hover, body.light .drop-zone.dragover {
+      background: rgba(138,92,40,0.04);
+    }
+    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    .drop-icon-wrap {
+      width: 56px; height: 56px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin: 0 auto 16px;
+    }
+
+    .drop-text { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+    .drop-text span { color: var(--gold); font-weight: 600; }
+    .drop-formats {
+      margin-top: 10px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 0.72rem; color: var(--muted);
+    }
+
+    /* bottom section: recent books */
+    .upload-bottom {
+      padding-top: 28px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 12px;
+      overflow: hidden;
+    }
+
+    .recent-label {
+      font-size: 0.7rem; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    #recentList {
+      display: flex; flex-direction: column; gap: 8px;
+      width: 100%; max-width: 420px;
+      padding: 0 20px;
+      max-height: calc(100% - 60px); overflow-y: auto;
+    }
+
+    .recent-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      font-size: 0.84rem; color: var(--text);
+    }
+    .recent-item:hover {
+      background: var(--surface2);
+      border-color: var(--gold);
+      transform: translateX(-2px);
+    }
+    .recent-item-icon {
+      width: 32px; height: 32px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .recent-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .recent-item-pg {
+      font-size: 0.7rem; color: var(--muted); flex-shrink: 0;
+      background: var(--surface2); padding: 2px 8px;
+      border-radius: 10px; border: 1px solid var(--border);
+    }
+
+    /* ── LOADING ── */
+    #loadingScreen {
+      position: fixed; inset: 0; z-index: 400;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #loadingScreen.show { opacity: 1; pointer-events: all; }
+    .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loadingText { font-size: 0.86rem; color: var(--muted); }
+    #loadingProgress { width: 200px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    #loadingBar { height: 100%; width: 0%; background: var(--gold); border-radius: 2px; transition: width 0.12s; }
+
+    /* ── READER ── */
+    #readerScreen {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    #readerScreen.show { opacity: 1; pointer-events: all; }
+
+    /* Header */
+    #pageHeader {
+      position: relative; z-index: 100;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 11px 14px;
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      will-change: transform;
+    }
+    #pageHeader.hidden-header { transform: translateY(-100%); }
+
+    .hbtn {
+      background: var(--track);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 34px; height: 34px; border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.88rem;
+      transition: background 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .hbtn:hover { background: var(--sidebar-hover); color: var(--text); }
+    .hbtn.active { background: var(--sidebar-active); color: var(--gold); border-color: var(--gold2); }
+
+    #headerCenter { flex: 1; text-align: center; min-width: 0; }
+    #bookTitle {
+      font-size: 0.92rem; font-weight: 600; color: var(--gold);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #headerMeta { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 2px; }
+    #headerMeta span { font-size: 0.68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    #pageIndicator { color: var(--gold) !important; font-weight: 600; }
+
+    /* Viewport */
+    #viewport { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; }
+
+    #scrollContainer {
+      position: absolute; inset: 0;
+      overflow-y: scroll; overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: auto;
+      overscroll-behavior: contain;
+      will-change: scroll-position;
+    }
+    #scrollContainer::-webkit-scrollbar { width: 0; }
+
+    /* The inner scroller — translateY sub-pixel trick lives here */
+    #scroller {
+      contain: layout style;
+      min-height: 100%;
+      transform: translateZ(0);
+      will-change: transform;
+      display: flex; flex-direction: column;
+      align-items: center;
+      padding: 16px 8px 240px;
+      gap: 14px;
+    }
+
+    .page-slot {
+      flex-shrink: 0; position: relative;
+      background: var(--surface); border-radius: 3px;
+      overflow: hidden; box-shadow: var(--page-shadow);
+    }
+    .page-slot canvas { display: block; }
+    .page-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      color: var(--border); font-size: 0.72rem;
+    }
+
+    /* ── SCROLL PANEL ── */
+    #scrollPanel {
+      position: fixed; bottom: 16px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 12px 16px 11px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 9px;
+      z-index: 1000;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.15);
+      width: 92%; max-width: 360px;
+      transition: opacity 0.3s, transform 0.3s;
+      contain: layout style;
+    }
+    body.light #scrollPanel {
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+    }
+    #scrollPanel.hidden {
+      opacity: 0; pointer-events: none;
+      transform: translateX(-50%) translateY(16px);
+    }
+
+    /* ── PROGRESS SECTION ── */
+    .progress-section { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+
+    .progress-labels {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .progress-label {
+      font-size: 0.7rem; color: var(--muted);
+      letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .progress-label svg { opacity: 0.7; }
+    .progress-pct {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--gold); font-variant-numeric: tabular-nums;
+    }
+    .time-remaining {
+      font-size: 0.7rem; color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* page counter chip */
+    .panel-page-info {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 3px 9px;
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      align-self: center;
+    }
+    .panel-page-info svg { opacity: 0.6; }
+
+    /* seek bar */
+    .seek-bar {
+      -webkit-appearance: none; width: 100%; height: 5px;
+      border-radius: 6px; outline: none; cursor: pointer;
+      background: var(--track);
+    }
+    .seek-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--gold);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .seek-bar:active::-webkit-slider-thumb {
+      transform: scale(1.2);
+      box-shadow: 0 3px 16px rgba(0,0,0,0.4);
+    }
+
+    /* ── DIVIDER ── */
+    .panel-divider {
+      width: calc(100% + 32px); margin: 0 -16px;
+      height: 1px; background: var(--border);
+    }
+
+    /* Panel-scoped variables — kept for buttons */
+    #scrollPanel {
+      --p-btn-bg:     var(--surface2);
+      --p-btn-border: var(--border);
+      --p-btn-color:  var(--text);
+      --p-divider:    var(--border);
+    }
+
+    /* ── MAIN CONTROLS ── */
+    .main-controls {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      gap: 8px; width: 100%;
+    }
+
+    /* jump buttons — bigger, pill shaped */
+    .jump-btn {
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      height: 34px; padding: 0 12px;
+      border-radius: 17px; cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.75rem; font-family: 'Tajawal', sans-serif;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .jump-btn:hover {
+      background: var(--sidebar-active);
+      color: var(--gold); border-color: var(--gold2);
+    }
+    .jump-btn:active { transform: scale(0.95); }
+
+    /* speed step buttons */
+    .step-btn {
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      width: 34px; height: 34px; border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-family: system-ui, sans-serif; font-weight: 300;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .step-btn:hover {
+      background: var(--sidebar-active);
+      color: var(--gold); border-color: var(--gold2);
+    }
+    .step-btn:active { transform: scale(0.9); }
+    .step-btn:disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+
+    /* play/pause — main CTA button */
+    .scroll-btn {
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      width: 52px; height: 52px; border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .scroll-btn::after {
+      content: '';
+      position: absolute; inset: -4px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      transition: border-color 0.3s, inset 0.3s;
+    }
+    .scroll-btn.active::after {
+      border-color: var(--gold2);
+      inset: -6px;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { inset: -4px; border-color: var(--gold2); }
+      100% { inset: -14px; border-color: transparent; }
+    }
+    .scroll-btn:active { transform: scale(0.9); }
+    .scroll-btn.active { background: var(--surface2); color: var(--gold); }
+
+    .play-icon, .pause-icon {
+      pointer-events: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pause-icon { display: none; }
+    .scroll-btn.active .play-icon  { display: none; }
+    .scroll-btn.active .pause-icon { display: flex; }
+
+    /* ── SPEED SECTION ── */
+    .speed-section {
+      width: 100%;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 12px;
+    }
+    .speed-label {
+      font-size: 0.7rem; color: var(--muted);
+      flex-shrink: 0; letter-spacing: 0.03em;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    .speed-slider {
+      -webkit-appearance: none; flex: 1; height: 4px;
+      border-radius: 4px; outline: none; cursor: pointer;
+      background: var(--track);
+    }
+    .speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--gold);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+      transition: transform 0.15s;
+    }
+    .speed-slider:active::-webkit-slider-thumb { transform: scale(1.3); }
+
+    .speed-badge {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      min-width: 36px; text-align: center;
+      flex-shrink: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 2px 6px;
+    }
+
+    /* ── ZOOM ROW ── */
+    .zoom-row {
+      display: flex; align-items: center; gap: 8px; width: 100%;
+      justify-content: center;
+    }
+    .zoom-btn {
+      background: var(--p-btn-bg);
+      border: 1px solid var(--p-btn-border);
+      color: var(--p-btn-color);
+      width: 30px; height: 30px; border-radius: 8px;
+      cursor: pointer; font-size: 1rem; font-family: system-ui;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .zoom-btn:hover { background: var(--sidebar-active); color: var(--gold); border-color: var(--gold2); }
+    .zoom-btn:active { transform: scale(0.9); }
+    .zoom-label {
+      font-size: 0.72rem; color: var(--muted);
+      display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+    }
+    .zoom-badge {
+      font-size: 0.75rem; font-weight: 700; color: var(--gold);
+      min-width: 38px; text-align: center;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 2px 5px;
+      font-variant-numeric: tabular-nums;
+    }
+    /* page night mode filter */
+    #scroller.page-night .page-slot canvas {
+      filter: invert(1) hue-rotate(180deg) sepia(0.25) brightness(0.9);
+    }
+
+    /* ── THUMBNAILS SIDEBAR ── */
+    #thumbSidebar {
+      position: fixed; top: 0; right: 0;
+      width: 120px; height: 100%;
+      background: var(--sidebar-bg); border-left: 1px solid var(--border);
+      z-index: 300; transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      overflow-y: auto; padding: 8px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #thumbSidebar.open { transform: translateX(0); }
+    #thumbSidebar::-webkit-scrollbar { width: 3px; }
+    #thumbSidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .thumb-item {
+      cursor: pointer; border: 2px solid transparent;
+      border-radius: 5px; overflow: hidden;
+      transition: border-color 0.15s; position: relative; flex-shrink: 0;
+    }
+    .thumb-item:hover { border-color: var(--gold); }
+    .thumb-item.active { border-color: var(--gold); }
+    .thumb-item canvas { width: 100% !important; height: auto !important; display: block; }
+    .thumb-pg {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.6); color: #fff;
+      font-size: 0.62rem; text-align: center; padding: 2px;
+      font-family: system-ui, sans-serif;
+    }
+    .thumb-ph { width: 100%; aspect-ratio: 0.707; background: var(--surface); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.65rem; font-family: system-ui, sans-serif; }
+
+    #thumbOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 299; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    #thumbOverlay.show { opacity: 1; pointer-events: all; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 100px; left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 7px 18px;
+      border-radius: 20px; font-size: 0.8rem;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none; white-space: nowrap; z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── OFFLINE ── */
+    #offlineBadge {
+      position: fixed; top: 60px; left: 50%;
+      transform: translateX(-50%);
+      background: #c0392b; color: #fff;
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 0.75rem; z-index: 900;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    #offlineBadge.show { opacity: 1; }
+  </style>
+
+</head>
+<body>
+
+<!-- UPLOAD -->
+
+<div id="uploadScreen">
+
+  <!-- Top: logo + title -->
+
+  <div class="upload-top">
+    <div class="upload-logo-wrap">📖</div>
+    <div class="upload-title">قارئ الكتب</div>
+    <div class="upload-sub">افتح أي كتاب PDF واقرأه بتمرير تلقائي سلس</div>
+  </div>
+
+  <!-- Middle: drop zone -->
+
+  <div class="upload-mid">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" accept=".pdf" id="fileInput">
+      <div class="drop-icon-wrap">📂</div>
+      <div class="drop-text">
+        اسحب ملف PDF هنا<br>أو <span>اضغط للاختيار من جهازك</span>
+      </div>
+      <div class="drop-formats">
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        PDF فقط
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: recent books -->
+
+  <div class="upload-bottom" id="recentSection" style="display:none;">
+    <div class="recent-label">آخر الكتب</div>
+    <div id="recentList"></div>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+
+<div id="loadingScreen">
+  <div class="spinner"></div>
+  <div id="loadingText">جاري تحميل الكتاب…</div>
+  <div id="loadingProgress"><div id="loadingBar"></div></div>
+</div>
+
+<!-- READER -->
+
+<div id="readerScreen">
+
+  <!-- Header -->
+
+  <div id="pageHeader">
+    <button class="hbtn" id="closeBtn" title="إغلاق">✕</button>
+    <div id="headerCenter">
+      <div id="bookTitle">—</div>
+      <div id="headerMeta">
+        <span id="pageIndicator">ص 1</span>
+        <span>·</span>
+        <span id="pctIndicator">0%</span>
+      </div>
+    </div>
+    <button class="hbtn" id="themeBtn" title="الوضع">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <button class="hbtn" id="pageNightBtn" title="وضع ليلي للصفحات">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+    <button class="hbtn" id="thumbBtn" title="الصفحات">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Scroll area -->
+
+  <div id="viewport">
+    <div id="scrollContainer">
+      <div id="scroller"></div>
+    </div>
+  </div>
+
+  <!-- Control panel -->
+
+  <div id="scrollPanel" class="hidden">
+
+<!-- Page info + Progress row -->
+
+<div class="progress-section">
+  <div class="progress-labels">
+    <span class="progress-label">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      التقدم
+    </span>
+    <span class="panel-page-info" id="panelPageInfo">
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+      ص 1 / —
+    </span>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+  <input type="range" class="seek-bar" id="seekBar" min="0" max="1000" value="0">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <span class="progress-label">بداية</span>
+    <span class="time-remaining" id="timeRemaining">
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      —
+    </span>
+    <span class="progress-label">نهاية</span>
+  </div>
+</div>
+
+<div class="panel-divider"></div>
+
+<!-- Main controls -->
+
+<div class="main-controls">
+
+  <button class="jump-btn" id="jumpTopBtn">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+    الأعلى
+  </button>
+
+  <button class="step-btn" id="minusBtn" title="أبطأ">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="4" y="11" width="16" height="2" rx="1"/></svg>
+  </button>
+
+  <button class="scroll-btn" id="scrollBtn">
+    <span class="play-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+    </span>
+    <span class="pause-icon">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="5" y="4" width="5" height="16" rx="1"/><rect x="14" y="4" width="5" height="16" rx="1"/></svg>
+    </span>
+  </button>
+
+  <button class="step-btn" id="plusBtn" title="أسرع">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 4a1 1 0 011 1v6h6a1 1 0 010 2h-6v6a1 1 0 01-2 0v-6H5a1 1 0 010-2h6V5a1 1 0 011-1z"/></svg>
+  </button>
+
+  <button class="jump-btn" id="jumpBottomBtn">
+    النهاية
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+
+</div>
+
+<div class="panel-divider"></div>
+
+<!-- Speed row -->
+
+<div class="speed-section">
+  <span class="speed-label">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    السرعة
+  </span>
+  <input type="range" class="speed-slider" id="speedSlider" min="0.05" max="3" step="0.05" value="0.3">
+  <span class="speed-badge" id="speedBadge">×0.3</span>
+</div>
+
+<div class="panel-divider"></div>
+
+<!-- Zoom row -->
+
+<div class="zoom-row">
+  <span class="zoom-label">
+    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    الحجم
+  </span>
+  <button class="zoom-btn" id="zoomOutBtn">−</button>
+  <span class="zoom-badge" id="zoomBadge">100%</span>
+  <button class="zoom-btn" id="zoomInBtn">+</button>
+  <button class="zoom-btn" id="zoomResetBtn" title="إعادة تعيين" style="font-size:0.65rem;width:auto;padding:0 7px;">تعيين</button>
+</div>
+
+  </div>
+
+</div>
+
+<!-- THUMBNAILS -->
+
+<div id="thumbOverlay"></div>
+<div id="thumbSidebar"></div>
+
+<!-- TOAST + OFFLINE -->
+
+<div id="toast"></div>
+<div id="offlineBadge">لا يوجد اتصال بالإنترنت</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ── CONFIG ──
+const RENDER_WINDOW = 2;
+const UNLOAD_WINDOW = 7;
+const THUMB_SCALE   = 0.18;
+const BASE_SPEED    = 30;   // px/s at ×1.0
+const MAX_CSS_W     = 860;
+
+// ── STATE ──
+let pdfDoc = null, totalPages = 0, bookName = '';
+let pageSlots = [], pageSizes = [], pageRendered = [], thumbItems = [];
+let currentPage = 1;
+let zoomLevel = 1.0;
+let pageNightMode = false;
+
+// scroll engine
+let isScrolling = false, rafId = null, lastTime = null;
+let scrollAccum = 0, scrollWhole = 0;
+let isPausedForManual = false, isTouching = false, resumeTimer = null;
+let isSeeking = false;
+
+// UI dirty flag (like quran site)
+let uiDirty = false, uiRafId = null;
+
+// ── ELEMENTS ──
+const uploadScreen    = document.getElementById('uploadScreen');
+const loadingScreen   = document.getElementById('loadingScreen');
+const readerScreen    = document.getElementById('readerScreen');
+const loadingBar      = document.getElementById('loadingBar');
+const loadingText     = document.getElementById('loadingText');
+const pageHeader      = document.getElementById('pageHeader');
+const bookTitle       = document.getElementById('bookTitle');
+const pageIndicator   = document.getElementById('pageIndicator');
+const pctIndicator    = document.getElementById('pctIndicator');
+const viewport        = document.getElementById('viewport');
+const scrollContainer = document.getElementById('scrollContainer');
+const scroller        = document.getElementById('scroller');
+const scrollPanel     = document.getElementById('scrollPanel');
+const scrollBtn       = document.getElementById('scrollBtn');
+const speedSlider     = document.getElementById('speedSlider');
+const speedBadge      = document.getElementById('speedBadge');
+const seekBar         = document.getElementById('seekBar');
+const minusBtn        = document.getElementById('minusBtn');
+const plusBtn         = document.getElementById('plusBtn');
+const jumpTopBtn      = document.getElementById('jumpTopBtn');
+const jumpBottomBtn   = document.getElementById('jumpBottomBtn');
+const progressPct     = document.getElementById('progressPct');
+const timeRemaining   = document.getElementById('timeRemaining');
+const closeBtn        = document.getElementById('closeBtn');
+const themeBtn        = document.getElementById('themeBtn');
+const thumbBtn        = document.getElementById('thumbBtn');
+const thumbSidebar    = document.getElementById('thumbSidebar');
+const thumbOverlay    = document.getElementById('thumbOverlay');
+const dropZone        = document.getElementById('dropZone');
+const fileInput       = document.getElementById('fileInput');
+const toast           = document.getElementById('toast');
+const offlineBadge    = document.getElementById('offlineBadge');
+const zoomInBtn       = document.getElementById('zoomInBtn');
+const zoomOutBtn      = document.getElementById('zoomOutBtn');
+const zoomResetBtn    = document.getElementById('zoomResetBtn');
+const zoomBadge       = document.getElementById('zoomBadge');
+const pageNightBtn    = document.getElementById('pageNightBtn');
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg, dur=1800) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), dur);
+}
+
+// ── THEME ──
+function applyTheme(light) {
+  document.body.classList.toggle('light', light);
+  localStorage.setItem('readerTheme', light ? 'light' : 'dark');
+}
+themeBtn.addEventListener('click', e => { e.stopPropagation(); applyTheme(!document.body.classList.contains('light')); });
+if (localStorage.getItem('readerTheme') === 'light') applyTheme(true);
+
+// ── RECENT ──
+function getRecent() { try { return JSON.parse(localStorage.getItem('readerRecent') || '[]'); } catch { return []; } }
+function saveRecent(name, page) {
+  let list = getRecent().filter(r => r.name !== name);
+  list.unshift({ name, page }); list = list.slice(0, 5);
+  localStorage.setItem('readerRecent', JSON.stringify(list));
+}
+function updateRecentPage(name, page) {
+  let list = getRecent(); const i = list.findIndex(r => r.name === name);
+  if (i >= 0) { list[i].page = page; localStorage.setItem('readerRecent', JSON.stringify(list)); }
+}
+function renderRecentList() {
+  const list = getRecent();
+  const sec = document.getElementById('recentSection');
+  const ul  = document.getElementById('recentList');
+  ul.innerHTML = '';
+  if (!list.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'flex';
+  list.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'recent-item';
+    el.innerHTML = `<div class="recent-item-icon">📄</div><span class="recent-item-name">${r.name}</span><span class="recent-item-pg">▶ ص ${r.page}</span>`;
+    el.title = `استمر من صفحة ${r.page}`;
+    el.addEventListener('click', () => {
+      showToast(`اختر الملف للاستمرار من ص ${r.page}`);
+      fileInput.click();
+    });
+    ul.appendChild(el);
+  });
+}
+renderRecentList();
+
+// ── FILE INPUT ──
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') loadPDF(file);
+  else showToast('يرجى اختيار ملف PDF فقط');
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadPDF(fileInput.files[0]); });
+
+// ── LOAD PDF ──
+async function loadPDF(file) {
+  // احفظ تقدم الكتاب الحالي قبل التبديل لكتاب جديد
+  saveProgress();
+
+  bookName = file.name.replace(/\.pdf$/i, '');
+  bookTitle.textContent = bookName;
+
+  uploadScreen.classList.add('hidden');
+  loadingScreen.classList.add('show');
+  loadingBar.style.width = '0%';
+  loadingText.textContent = 'جاري تحميل الكتاب…';
+
+  const buf = await file.arrayBuffer();
+  const task = pdfjsLib.getDocument({ data: buf });
+  task.onProgress = p => { if (p.total) loadingBar.style.width = Math.round((p.loaded/p.total)*40)+'%'; };
+
+  pdfDoc = await task.promise;
+  totalPages = pdfDoc.numPages;
+  pageSlots = []; pageSizes = []; pageRendered = []; thumbItems = [];
+  scroller.innerHTML = ''; thumbSidebar.innerHTML = '';
+
+  loadingText.textContent = 'جاري قياس الصفحات…';
+  const containerW = Math.min(scrollContainer.clientWidth - 16, MAX_CSS_W);
+
+  for (let i = 1; i <= totalPages; i++) {
+    loadingBar.style.width = (40 + Math.round((i/totalPages)*45)) + '%';
+    const pg  = await pdfDoc.getPage(i);
+    const vp  = pg.getViewport({ scale: 1 });
+    const scl = containerW / vp.width;
+    const cssW = Math.round(vp.width  * scl);
+    const cssH = Math.round(vp.height * scl);
+    pageSizes.push({ w: cssW, h: cssH, scale: scl });
+
+    const slot = document.createElement('div');
+    slot.className = 'page-slot page-placeholder';
+    slot.dataset.page = i;
+    slot.style.width  = cssW + 'px';
+    slot.style.height = cssH + 'px';
+    scroller.appendChild(slot);
+    pageSlots.push(slot);
+    pageRendered.push(false);
+
+    // Thumb placeholder
+    const tw = document.createElement('div');
+    tw.className = 'thumb-item';
+    tw.dataset.page = i;
+    const tph = document.createElement('div');
+    tph.className = 'thumb-ph'; tph.textContent = i;
+    tw.appendChild(tph);
+    tw.addEventListener('click', () => { scrollToPage(i, true); closeThumbs(); });
+    thumbSidebar.appendChild(tw);
+    thumbItems.push(tw);
+  }
+
+  loadingBar.style.width = '95%';
+
+  // Restore saved progress
+  let startPage = 1, savedScrollTop = null;
+  try {
+    const saved = JSON.parse(localStorage.getItem('readerProgress_'+bookName));
+    if (saved && saved.page) {
+      startPage = Math.min(saved.page, totalPages);
+      if (saved.speed) speedSlider.value = saved.speed;
+      if (saved.scrollTop != null) savedScrollTop = saved.scrollTop;
+      // استعادة الزوم المحفوظ للكتاب إن وجد
+      if (saved.zoom && saved.zoom >= ZOOM_MIN && saved.zoom <= ZOOM_MAX) {
+        zoomLevel = saved.zoom;
+        zoomBadge.textContent = Math.round(zoomLevel * 100) + '%';
+      }
+    }
+  } catch {}
+
+  saveRecent(bookName, startPage);
+  updateSpeedSliderUI();
+
+  setTimeout(() => {
+    loadingScreen.classList.remove('show');
+    readerScreen.classList.add('show');
+    scrollPanel.classList.remove('hidden');
+
+    // Apply saved zoom to freshly-built slots
+    applyZoom(false);
+
+    if (savedScrollTop != null && savedScrollTop > 0) {
+      // تحقق أن الـ scrollTop المحفوظ منطقي (لم تتغير أبعاد الصفحة كثيراً)
+      const maxPossible = scrollContainer.scrollHeight;
+      if (savedScrollTop <= maxPossible) {
+        scrollContainer.scrollTop = savedScrollTop;
+        scrollAccum = savedScrollTop;
+        scrollWhole = Math.floor(savedScrollTop);
+      } else {
+        // fallback: انتقل إلى رقم الصفحة مباشرةً
+        scrollToPage(startPage, false);
+        scrollAccum = scrollContainer.scrollTop;
+        scrollWhole = Math.floor(scrollAccum);
+      }
+    } else {
+      scrollToPage(startPage, false);
+      scrollAccum = scrollContainer.scrollTop;
+      scrollWhole = Math.floor(scrollAccum);
+    }
+
+    lazyRender();
+    scheduleUI();
+
+    if (startPage > 1) showToast('استُؤنفت القراءة من ص ' + startPage);
+  }, 250);
+}
+
+// ── LAZY RENDER ──
+let lazyTimer = null;
+function scheduleLazy() { clearTimeout(lazyTimer); lazyTimer = setTimeout(lazyRender, 100); }
+
+async function lazyRender() {
+  if (!pdfDoc) return;
+  const start = Math.max(1, currentPage - RENDER_WINDOW);
+  const end   = Math.min(totalPages, currentPage + RENDER_WINDOW);
+  for (let i = start; i <= end; i++) {
+    if (!pageRendered[i-1]) await renderPageIntoSlot(i);
+  }
+  // unload far pages
+  for (let i = 1; i <= totalPages; i++) {
+    if (pageRendered[i-1] && Math.abs(i - currentPage) > UNLOAD_WINDOW) unloadPage(i);
+  }
+}
+
+async function renderPageIntoSlot(num) {
+  if (!pdfDoc || pageRendered[num-1]) return;
+  pageRendered[num-1] = true;
+  const slot = pageSlots[num-1];
+  const size = pageSizes[num-1];
+  const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+  const pg   = await pdfDoc.getPage(num);
+  const vp   = pg.getViewport({ scale: size.scale * dpr });
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = vp.width; canvas.height = vp.height;
+  canvas.style.width  = size.w + 'px';
+  canvas.style.height = size.h + 'px';
+
+  try {
+    await pg.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+  } catch {
+    pageRendered[num-1] = false; return;
+  }
+
+  slot.classList.remove('page-placeholder');
+  slot.innerHTML = ''; slot.appendChild(canvas);
+
+  // Apply current zoom to this newly rendered slot
+  if (zoomLevel !== 1) {
+    const w = Math.round(pageSizes[num-1].w * zoomLevel);
+    const h = Math.round(pageSizes[num-1].h * zoomLevel);
+    slot.style.width  = w + 'px';
+    slot.style.height = h + 'px';
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+  }
+
+  // Thumb
+  const tw = thumbItems[num-1];
+  if (tw && tw.querySelector('.thumb-ph')) {
+    const tvp = pg.getViewport({ scale: THUMB_SCALE });
+    const tc  = document.createElement('canvas');
+    tc.width = tvp.width; tc.height = tvp.height;
+    try {
+      await pg.render({ canvasContext: tc.getContext('2d'), viewport: tvp }).promise;
+      const tpg = document.createElement('div');
+      tpg.className = 'thumb-pg'; tpg.textContent = num;
+      tw.innerHTML = ''; tw.appendChild(tc); tw.appendChild(tpg);
+    } catch {}
+  }
+}
+
+function unloadPage(num) {
+  if (!pageRendered[num-1]) return;
+  const slot = pageSlots[num-1], size = pageSizes[num-1];
+  slot.innerHTML = '';
+  slot.classList.add('page-placeholder');
+  // احتفظ بالحجم مع الزوم الحالي لضمان عدم تغيير الـ scrollTop
+  const w = Math.round(size.w * zoomLevel);
+  const h = Math.round(size.h * zoomLevel);
+  slot.style.width = w+'px'; slot.style.height = h+'px';
+  pageRendered[num-1] = false;
+}
+
+function scrollToPage(num, animated) {
+  const slot = pageSlots[num-1];
+  if (!slot) return;
+  const top = slot.offsetTop - 16;
+  if (animated) scrollContainer.scrollTo({ top, behavior: 'smooth' });
+  else scrollContainer.scrollTop = top;
+  scrollAccum = scrollContainer.scrollTop;
+  scrollWhole = Math.floor(scrollAccum);
+}
+
+// ── MAX SCROLL ──
+function getMaxScroll() { return Math.max(0, scrollContainer.scrollHeight - scrollContainer.clientHeight); }
+
+// ── UI FLUSH (dirty-flag RAF pattern like quran site) ──
+function scheduleUI() { if (!uiDirty) { uiDirty = true; uiRafId = requestAnimationFrame(flushUI); } }
+
+function flushUI() {
+  uiRafId = null; uiDirty = false;
+  const scrollY = scrollContainer.scrollTop;
+  const maxS    = getMaxScroll();
+  const pct     = maxS > 0 ? scrollY / maxS : 0;
+  const pctNum  = Math.round(pct * 100);
+
+  // Page detection
+  const mid = scrollY + scrollContainer.clientHeight * 0.4;
+  let best = 1, bestDist = Infinity;
+  pageSlots.forEach((s, i) => {
+    const d = Math.abs((s.offsetTop + s.offsetHeight * 0.5) - mid);
+    if (d < bestDist) { bestDist = d; best = i+1; }
+  });
+  if (best !== currentPage) {
+    currentPage = best;
+    thumbItems.forEach((t,i) => t.classList.toggle('active', i+1 === currentPage));
+    saveProgress();
+    scheduleLazy();
+  }
+
+  pageIndicator.textContent = `ص ${currentPage} / ${totalPages}`;
+  pctIndicator.textContent  = pctNum + '%';
+  progressPct.textContent   = pctNum + '%';
+  const panelPageInfo = document.getElementById('panelPageInfo');
+  if (panelPageInfo) panelPageInfo.innerHTML = `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg> ص ${currentPage} / ${totalPages}`;
+
+  if (!isSeeking) {
+    seekBar.value = Math.round(pct * 1000);
+    seekBar.style.background = `linear-gradient(to left, var(--gold2) ${pctNum}%, var(--track) ${pctNum}%)`;
+  }
+
+  // Time remaining
+  const remaining = maxS - scrollY;
+  if (remaining <= 2) { timeRemaining.textContent = 'تمت القراءة ✓'; return; }
+  const speed = parseFloat(speedSlider.value);
+  const secs  = remaining / (speed * BASE_SPEED);
+  const m = Math.floor(secs / 60), s = Math.floor(secs % 60);
+  timeRemaining.textContent = `متبقي ${m}:${s<10?'0'+s:s} د`;
+
+  updateSpeedBtnStates();
+}
+
+// ── SCROLL ENGINE — sub-pixel with translateY (same as quran site) ──
+function tick(timestamp) {
+  if (!isScrolling) return;
+  if (lastTime === null) { lastTime = timestamp; rafId = requestAnimationFrame(tick); return; }
+
+  const delta = Math.min(timestamp - lastTime, 50);
+  lastTime = timestamp;
+
+  const speed = parseFloat(speedSlider.value);
+  const dy    = (speed * BASE_SPEED * delta) / 1000;
+  const maxS  = getMaxScroll();
+
+  scrollAccum = Math.min(scrollAccum + dy, maxS);
+
+  const newWhole = Math.floor(scrollAccum);
+  const frac     = scrollAccum - newWhole;
+
+  if (newWhole !== scrollWhole) {
+    scrollWhole = newWhole;
+    scrollContainer.scrollTop = scrollWhole;
+  }
+
+  // Sub-pixel fractional offset → no jitter
+  scroller.style.transform = frac > 0.001
+    ? `translateY(-${frac.toFixed(3)}px) translateZ(0)`
+    : 'translateZ(0)';
+
+  scheduleUI();
+
+  if (scrollAccum >= maxS) {
+    scroller.style.transform = 'translateZ(0)';
+    stopScroll();
+    showToast('انتهى الكتاب 📖');
+    return;
+  }
+  rafId = requestAnimationFrame(tick);
+}
+
+function startScroll() {
+  if (isScrolling) return;
+  isScrolling = true; isPausedForManual = false; lastTime = null;
+  scrollAccum = scrollContainer.scrollTop; scrollWhole = Math.floor(scrollAccum);
+  scrollBtn.classList.add('active');
+  pageHeader.classList.add('hidden-header');
+  rafId = requestAnimationFrame(tick);
+  showToast('السكرول شغّال');
+}
+
+function stopScroll() {
+  isScrolling = false; isPausedForManual = false; isTouching = false;
+  clearTimeout(resumeTimer);
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  lastTime = null;
+  scrollContainer.scrollTop = scrollWhole;
+  scroller.style.transform = 'translateZ(0)';
+  scrollBtn.classList.remove('active');
+  pageHeader.classList.remove('hidden-header');
+  scheduleUI(); saveProgress();
+}
+
+function pauseAndResume() {
+  if (!isScrolling || isPausedForManual) return;
+  isPausedForManual = true;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  lastTime = null;
+  scheduleResumeIfNotTouching();
+}
+
+function scheduleResumeIfNotTouching() {
+  clearTimeout(resumeTimer);
+  if (isTouching) return;
+  resumeTimer = setTimeout(() => {
+    if (!isPausedForManual) return;
+    isPausedForManual = false;
+    scrollAccum = scrollContainer.scrollTop;
+    scrollWhole = Math.floor(scrollAccum);
+    lastTime = null;
+    rafId = requestAnimationFrame(tick);
+  }, 1000);
+}
+
+scrollBtn.addEventListener('click', e => { e.stopPropagation(); isScrolling ? stopScroll() : startScroll(); });
+
+// ── TOUCH / WHEEL ──
+let touchStartY = 0;
+scrollContainer.addEventListener('wheel', () => { if (isScrolling) pauseAndResume(); }, { passive: true });
+scrollContainer.addEventListener('touchstart', e => {
+  touchStartY = e.touches[0].clientY;
+  if (isScrolling && isPausedForManual) { isTouching = true; clearTimeout(resumeTimer); }
+}, { passive: true });
+scrollContainer.addEventListener('touchmove', e => {
+  if (Math.abs(e.touches[0].clientY - touchStartY) > 8 && isScrolling) {
+    isTouching = true; clearTimeout(resumeTimer); pauseAndResume();
+  }
+}, { passive: true });
+scrollContainer.addEventListener('touchend', () => {
+  if (isTouching) { isTouching = false; if (isPausedForManual) scheduleResumeIfNotTouching(); }
+}, { passive: true });
+scrollContainer.addEventListener('touchcancel', () => {
+  if (isTouching) { isTouching = false; if (isPausedForManual) scheduleResumeIfNotTouching(); }
+}, { passive: true });
+scrollContainer.addEventListener('scroll', () => {
+  if (!isScrolling) scheduleUI();
+  scheduleLazy();
+}, { passive: true });
+
+// ── SEEK BAR ──
+seekBar.addEventListener('mousedown',  () => isSeeking = true);
+seekBar.addEventListener('touchstart', () => isSeeking = true, { passive: true });
+seekBar.addEventListener('input', () => {
+  const maxS = getMaxScroll();
+  const y = (parseInt(seekBar.value)/1000) * maxS;
+  scrollContainer.scrollTop = y; scrollAccum = y; scrollWhole = Math.floor(y);
+  scheduleUI();
+});
+seekBar.addEventListener('mouseup',  () => { isSeeking = false; scheduleUI(); saveProgress(); });
+seekBar.addEventListener('touchend', () => { isSeeking = false; scheduleUI(); saveProgress(); }, { passive: true });
+seekBar.addEventListener('click', e => e.stopPropagation());
+
+// ── SPEED ──
+function updateSpeedSliderUI() {
+  const v   = parseFloat(speedSlider.value);
+  const pct = ((v - +speedSlider.min) / (+speedSlider.max - +speedSlider.min)) * 100;
+  speedSlider.style.background = `linear-gradient(to left, rgba(61,40,0,0.5) ${pct}%, rgba(0,0,0,0.2) ${pct}%)`;
+  speedBadge.textContent = `×${v.toFixed(2)}`;
+}
+function updateSpeedBtnStates() {
+  const v = parseFloat(speedSlider.value);
+  minusBtn.disabled = v <= parseFloat(speedSlider.min) + 0.001;
+  plusBtn.disabled  = v >= parseFloat(speedSlider.max) - 0.001;
+}
+speedSlider.addEventListener('input', () => { updateSpeedSliderUI(); scheduleUI(); });
+speedSlider.addEventListener('click', e => e.stopPropagation());
+plusBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  speedSlider.value = Math.min(parseFloat(speedSlider.value)+0.05, +speedSlider.max).toFixed(2);
+  updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2));
+});
+minusBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  speedSlider.value = Math.max(parseFloat(speedSlider.value)-0.05, +speedSlider.min).toFixed(2);
+  updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2));
+});
+
+// ── JUMP ──
+jumpTopBtn.addEventListener('click', e => {
+  e.stopPropagation(); stopScroll();
+  scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+});
+jumpBottomBtn.addEventListener('click', e => {
+  e.stopPropagation(); stopScroll();
+  scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+});
+
+// ── PANEL TOGGLE ──
+document.body.addEventListener('click', e => {
+  if (scrollPanel.contains(e.target) || thumbSidebar.contains(e.target) || pageHeader.contains(e.target)) return;
+  scrollPanel.classList.toggle('hidden');
+});
+
+// ── THUMBNAILS ──
+function openThumbs() {
+  thumbSidebar.classList.add('open'); thumbOverlay.classList.add('show');
+  const a = thumbSidebar.querySelector('.thumb-item.active');
+  if (a) a.scrollIntoView({ block: 'center' });
+}
+function closeThumbs() { thumbSidebar.classList.remove('open'); thumbOverlay.classList.remove('show'); }
+thumbBtn.addEventListener('click', e => { e.stopPropagation(); thumbSidebar.classList.contains('open') ? closeThumbs() : openThumbs(); });
+thumbOverlay.addEventListener('click', closeThumbs);
+
+// ── CLOSE ──
+closeBtn.addEventListener('click', () => {
+  stopScroll();
+  saveProgress(); // احفظ قبل الإغلاق
+  readerScreen.classList.remove('show');
+  uploadScreen.classList.remove('hidden');
+  renderRecentList();
+  scroller.innerHTML = ''; thumbSidebar.innerHTML = '';
+  pageSlots = []; pageSizes = []; pageRendered = []; thumbItems = [];
+  pdfDoc = null; bookName = ''; scrollPanel.classList.add('hidden');
+});
+
+// ── SAVE PROGRESS ──
+function saveProgress() {
+  if (!bookName) return;
+  try {
+    localStorage.setItem('readerProgress_'+bookName, JSON.stringify({
+      page:      currentPage,
+      scrollTop: scrollContainer.scrollTop,
+      speed:     speedSlider.value,
+      zoom:      zoomLevel
+    }));
+    updateRecentPage(bookName, currentPage);
+  } catch {}
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  switch (e.code) {
+    case 'Space': e.preventDefault(); isScrolling ? stopScroll() : startScroll(); break;
+    case 'ArrowUp': case 'ArrowLeft':
+      e.preventDefault();
+      speedSlider.value = Math.max(parseFloat(speedSlider.value)-0.05, +speedSlider.min).toFixed(2);
+      updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2)); break;
+    case 'ArrowDown': case 'ArrowRight':
+      e.preventDefault();
+      speedSlider.value = Math.min(parseFloat(speedSlider.value)+0.05, +speedSlider.max).toFixed(2);
+      updateSpeedSliderUI(); showToast('السرعة: ×'+parseFloat(speedSlider.value).toFixed(2)); break;
+    case 'Escape': closeThumbs(); break;
+  }
+});
+
+// ── OFFLINE ──
+window.addEventListener('online',  () => offlineBadge.classList.remove('show'));
+window.addEventListener('offline', () => offlineBadge.classList.add('show'));
+if (!navigator.onLine) offlineBadge.classList.add('show');
+
+// ── PINCH TO ZOOM (على منطقة الصفحات فقط) ──
+let pinchStartDist = 0, pinchStartZoom = 1;
+
+function getPinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+scrollContainer.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    pinchStartDist = getPinchDist(e.touches);
+    pinchStartZoom = zoomLevel;
+    if (isScrolling) pauseAndResume();
+  }
+}, { passive: false });
+
+scrollContainer.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = getPinchDist(e.touches);
+    const rawRatio = dist / pinchStartDist;
+    // تخفيف الحساسية: نقلل الأثر لـ 40% من النسبة الأصلية
+    const dampedRatio = 1 + (rawRatio - 1) * 0.4;
+    const newZoom = Math.min(Math.max(pinchStartZoom * dampedRatio, ZOOM_MIN), ZOOM_MAX);
+    zoomLevel = parseFloat(newZoom.toFixed(2));
+    applyZoom(false);
+  }
+}, { passive: false });
+
+scrollContainer.addEventListener('touchend', e => {
+  if (e.touches.length < 2 && pinchStartDist > 0) {
+    pinchStartDist = 0;
+    applyZoom(true); // احفظ الزوم النهائي
+    showToast('الحجم: ' + Math.round(zoomLevel * 100) + '%');
+  }
+}, { passive: true });
+
+// منع زوم المتصفح الافتراضي على كامل الصفحة
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+
+// ── ZOOM ──
+const ZOOM_STEP = 0.05, ZOOM_MIN = 0.5, ZOOM_MAX = 1.8;
+
+function applyZoom(save = true) {
+  zoomBadge.textContent = Math.round(zoomLevel * 100) + '%';
+
+  // احفظ الصفحة الحالية قبل تغيير الأحجام
+  const anchorPage = currentPage;
+  const anchorSlot = pageSlots[anchorPage - 1];
+  // احسب الإزاحة داخل الصفحة قبل الزوم (0 = أعلى الصفحة، 1 = أسفلها)
+  let offsetRatio = 0;
+  if (anchorSlot) {
+    const slotTop = anchorSlot.offsetTop;
+    const slotH   = anchorSlot.offsetHeight || 1;
+    offsetRatio = (scrollContainer.scrollTop - slotTop) / slotH;
+    offsetRatio = Math.max(0, Math.min(1, offsetRatio));
+  }
+
+  pageSlots.forEach((slot, i) => {
+    const base = pageSizes[i];
+    if (!base) return;
+    const w = Math.round(base.w * zoomLevel);
+    const h = Math.round(base.h * zoomLevel);
+    slot.style.width  = w + 'px';
+    slot.style.height = h + 'px';
+    const canvas = slot.querySelector('canvas');
+    if (canvas) { canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; }
+  });
+
+  // أعد ضبط الـ scrollTop ليبقى على نفس الصفحة والموقع
+  if (anchorSlot) {
+    const newSlotTop = anchorSlot.offsetTop;
+    const newSlotH   = anchorSlot.offsetHeight || 1;
+    const newScrollTop = newSlotTop + offsetRatio * newSlotH;
+    scrollContainer.scrollTop = newScrollTop;
+    scrollAccum = newScrollTop;
+    scrollWhole = Math.floor(newScrollTop);
+  }
+
+  // عند التكبير أكثر من عرض الشاشة: اتركها تتمدد
+  const anyBase = pageSizes[0];
+  if (anyBase) {
+    const zoomed = Math.round(anyBase.w * zoomLevel);
+    if (zoomed > scrollContainer.clientWidth) {
+      scroller.style.alignItems = 'flex-start';
+      scroller.style.minWidth = zoomed + 16 + 'px';
+    } else {
+      scroller.style.alignItems = 'center';
+      scroller.style.minWidth = '';
+    }
+  }
+
+  if (save) try { localStorage.setItem('readerZoom', zoomLevel); } catch {}
+}
+
+function setZoom(z, toast_msg) {
+  zoomLevel = Math.min(Math.max(+z.toFixed(1), ZOOM_MIN), ZOOM_MAX);
+  applyZoom();
+  if (toast_msg) showToast(toast_msg);
+}
+
+zoomInBtn.addEventListener('click',    e => { e.stopPropagation(); setZoom(zoomLevel + ZOOM_STEP, 'الحجم: ' + Math.round(zoomLevel*100) + '%'); });
+zoomOutBtn.addEventListener('click',   e => { e.stopPropagation(); setZoom(zoomLevel - ZOOM_STEP, 'الحجم: ' + Math.round(zoomLevel*100) + '%'); });
+zoomResetBtn.addEventListener('click', e => { e.stopPropagation(); setZoom(1.0, 'الحجم: 100%'); });
+
+// Restore saved zoom
+try {
+  const z = parseFloat(localStorage.getItem('readerZoom'));
+  if (z >= ZOOM_MIN && z <= ZOOM_MAX) { zoomLevel = z; zoomBadge.textContent = Math.round(z*100)+'%'; }
+} catch {}
+
+// ── PAGE NIGHT MODE ──
+function applyPageNight(on) {
+  pageNightMode = on;
+  scroller.classList.toggle('page-night', on);
+  pageNightBtn.classList.toggle('active', on);
+  try { localStorage.setItem('readerPageNight', on ? '1' : '0'); } catch {}
+}
+pageNightBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  applyPageNight(!pageNightMode);
+  showToast(pageNightMode ? 'وضع ليلي للصفحات ✓' : 'وضع عادي للصفحات');
+});
+if (localStorage.getItem('readerPageNight') === '1') applyPageNight(true);
+
+window.addEventListener('beforeunload', saveProgress);
+</script>
+
+</body>
+</html>

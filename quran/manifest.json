@@ -1,0 +1,15 @@
+{
+  "name": "القرآن الكريم",
+  "short_name": "القرآن",
+  "description": "تطبيق القرآن الكريم بخط حفص",
+  "start_url": "https://aseel.space/quran/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"}],
+  "categories": ["education", "books", "religion"],
+  "screenshots": []
+}

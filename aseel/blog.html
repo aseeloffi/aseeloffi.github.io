@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدونتي الشخصية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a5acd;
+            --primary-light: #9370db;
+            --primary-dark: #483d8b;
+            --dark-bg: #121212;
+            --darker-bg: #0a0a0a;
+            --card-bg: #1e1e1e;
+            --card-hover: #252525;
+            --text-color: #f0f0f0;
+            --text-muted: #aaa;
+            --border-color: #333;
+            --hover-color: #7b68ee;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Tajawal', sans-serif;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .blog-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blog-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .blog-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .blog-description {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Blog Content */
+        .blog-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        @media (min-width: 768px) {
+            .blog-content {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Articles Section */
+        .articles-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .article-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .article-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .article-content {
+            padding: 25px;
+        }
+
+        .article-date {
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .article-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .article-excerpt {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .read-more {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .sidebar-widget {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .widget-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .widget-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(to left, var(--primary-color), var(--primary-light));
+        }
+
+
+        .social-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Quotes Widget */
+        .quote-item {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-right: 4px solid var(--primary-color);
+        }
+
+        .quote-text {
+            font-style: italic;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .quote-author {
+            color: var(--primary-light);
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        /* Categories Widget */
+        .categories-list {
+            list-style: none;
+        }
+
+        .category-item {
+            margin-bottom: 10px;
+        }
+
+        .category-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .category-link:hover {
+            color: var(--primary-light);
+            padding-right: 10px;
+        }
+
+        .category-count {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        /* Footer */
+        .blog-footer {
+            text-align: center;
+            padding: 30px 0;
+            background-color: #1a1a1a;
+            margin-top: 50px;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .blog-title {
+                font-size: 2rem;
+            }
+            
+            .blog-description {
+                font-size: 1rem;
+            }
+            
+            .article-title {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .blog-header {
+                padding: 40px 0;
+            }
+            
+            .blog-title {
+                font-size: 1.8rem;
+            }
+            
+            .article-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="blog-header">
+        <div class="container">
+            <h1 class="blog-title">مدونتي الشخصية</h1>
+            <p class="blog-description">هنا أكتب مقالاتٍ واقتباسات تروي جزءًا من نفسي وتعبّر عن بعض من أفكاري</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="blog-content">
+            <!-- Articles Section -->
+            <main class="articles-section">
+                <article class="article-card">
+                    <img src="https://source.unsplash.com/random/600x400/?writing" alt="مقالة" class="article-image">
+                    <div class="article-content">
+                        <div class="article-date">
+                            <i class="far fa-calendar-alt"></i> 15 يونيو 2023
+                        </div>
+                        <h2 class="article-title">عن الكتابة والتعبير عن الذات</h2>
+                        <p class="article-excerpt">
+                            الكتابة ليست مجرد كلمات على ورق، بل هي رحلة اكتشاف للذات، حوار داخلي يتحول إلى حروف وكلمات. في هذه المقالة أشارككم تجربتي مع الكتابة وكيف ساعدتني على فهم نفسي بشكل أعمق.
+                        </p>
+                        <a href="#" class="read-more">قراءة المزيد</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <img src="https://source.unsplash.com/random/600x400/?books" alt="مقالة" class="article-image">
+                    <div class="article-content">
+                        <div class="article-date">
+                            <i class="far fa-calendar-alt"></i> 2 مايو 2023
+                        </div>
+                        <h2 class="article-title">كتب غيرت طريقة تفكيري</h2>
+                        <p class="article-excerpt">
+                            هناك كتب تقرأها فتترك أثرًا لا يمحى في عقلك وقلبك. في هذه المقالة أستعرض بعض الكتب التي غيرت من منظوراتي للحياة وساعدتني في رحلتي الشخصية والفكرية.
+                        </p>
+                        <a href="#" class="read-more">قراءة المزيد</a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <img src="https://source.unsplash.com/random/600x400/?inspiration" alt="مقالة" class="article-image">
+                    <div class="article-content">
+                        <div class="article-date">
+                            <i class="far fa-calendar-alt"></i> 10 أبريل 2023
+                        </div>
+                        <h2 class="article-title">كيف أجد الإلهام في الأيام العادية؟</h2>
+                        <p class="article-excerpt">
+                            الإلهام لا يأتي دائمًا في لحظات درامية، بل يمكن العثور عليه في التفاصيل الصغيرة للحياة اليومية. هذه بعض الطرق التي تساعدني على رؤية الجمال والإلهام في الروتين اليومي.
+                        </p>
+                        <a href="#" class="read-more">قراءة المزيد</a>
+                    </div>
+                </article>
+            </main>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+
+
+                <!-- Quotes Widget -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">اقتباسات أعجبتني</h3>
+                    <div class="quote-item">
+                        <p class="quote-text">"لا تكتب لتكون كاتبًا، اكتب لأن في داخلك شيئًا يريد أن يُقال."</p>
+                        <p class="quote-author">— أحمد خالد توفيق</p>
+                    </div>
+                    <div class="quote-item">
+                        <p class="quote-text">"القراءة تمكنك من العيش ألف حياة قبل أن تموت، أما عدم القراءة فلا يجعلك تعيش إلا حياة واحدة."</p>
+                        <p class="quote-author">— جورج آر. آر. مارتن</p>
+                    </div>
+                    <div class="quote-item">
+                        <p class="quote-text">"اكتب عن ما يؤلمك، ففي ذلك الشفاء."</p>
+                        <p class="quote-author">— نجيب محفوظ</p>
+                    </div>
+                </div>
+
+                <!-- Categories Widget -->
+                <div class="sidebar-widget">
+                    <h3 class="widget-title">التصنيفات</h3>
+                    <ul class="categories-list">
+                        <li class="category-item">
+                            <a href="#" class="category-link">
+                                تأملات شخصية
+                                <span class="category-count">12</span>
+                            </a>
+                        </li>
+                        <li class="category-item">
+                            <a href="#" class="category-link">
+                                قراءات وكتب
+                                <span class="category-count">8</span>
+                            </a>
+                        </li>
+                        <li class="category-item">
+                            <a href="#" class="category-link">
+                                نصائح كتابية
+                                <span class="category-count">5</span>
+                            </a>
+                        </li>
+                        <li class="category-item">
+                            <a href="#" class="category-link">
+                                يوميات
+                                <span class="category-count">15</span>
+                            </a>
+                        </li>
+                        <li class="category-item">
+                            <a href="#" class="category-link">
+                                أفكار إبداعية
+                                <span class="category-count">7</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="blog-footer">
+        <div class="container">
+            <p class="footer-text">جميع الحقوق محفوظة &copy; 2023 مدونتي الشخصية</p>
+        </div>
+    </footer>
+</body>
+
+</html>
