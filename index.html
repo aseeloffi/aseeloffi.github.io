@@ -275,24 +275,24 @@
 			border-radius: 3px;
 		}
 
-		.social-link.has-badge {
+		.social-link-wrapper {
 			position: relative;
-			overflow: visible;
+			display: inline-block;
 		}
 
-		.social-link .badge-dot {
+		.badge-dot {
 			position: absolute;
-			top: -4px;
-			right: -4px;
+			top: -2px;
+			right: -2px;
 			width: 14px;
 			height: 14px;
 			background-color: var(--primary-light);
 			border-radius: 50%;
 			border: 2px solid var(--card-bg);
-			z-index: 5;
+			z-index: 10;
+			pointer-events: none;
 			animation: badge-pulse 1.8s ease-in-out infinite;
 		}
-
 
 		@keyframes badge-pulse {
 			0% {
@@ -730,10 +730,13 @@
 				<a href="#" target="_blank" class="social-link" aria-label="GitHub">
 					<i class="fab fa-github"></i>
 				</a>
-				<a href="https://aseel.space/blog/" target="_blank" class="social-link" aria-label="Blog">
-					<i class="fas fa-blog"></i>
+				<span class="social-link-wrapper">
+					<a href="https://aseel.space/blog/" target="_blank" class="social-link" aria-label="Blog">
+						<i class="fas fa-blog"></i>
+					</a>
 					<span class="badge-dot"></span>
-				</a>
+				</span>
+
 
 
 			</div>
