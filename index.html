@@ -277,20 +277,22 @@
 
 		.social-link.has-badge {
 			position: relative;
+			overflow: visible;
 		}
 
 		.social-link .badge-dot {
 			position: absolute;
-			top: -3px;
-			right: -3px;
+			top: -4px;
+			right: -4px;
 			width: 14px;
 			height: 14px;
 			background-color: var(--primary-light);
 			border-radius: 50%;
 			border: 2px solid var(--card-bg);
-			z-index: 2;
+			z-index: 5;
 			animation: badge-pulse 1.8s ease-in-out infinite;
 		}
+
 
 		@keyframes badge-pulse {
 			0% {
